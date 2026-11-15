@@ -1,0 +1,3 @@
+# Colab ships pandas, numpy, scikit-learn and matplotlib. These two are added by the setup cell.
+opendp>=0.16
+fairlearn>=0.13
