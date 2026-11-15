@@ -1,0 +1,10 @@
+{
+  "model": "Ahliya",
+  "version": "1.3",
+  "author": "Anmar Al-Ghamdi",
+  "validation_set": "applications of 2025 and 2026 from Riyadh and Makkah, labelled by officers' decisions",
+  "rows": 6117,
+  "accuracy": 0.881,
+  "auc": 0.927,
+  "threshold": 0.5
+}

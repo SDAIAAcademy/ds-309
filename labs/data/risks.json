@@ -1,0 +1,14 @@
+{
+  "R1": {"risk": "A recipient re-identifies applicants in the research extract by linking it to a public list",
+         "evidence": "Release A linked 99.2% of the register's applicants; after treatment no register record matched a single record; classes can still share one sensitive value",
+         "affected": "60,000 applicants; income, disability and support status"},
+  "R2": {"risk": "Ahliya declines eligible applicants, more often non-Saudi women and the self-employed",
+         "evidence": "FNR 30% for eligible non-Saudi women against 22% for others; 65% for the self-employed; group thresholds narrow the gap to 10 points",
+         "affected": "1,444 of 6,341 eligible applicants in the reviewed sample declined by the screen; housing support delayed or lost"},
+  "R3": {"risk": "The district dashboard is misread, or its budget is overspent by monthly refreshes",
+         "evidence": "Relative error 3.1% in the ten smallest districts at epsilon 0.5; a monthly refresh at 0.5 spends 6 a year",
+         "affected": "public trust in the statistics; applicants in small districts"},
+  "R4": {"risk": "The hackathon file is regenerated with a setting that copies applicants",
+         "evidence": "Leaves of one row copied 92.8% of training rows (membership AUC 0.819); leaves of 200 passed (0.511)",
+         "affected": "the 8,000 applicants in the generator's training rows"}
+}

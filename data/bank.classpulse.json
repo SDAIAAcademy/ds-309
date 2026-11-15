@@ -1,0 +1,1583 @@
+{
+  "format": "classpulse-bank",
+  "version": 1,
+  "course": {
+    "name": "Responsible Data Science: Privacy, Fairness and Documentation",
+    "los": [
+      {
+        "code": "LO1",
+        "description": "Distinguish pseudonymisation, de-identification, aggregation, synthetic data and differential privacy by the guarantee and cost of each, given five described data releases"
+      },
+      {
+        "code": "LO2",
+        "description": "Measure re-identification risk from quasi-identifiers and reduce it while tracking analytic utility, given 60,000 synthetic applicant records and a linkable external file"
+      },
+      {
+        "code": "LO3",
+        "description": "Compute differentially private counts and means and state the accuracy cost of a privacy budget, given three candidate budgets"
+      },
+      {
+        "code": "LO4",
+        "description": "Test a synthetic extract for analytic utility and membership-inference leakage, given a generator trained on the applicant table"
+      },
+      {
+        "code": "LO5",
+        "description": "Audit a screening model for subgroup disparities, choose fairness criteria that fit the decision and evaluate two mitigations, given a scored test set with protected and intersectional attributes"
+      },
+      {
+        "code": "LO6",
+        "description": "Build the datasheet, model card and impact assessment a reviewer needs to judge and rerun a release, given the participant's capstone release"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "check-hashed-id-q1",
+      "type": "single",
+      "prompt": "Malak replaces each national identifier with its SHA-256 hash and removes names. Birth date, gender and postcode stay. Waad says the extract is now anonymous. What do you answer?",
+      "options": [
+        "Yes: a hash cannot be reversed, so nobody can find the person",
+        "No: the hash is a pseudonym and the quasi-identifiers still single people out",
+        "Yes, as long as it stays on the university's servers",
+        "No, but only because names were in the original table"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Hashing is pseudonymisation: recomputable by anyone with the identifiers, and it leaves birth date, gender and postcode, which together are unique for almost every applicant.",
+      "misconceptions": [
+        "Treats a one-way function as a missing key: anyone with the list of identifiers recomputes the same hashes",
+        "",
+        "Confuses who holds the data with what the data is: the extract identifies people wherever it sits",
+        "Thinks names are the only identifier: birth date, gender and postcode do the identifying here"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 14
+    },
+    {
+      "id": "check-control-q1",
+      "type": "single",
+      "prompt": "Bashayer wants applicants per district on a public dashboard, refreshed every month. Some districts have fewer than ten applicants a month. Which control fits best?",
+      "options": [
+        "Pseudonymise the applicant numbers before counting",
+        "Suppress every count below ten each month",
+        "Publish a synthetic extract instead of counts",
+        "Add calibrated noise under a stated yearly privacy budget"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Differential privacy bounds what any one applicant changes in every release, and the budget makes the cost of monthly repetition explicit.",
+      "misconceptions": [
+        "Thinks a code protects published numbers: pseudonymisation applies to rows, not to counts",
+        "Assumes suppression is free when repeated: monthly tables with suppressed cells can be differenced against each other",
+        "Uses a row-level control for an aggregate need, and gives up the counts the dashboard is for",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 22
+    },
+    {
+      "id": "check-which-field-q1",
+      "type": "single",
+      "prompt": "Release A links 99% of the register's applicants on birth date, gender and postcode. Waad needs household size and approval by region. Which single change cuts the links most while keeping her question answerable?",
+      "options": [
+        "Replace the birth date with an age band",
+        "Remove gender",
+        "Replace the study code with a new random code",
+        "Round income to the nearest 1,000 riyals"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The birth date has by far the most values of the three fields; coarsening it collapses the combinations, and the question needs only an age band.",
+      "misconceptions": [
+        "",
+        "Removes a field that has only two values: gender splits each class in half and barely changes uniqueness",
+        "Thinks the code is what links: the study code was never part of the join",
+        "Protects a sensitive attribute, not an identifier: linkage uses the quasi-identifiers, not the income"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 30
+    },
+    {
+      "id": "check-k-q1",
+      "type": "single",
+      "prompt": "Release B and release C both have k = 1. B has 2,152 unique records and C has 7. Yahya asks whether they are equally risky. What do you tell him?",
+      "options": [
+        "Yes: both have k = 1, so both expose someone",
+        "B is safer because its birth year and district are more precise",
+        "C is far safer, but neither meets k of five until the small classes are treated",
+        "C is safe to release as it is, since seven records is negligible"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "k reports only the worst class. The count of unique records and the average risk show that C exposes 7 people and B exposes 2,152, yet both still fail the target.",
+      "misconceptions": [
+        "Reads k as the whole story: k is only the smallest class, so it hides how many people are exposed",
+        "Confuses detail kept for the analysis with protection: finer birth and place values split classes and raise the risk",
+        "",
+        "Treats seven people as negligible: each of them is certainly re-identified by anyone who knows them"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 38
+    },
+    {
+      "id": "review-day1-q1",
+      "type": "single",
+      "prompt": "Yesterday three fields linked 99.2% of the register's applicants to their income and decision. Yahya asks what the attacker had to have. Which answer is right?",
+      "options": [
+        "The key that maps study codes back to applicants",
+        "At least one direct identifier left in the release",
+        "An outside file sharing birth date, gender and postcode with the release",
+        "The applicants' incomes, to match them to the release"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "A linkage attack needs only quasi-identifiers that an outside file shares with the release; the names come from the outside file.",
+      "misconceptions": [
+        "Assumes re-identification needs the fund's secrets: the study code was never used in the join",
+        "Thinks only direct identifiers re-identify: no name or national identifier was in the release",
+        "",
+        "Confuses the harm with the means: income is what the link revealed, not what it used"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 3
+    },
+    {
+      "id": "check-suppress-q1",
+      "type": "single",
+      "prompt": "At five-year band and district, 1,728 records (2.9%) are below five. Waad wants to keep the district. Malak can suppress those 1,728 or move to region and suppress 293. What should she weigh?",
+      "options": [
+        "Which small groups the 1,728 are, and whether Waad's question needs the district",
+        "Always the option with fewer suppressed records",
+        "Always suppression, since it leaves every kept record exact",
+        "Whichever option gives the higher k"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Both meet k of five. The choice is about utility: what the question needs, and whose records the suppression removes.",
+      "misconceptions": [
+        "",
+        "Thinks the least suppression always wins: it ignores what the question needs",
+        "Thinks suppression is free because rows are simply removed: they are the rare groups, so estimates for them shift",
+        "Confuses the target with a preference: k of five is met either way, so k cannot decide it"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 11
+    },
+    {
+      "id": "check-epsilon-q1",
+      "type": "single",
+      "prompt": "Malak releases the 59 district counts at epsilon 0.1 instead of 0.5. Bashayer asks what changed. Which statement is right?",
+      "options": [
+        "The large districts now carry most of the error",
+        "The counts are now private, where before they were not",
+        "The noise is 59 times larger, one share per district",
+        "Each count's noise is about five times larger, and the guarantee is stronger"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The scale is sensitivity over epsilon: going from 0.5 to 0.1 multiplies it by five, and a smaller epsilon bounds any one applicant's influence more tightly.",
+      "misconceptions": [
+        "Thinks noise grows with the count: the noise scale is set by sensitivity and epsilon, not by the district's size",
+        "Thinks privacy is binary: every epsilon gives a guarantee, a smaller one is a stronger one",
+        "Confuses the sensitivity with the number of counts: one person changes one count, whatever the number of districts",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 20
+    },
+    {
+      "id": "check-parallel-q1",
+      "type": "single",
+      "prompt": "Malak releases applicants per region, 13 counts, each with noise of scale 10 (epsilon 0.1 for a count). Every applicant is in exactly one region. What has the release spent?",
+      "options": [
+        "1.3, the sum over the 13 regions",
+        "0.1, because the regions hold disjoint applicants",
+        "About 0.008, a thirteenth of 0.1",
+        "Nothing, since counts are aggregates"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Parallel composition: one applicant affects only one region's count, so the release spends the epsilon of one count.",
+      "misconceptions": [
+        "Adds epsilons over disjoint groups: sequential composition applies only to releases about the same people",
+        "",
+        "Divides the budget instead of adding it: splitting into regions does not make each count cheaper",
+        "Thinks counts are free because they are aggregates: every noisy count spends budget"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 29
+    },
+    {
+      "id": "check-synthetic-q1",
+      "type": "single",
+      "prompt": "A vendor's synthetic file matches the real one on utility. No row is an exact copy, and 31% of its rows are closer to the training data than to a holdout. What do you conclude?",
+      "options": [
+        "Nothing blocks it on these tests: no copies, and no preference for training rows",
+        "It leaks: 31% of rows sit next to training records",
+        "It is too accurate to be private, so it must be copying",
+        "It is differentially private, since no row is copied"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO4"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Leakage shows as more closeness to training rows than to unseen rows. 31% is below the 50% of no preference, and no row is copied.",
+      "misconceptions": [
+        "",
+        "Reads any share below 100% as leakage: the warning sign is a share well above 50%, not below it",
+        "Treats high utility as a leak in itself: utility is a warning only when copies or membership show memorising",
+        "Thinks no copies means a formal guarantee: these tests are evidence against one attack, not a proof"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 38
+    },
+    {
+      "id": "review-day2-q1",
+      "type": "single",
+      "prompt": "Bashayer approves the district counts at epsilon 0.5 and asks for them every month. Yahya asks what the fund will have spent after a year.",
+      "options": [
+        "0.5, because each month is a separate table",
+        "6, because the same applicants are counted twelve times",
+        "0.5, because later months are post-processing",
+        "About 0.04, a twelfth of 0.5"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Sequential composition: twelve releases about the same people spend twelve times 0.5.",
+      "misconceptions": [
+        "Applies parallel composition across months: the months are about the same applicants, so the epsilons add",
+        "",
+        "Thinks post-processing covers new releases: each month is a new measurement on the data, not a computation on last month's output",
+        "Divides instead of adding: splitting a budget into months is a choice, not what happens by default"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 3
+    },
+    {
+      "id": "check-interval-q1",
+      "type": "single",
+      "prompt": "Hail has an FNR of 18.2% from 110 eligible applicants, interval 12.1% to 26.4%. The FNR over all 6,341 eligible applicants is 22.8%. Wiam asks whether Ahliya treats Hail's applicants better.",
+      "options": [
+        "Yes: 18.2% is lower than 22.8%, so Hail is treated better",
+        "Nothing at all, since 110 applicants is too few to compute a rate",
+        "No difference is shown: the interval includes the overall rate",
+        "No: small regions are always disadvantaged by the model"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The interval from 12.1% to 26.4% contains 22.8%, so the data do not show that Hail differs.",
+      "misconceptions": [
+        "Reads a point estimate without its interval: the interval includes the overall rate",
+        "Treats a wide interval as no information: it still rules out very high or very low rates",
+        "",
+        "Confuses a smaller group with a worse outcome: size widens the interval, it does not move the rate"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 12
+    },
+    {
+      "id": "check-criterion-q1",
+      "type": "single",
+      "prompt": "Ahliya decides who is passed to an officer for housing support. Eligible applicants are more common among women. Bashayer asks which fairness criterion the fund should commit to.",
+      "options": [
+        "Equal false negative rates: miss eligible applicants equally in each group",
+        "Equal selection rates: pass the same share of women and men",
+        "All three criteria at once, to be safe",
+        "None: Ahliya does not use gender, so it is fair"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The harmful error in a support decision is the missed eligible applicant, and need differs between groups, so error rates among the eligible are what must be equal.",
+      "misconceptions": [
+        "",
+        "Ignores the different need: equal selection would decline eligible women to match men's rate",
+        "Thinks all criteria can be met together: with different base rates they conflict",
+        "Equates removing an input with fair outcomes: outcomes still differ through other features"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 20
+    },
+    {
+      "id": "check-bias-type-q1",
+      "type": "single",
+      "prompt": "Self-employed applicants are missed by Ahliya far more often. An income audit shows their recorded income is 1.73 times the verified income; for employees it is 1.00. Which type fits, and what is the first fix?",
+      "options": [
+        "Labeling Bias: retrain on corrected decisions",
+        "Sampling Bias: reweight the self-employed in training",
+        "Historical Bias: retrain on recent applications only",
+        "Measurement Bias: record net income for the self-employed"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The feature itself is systematically over-recorded for one group, which is the guide's measurement bias; the fix is at the point of recording.",
+      "misconceptions": [
+        "Blames the outcome when the evidence points at a feature: the officers applied the rule correctly to the income they were given",
+        "Reaches for a mitigation that cannot repair a wrong input: weights change counts, not recorded incomes",
+        "Treats every old pattern as historical: nothing here changed over time",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 28
+    },
+    {
+      "id": "check-mitigation-q1",
+      "type": "single",
+      "prompt": "Reweighting moved the FNR gap from 12.9 to 12.6 points. Group thresholds moved it to 10.0, at the same accuracy. The gap comes mostly from missing and mis-recorded income. What do you recommend to Bashayer?",
+      "options": [
+        "Group thresholds as the permanent fix, since accuracy did not fall",
+        "Fix income recording first; thresholds only as an approved interim measure",
+        "Reweighting, because pre-processing is always preferable",
+        "Neither, since the gap is not closed completely"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The cause is in the income feature, so the lasting fix is at the source; the threshold change helps meanwhile but needs approval because it uses gender and nationality.",
+      "misconceptions": [
+        "Reads an unchanged accuracy as a free fix: the rule uses protected attributes and the gap remains",
+        "",
+        "Ignores what the evidence showed: the weights cannot repair a wrong feature",
+        "Treats an unfinished fix as no fix: a narrowed gap with monitoring is better than the baseline"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 36
+    },
+    {
+      "id": "review-day3-q1",
+      "type": "single",
+      "prompt": "Anmar reports that eligible women and men are missed at 22.7% and 22.8%. He proposes to close the audit.",
+      "options": [
+        "Not shown: the intersection of gender and nationality must be checked too",
+        "Yes: equal false negative rates by gender meet equal opportunity",
+        "No: the selection rates by gender must also be equal",
+        "Not until every region by gender by nationality cell is estimated"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Non-Saudi women are missed at 29.8%, which the gender margin hides.",
+      "misconceptions": [
+        "",
+        "Reads equal margins as equal treatment: a gap inside an intersection can cancel out in both margins",
+        "Moves to a criterion the course did not choose: for support by need, the harm is the missed eligible applicant",
+        "Treats every slice as required: cells below the minimum of 30 eligible are reported as too few, not audited"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 3
+    },
+    {
+      "id": "check-datasheet-q1",
+      "type": "single",
+      "prompt": "Malak's draft says: \"k = 5 was reached, so the extract is anonymous and no risk remains.\" Yahya sends it back.",
+      "options": [
+        "That k should be raised to 10 before release",
+        "That the sharing agreement makes residual risk irrelevant",
+        "That 99.2% of applicants can still be linked",
+        "The risks k does not cover, and that the extract is still personal data"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "k limits singling out on the chosen quasi-identifiers only; attribute disclosure and other files remain, and the data stay Restricted.",
+      "misconceptions": [
+        "Moves the problem to a number: a larger k narrows linkage risk but still says nothing about classes that share one value",
+        "Confuses documentation with access control: the agreement limits use, it does not remove the risk the datasheet must state",
+        "Reports the before-treatment figure as if it remained: no register record matched one record after treatment",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 10
+    },
+    {
+      "id": "check-card-q1",
+      "type": "single",
+      "prompt": "Anmar's card has all seven sections. Its results table shows gender and region, each with intervals. Wiam rejects it.",
+      "options": [
+        "The card omits the validation report's 88.1%",
+        "It does not estimate every region by gender cell",
+        "It hides the largest gap, which is in gender by nationality",
+        "The gap is not closed, so the card cannot be filed"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Non-Saudi women are missed at 29.8%; margins by gender and region alone do not show it.",
+      "misconceptions": [
+        "Asks for a figure the card already handles: the vendor's number is named and explained, not required",
+        "Asks for more rows than the data support: small cells are reported as too few, not filled",
+        "",
+        "Reads the absence of a fix as a defect of the card: the card records the mitigation, it does not have to close the gap"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 18
+    },
+    {
+      "id": "check-likelihood-q1",
+      "type": "single",
+      "prompt": "Malak scores R2's likelihood as 2, \"unlikely\", because officers can overturn Ahliya. The audit measured 1,444 of 6,341 eligible applicants declined by the screen.",
+      "options": [
+        "2 is right, since officers review every decision",
+        "4: the harm is measured now, without an effective control",
+        "3, so that the level does not reach the catastrophic band",
+        "1, because the gender gap is only 0.1 points"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Likelihood is argued from exposure and the controls in place; the harm is already measured and auto-declines bypass review.",
+      "misconceptions": [
+        "Counts a control that is not in place: 37.4% of applications are auto-declined and never seen by an officer",
+        "",
+        "Lowers the likelihood because the impact is high: the two scores are argued separately",
+        "Scores on fairness instead of harm: likelihood asks how probable the harm is, not whether groups differ"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 26
+    },
+    {
+      "id": "check-review-q1",
+      "type": "single",
+      "prompt": "A peer reports an FNR gap of -2.9 points; your rerun on all rows at 0.5 gives -0.2. The bootstrap is unseeded, the threshold is 0.45, and 633 rows with missing income are dropped.",
+      "options": [
+        "The dropped rows: removing them alone takes the gap from +0.6 to -2.9",
+        "The unseeded bootstrap, because each run differs",
+        "The threshold of 0.45, because it differs from the documented 0.5",
+        "A different pandas version on the peer's machine"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "At the peer's threshold, keeping the rows gives +0.6; dropping them gives -2.9, because they are mostly women Ahliya misses.",
+      "misconceptions": [
+        "",
+        "Blames the visible randomness: an unseeded bootstrap moves the interval, not the point estimate",
+        "Picks the documented mismatch: at all rows, 0.45 against 0.5 moves the gap by under one point",
+        "Assumes environments explain differences: the same code on the same data reproduced the claim exactly"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 34
+    },
+    {
+      "id": "q-privacy-01",
+      "type": "single",
+      "prompt": "Yusr replaces each national identifier in a research extract with a salted hash. The data protection officer keeps the salt. The researcher asks whether the extract is still personal data.",
+      "options": [
+        "No: the recipient cannot reverse a salted hash",
+        "Yes: the fund can relink it, so it is still personal data",
+        "No: once direct identifiers are gone the data are anonymous",
+        "Only if the hash had been computed without a salt"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Pseudonymised data can be linked back with information the fund holds, so the national anonymisation guideline treats it as personal data.",
+      "misconceptions": [
+        "Treats one-way hashing as anonymisation; the fund can still relink, and other fields still single people out",
+        "",
+        "Ignores both the key the fund keeps and the quasi-identifiers left in the rows",
+        "Thinks the salt changes the legal status; it slows guessing, it does not stop the fund relinking"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 13
+    },
+    {
+      "id": "q-privacy-02",
+      "type": "single",
+      "prompt": "The board wants to publish approved applications per district each quarter, including districts with fewer than ten applicants. Which control fits, and what does it cost?",
+      "options": [
+        "Differential privacy; small districts get noisier figures",
+        "Pseudonymisation of the counts; nothing is lost",
+        "k-anonymity on the published table; rows can still be linked",
+        "A synthetic copy of the table; the counts stay exact"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Counts are aggregates; differential privacy bounds what one applicant changes, and the price is noise that matters most where counts are small.",
+      "misconceptions": [
+        "",
+        "Applies a record-level control to a table of counts, where there is no identifier to replace",
+        "Applies a microdata control to aggregates, and misstates what it leaves behind",
+        "Expects exact counts from synthetic data, which neither keeps them exact nor bounds the risk"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 21
+    },
+    {
+      "id": "q-privacy-03",
+      "type": "single",
+      "prompt": "A university requests an extract of 40,000 applicants with region, five-year age band, household size and support status, treated to k = 5. Under the Data Classification Policy, at what level does it stay?",
+      "options": [
+        "Public, because k = 5 makes it anonymous",
+        "Secret, because it concerns social support",
+        "No level, because de-identified data are outside the policy",
+        "Restricted, as personal data about individuals"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The policy lists personal data under Restricted; de-identification lowers the risk but the extract remains personal data.",
+      "misconceptions": [
+        "Thinks a treatment changes the class; it lowers the risk of the data, which are still about people",
+        "Over-classifies: the harm of disclosure does not reach the level the Secret class describes",
+        "Thinks some data escape classification; every data asset gets a level",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 18
+    },
+    {
+      "id": "q-privacy-04",
+      "type": "single",
+      "prompt": "A university researcher emails Yusr directly to ask for applicant records for her study. Under the General Rules for Secondary Use of Data, what is missing?",
+      "options": [
+        "Nothing: research is a legitimate purpose, so her email request is enough",
+        "A public release of the records first, so that anyone may use them",
+        "A request via her institution with written approval, for minimum data",
+        "Only encryption of the file when it is sent"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO1"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The rules route a researcher's request through her institution with written approval, and limit the data to what the purpose needs.",
+      "misconceptions": [
+        "Takes a legitimate purpose as the only condition; the route and the minimum data matter too",
+        "Confuses secondary use under conditions with open data",
+        "",
+        "Treats a transfer safeguard as the permission to use the data"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 19
+    },
+    {
+      "id": "q-privacy-05",
+      "type": "single",
+      "prompt": "Release A drops names and national identifiers but keeps birth date, gender and postcode. A public register lists names with the same three fields. A join re-identifies 99.2% of the register's applicants. Why?",
+      "options": [
+        "Together the three fields are unique for almost everyone",
+        "The register also holds the applicants' national identifiers",
+        "The postcode alone points to one applicant",
+        "The test must be wrong, since linkage needs exact names"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Birth date, gender and postcode in combination single out almost everyone, so a join on them finds one match per person.",
+      "misconceptions": [
+        "",
+        "Assumes the attack needs an identifier; it joined on the quasi-identifiers only",
+        "Credits a single field; it is the combination that is unique",
+        "Denies the result; linkage needs shared fields, not names"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 25
+    },
+    {
+      "id": "q-privacy-06",
+      "type": "single",
+      "prompt": "In candidate release B, 2,152 records are unique on the quasi-identifiers. What is k for release B, and what does it say?",
+      "options": [
+        "k = 2,152: the number of records at risk",
+        "k = 1: at least one record can be singled out on these fields",
+        "k is unknown until a linkage test is run",
+        "k = 1, so every single record in release B is unique"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "k is the size of the smallest equivalence class; a unique record is a class of one.",
+      "misconceptions": [
+        "Confuses k with a count of unique records",
+        "",
+        "Thinks k needs an outside file; it is computed from the release alone",
+        "Reads k, a minimum, as a statement about every class"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 33
+    },
+    {
+      "id": "q-privacy-07",
+      "type": "single",
+      "prompt": "To reach k = 5, node (a) uses five-year birth bands and region and suppresses 293 records; node (b) uses ten-year bands and region and suppresses 84. The study asks how approval varies with age. What do you choose and report?",
+      "options": [
+        "(b), because fewer suppressed records always means more utility",
+        "(a), without mentioning the suppressed records, since k is met",
+        "Neither: k = 5 needs the age field removed entirely",
+        "(a), reporting the suppressed records and the change by age"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The research question needs age detail, and a release reports both its suppression and its measured utility change.",
+      "misconceptions": [
+        "Counts only one cost; ten-year bands blur the age effect the study needs",
+        "Hides who was removed, which can bias the analysis",
+        "Contradicted by both nodes, which reach k = 5 with age kept",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 8
+    },
+    {
+      "id": "q-privacy-08",
+      "type": "single",
+      "prompt": "After treatment k = 5, but in one class all five records have disability in household = yes. A recipient knows her neighbour is in that class. What has the treatment failed to prevent?",
+      "options": [
+        "Identity disclosure: she can now find her neighbour's exact record",
+        "Nothing, since k = 5 protects every attribute",
+        "Attribute disclosure: she learns the status without the record",
+        "Membership inference, which arises only in synthetic data"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO2"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "When a class shares one sensitive value, membership in the class reveals it; k does not prevent this.",
+      "misconceptions": [
+        "Forgets that k = 5 leaves five candidates for one person",
+        "Reads k as a guarantee about attributes, which it does not give",
+        "",
+        "Names a different attack from another release type"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 10
+    },
+    {
+      "id": "q-privacy-09",
+      "type": "single",
+      "prompt": "Yusr releases district counts with differential privacy at epsilon 0.5. What does this promise each applicant?",
+      "options": [
+        "Their record is removed from the data before the counts are made",
+        "No count is off by more than 0.5",
+        "No one can learn anything about their district",
+        "The counts are almost as likely with or without their record"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Differential privacy bounds how much any one record can change the probability of the output.",
+      "misconceptions": [
+        "Confuses differential privacy with suppression",
+        "Reads epsilon as a bound on the error",
+        "Expects protection of group facts; the guarantee is about one person's record",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 14
+    },
+    {
+      "id": "q-privacy-10",
+      "type": "single",
+      "prompt": "A count per district is released with the Laplace mechanism. Each applicant is in exactly one district. At epsilon 0.5, what is the noise scale?",
+      "options": [
+        "0.5: the scale equals epsilon",
+        "2: sensitivity 1 divided by epsilon 0.5",
+        "1: the scale equals the sensitivity",
+        "0.25: sensitivity times epsilon"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The Laplace scale is sensitivity divided by epsilon; one applicant changes one count by 1.",
+      "misconceptions": [
+        "Uses epsilon as the scale; a smaller epsilon must mean more noise, not less",
+        "",
+        "Leaves epsilon out of the scale",
+        "Multiplies, which would add less noise for stronger privacy"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 15
+    },
+    {
+      "id": "q-privacy-11",
+      "type": "single",
+      "prompt": "Over a year the fund releases four tables about the same applicants at epsilon 0.1, 0.2, 0.2 and 0.5. What is the total privacy loss?",
+      "options": [
+        "1.0: releases about the same people add up",
+        "0.5: the largest of the four",
+        "0.25: their average",
+        "0.1: the smallest, because it protects the most"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Under sequential composition, releases about the same people spend the sum of their epsilons.",
+      "misconceptions": [
+        "",
+        "Applies the parallel rule, which holds only for disjoint groups of people",
+        "Averages losses that accumulate",
+        "Thinks the strongest release covers the others"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 23
+    },
+    {
+      "id": "q-privacy-12",
+      "type": "single",
+      "prompt": "District counts at epsilon 0.1, 0.5 and 1 give a mean error of 9.98, 1.92 and 0.85, and a relative error in the ten smallest districts of 16%, 3.1% and 1.5%. The dashboard must keep small districts within about 5%. Which budget do you recommend?",
+      "options": [
+        "0.1, because the smallest budget is always the safest choice",
+        "1, because its error is the lowest",
+        "0.5: the smallest budget that meets the need in small districts",
+        "Any of them, since all mean errors are below 10"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO3"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Choose the smallest epsilon whose error meets the use, measured where the error matters most.",
+      "misconceptions": [
+        "Ignores fitness for use: 16% error in small districts misleads readers",
+        "Spends more privacy than the stated need requires",
+        "",
+        "Judges by the average, which hides the small districts"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 18
+    },
+    {
+      "id": "q-privacy-13",
+      "type": "single",
+      "prompt": "Bashayer says: \"The hackathon file is synthetic, so no applicant can be in it.\" What do you answer?",
+      "options": [
+        "She is right: synthetic rows are invented by definition",
+        "A generator can copy training rows, so leakage is tested first",
+        "She is right if the file has as many rows as the original",
+        "Only a differentially private generator may ever be released at all"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO4"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "A flexible generator can memorise its training data, so copying and membership inference are tested before release.",
+      "misconceptions": [
+        "Assumes a generator cannot reproduce its training rows",
+        "",
+        "Links privacy to the number of rows, which says nothing about copying",
+        "Overcorrects: measured leakage tests are another accepted basis for release"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 32
+    },
+    {
+      "id": "q-privacy-14",
+      "type": "single",
+      "prompt": "0.10% of synthetic rows match a training record exactly, and 0.05% match a record from a holdout the generator never saw. What does this suggest?",
+      "options": [
+        "The file leaks, because any exact copy is a leak",
+        "The holdout comparison means nothing, since the generator never saw it",
+        "Utility is too low, because so few rows match real ones",
+        "Copies are close to the rate of chance matches seen on the holdout"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO4"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Rows the generator never saw are matched almost as often, so most matches are coincidences of common values, not memorisation.",
+      "misconceptions": [
+        "Ignores matches by coincidence, which the holdout measures",
+        "Misses that the unseen holdout is the baseline for chance matches",
+        "Confuses copying with utility, which is measured on analyses",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 35
+    },
+    {
+      "id": "q-privacy-15",
+      "type": "single",
+      "prompt": "A membership-inference test gives AUC 0.819 for a generator with leaves of one row, and 0.511 with leaves of 200 rows. What do you conclude?",
+      "options": [
+        "With leaves of 200, an attacker does little better than chance",
+        "Leaves of one are better, since a higher AUC means more utility",
+        "Neither can be released, since any AUC above 0.5 is leakage",
+        "Nothing, since AUC measures the attack, not the file"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO4"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "An AUC near 0.5 means the attacker cannot tell training rows from others; 0.819 means it often can.",
+      "misconceptions": [
+        "",
+        "Reads the attack's AUC as if it were a model's accuracy",
+        "Treats a value within noise of 0.5 as evidence of leakage",
+        "Misses that the attack's success is the measure of the file's leakage"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 36
+    },
+    {
+      "id": "q-privacy-16",
+      "type": "single",
+      "prompt": "The leaf-200 file copies 0.10% of rows (holdout 0.05%), membership AUC 0.511, and a model trained on it reaches AUC 0.933 against 0.936 on real data. The hackathon will train models. What do you recommend?",
+      "options": [
+        "Release the leaf-one file, which reproduces the real data more closely",
+        "Release this file and stop running the tests, since they passed once",
+        "Release this file with its leakage tests and generator settings documented",
+        "Hold it until its utility matches the real data exactly"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO4"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Utility is close to real and leakage is at chance, so release with the evidence documented.",
+      "misconceptions": [
+        "Prefers fidelity over privacy; that file copied 92.8% of rows",
+        "Forgets that every regeneration needs the same release gate",
+        "",
+        "Asks for perfect utility, which only copying achieves"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 37
+    },
+    {
+      "id": "q-fairness-17",
+      "type": "single",
+      "prompt": "In Al-Jouf, 4 non-Saudi women were eligible and the screen declined 3. How should the audit report this cell?",
+      "options": [
+        "As a false negative rate of 75%, the highest in the audit",
+        "As too few to estimate, with the count of 4",
+        "Merged with Saudi women in Al-Jouf, without saying so",
+        "Not at all: the region is dropped from the report"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Below the minimum count the rate is not estimated; the count is reported so the reader sees why.",
+      "misconceptions": [
+        "Reports a rate from four people as if it were precise",
+        "",
+        "Changes the slice silently, which hides a choice from the reader",
+        "Removes evidence instead of stating its limit"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 9
+    },
+    {
+      "id": "q-fairness-18",
+      "type": "single",
+      "prompt": "Forcing equal selection rates for women and men opened a 12.4-point gap in their false negative rates. For a decision on housing support, which criterion fits?",
+      "options": [
+        "Equal false negative rates: the harm is missing eligible people",
+        "Equal selection rates, which is what fairness means",
+        "Equal precision, since every approved applicant must be eligible",
+        "All three at once, by tuning the threshold carefully"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Equal opportunity fits a support decision: the error that harms is missing an eligible applicant.",
+      "misconceptions": [
+        "",
+        "Treats one criterion as the definition, regardless of the decision",
+        "Puts the fund's cost of wrong approvals before the applicant's harm",
+        "Different base rates make the criteria conflict; no threshold meets all three"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 19
+    },
+    {
+      "id": "q-fairness-19",
+      "type": "single",
+      "prompt": "Self-employed applicants' recorded income is 1.5 to 2 times their verified income, and the screen declines more than half of the eligible self-employed. Which bias type of the national AI Bias Reference Guide does this match?",
+      "options": [
+        "Historical bias",
+        "Sampling bias",
+        "Feedback loop bias",
+        "Measurement bias"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "A feature that records the quantity wrongly for one group is measurement bias.",
+      "misconceptions": [
+        "The past rule is a different finding; here the field itself is wrong",
+        "The self-employed are in the data; it is their values that are off",
+        "Describes retraining on the model's own outcomes, not a recorded value",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 24
+    },
+    {
+      "id": "q-fairness-20",
+      "type": "single",
+      "prompt": "Group thresholds narrow the false negative gap from 12.9 to 10.0 points at the same accuracy. What must accompany them before deployment?",
+      "options": [
+        "Nothing, since accuracy did not fall",
+        "Reweighting first, since post-processing is not allowed",
+        "Approval to use gender and nationality, and an income fix",
+        "Removing gender and nationality, so the rule cannot be challenged"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO5"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The rule uses protected attributes at decision time, which needs approval, and the cause lies in the income feature.",
+      "misconceptions": [
+        "Treats unchanged accuracy as the only cost",
+        "Invents a rule; reweighting barely helped here because the cause is a feature",
+        "",
+        "Contradicts itself: the thresholds need those attributes"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 33
+    },
+    {
+      "id": "q-documentation-21",
+      "type": "single",
+      "prompt": "Malak fills the datasheet's De-identification section from her notebook's last run, which suppressed 290 records. The release log says 293. What should she write?",
+      "options": [
+        "290, since it is the more recent run",
+        "293, the number in the log of the released run",
+        "291.5, the average, with a note on uncertainty",
+        "No number, since a difference of three does not matter"
+      ],
+      "key": {
+        "indices": [
+          1
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "The datasheet describes the release that left the fund, which the log recorded.",
+      "misconceptions": [
+        "Documents a run that was not the one approved and released",
+        "",
+        "Invents a number that no run produced",
+        "Drops a fact the reviewer needs to check the release"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 7
+    },
+    {
+      "id": "q-documentation-22",
+      "type": "single",
+      "prompt": "The vendor reports 88.1% accuracy against officers' decisions in two regions; against the reviewed outcome of 12,000 applications it is 84.8%. What goes in the model card?",
+      "options": [
+        "88.1%, since it is the figure the model was approved on",
+        "Both, without comment, so readers choose",
+        "Neither, since accuracy says nothing about fairness",
+        "84.8%, and why the vendor's 88.1% is not used"
+      ],
+      "key": {
+        "indices": [
+          3
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Accuracy belongs against the reviewed outcome; naming the other figure prevents confusion.",
+      "misconceptions": [
+        "Repeats an evaluation the audit found biased",
+        "Leaves the reader to resolve a difference the author understands",
+        "Drops a metric the reviewer needs alongside the group results",
+        ""
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 14
+    },
+    {
+      "id": "q-documentation-23",
+      "type": "single",
+      "prompt": "Risk R2 (wrongful declines) scores likelihood 4 and impact 3. After adding officer review of every decline, Anmar rescores it as likelihood 2 and impact 1. Wiam rejects the new impact. Why?",
+      "options": [
+        "Review lowers the chance of a wrong decision, not the harm when one happens",
+        "A residual cannot be scored until the treatment has run for a year",
+        "A high risk can only be avoided, never mitigated",
+        "Likelihood can never fall after a measured harm"
+      ],
+      "key": {
+        "indices": [
+          0
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "Treatment here acts on likelihood; an applicant still wrongly declined is harmed as before.",
+      "misconceptions": [
+        "",
+        "Invents a waiting rule; residual risk is scored when the treatment is chosen",
+        "Forgets that mitigate is one of the framework's four treatments",
+        "Denies that a control changes how probable the harm is"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 24
+    },
+    {
+      "id": "q-documentation-24",
+      "type": "single",
+      "prompt": "A peer's script reproduces their claimed gap exactly. Your review finds it drops 633 rows with missing income, 65% of them women, and the README does not say so. What do you record?",
+      "options": [
+        "Nothing: a result that reproduces is confirmed",
+        "Only that the result is not reproducible",
+        "The filter, its place, its effect on the gap, and the fix",
+        "That missing values should be dropped in every analysis they run"
+      ],
+      "key": {
+        "indices": [
+          2
+        ]
+      },
+      "lo": [
+        "LO6"
+      ],
+      "weight": 1,
+      "scored": true,
+      "timer": 30,
+      "displayMode": "full",
+      "explanation": "A useful gap names the choice, its place in the code, its effect on the number and the fix.",
+      "misconceptions": [
+        "Takes reproduction as validity; the undocumented choice changes the answer",
+        "States a verdict the author cannot act on, and it is not even true here",
+        "",
+        "Turns one choice into a rule, when dropping them is what biased this result"
+      ],
+      "liveContext": false,
+      "basis": "best",
+      "confidence": true,
+      "createdAt": 1794759376000,
+      "updatedAt": 1794759376000,
+      "slide": 32
+    }
+  ]
+}

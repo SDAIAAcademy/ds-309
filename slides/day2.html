@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2 · Release with less risk · Responsible Data Science: Privacy, Fairness and Documentation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day2.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Responsible Data Science: Privacy, Fairness and Documentation" data-track="data-science" data-day="Day 2">
+<!-- ======================= OPENING ======================= -->
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation</div>
+  <h1>Release with less risk</h1>
+  <p class="lead mt">Day 2: Generalisation, differential privacy, budgets and synthetic data</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-309</span></div>
+  <aside class="notes"><p>Day 2 turns yesterday's measurements into controls. Every session today ends with two numbers: how much risk the control removed and how much analysis it cost. Start with the review checkpoint on Day 1.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Release with less risk</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Generalisation and suppression</b><small>Generalise and suppress until every record hides among five, and measure what the analysis loses</small></div></div><div class="item"><div><b>Session 2 · Differential privacy for counts</b><small>The promise of differential privacy, calibrated noise on counts, and the error a budget costs</small></div></div><div class="item"><div><b>Session 3 · Budgets and composition</b><small>Sequential and parallel composition, bounded means, and one budget spread over several queries</small></div></div><div class="item"><div><b>Session 4 · Synthetic data and leakage</b><small>A synthetic extract generated column by column, its utility, and the tests that show it copies people</small></div></div></div>
+</section>
+
+<section class="slide" id="review-day1" data-lo="LO2" data-n="3">
+  <div class="kicker">Review of Day 1</div>
+  <h2>What did the linkage attack actually need?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="review-day1-q1">
+    <p class="lead">Yesterday three fields linked 99.2% of the register's applicants to their income and decision. Yahya asks what the attacker had to have. Which answer is right?</p>
+    <div class="opts">
+      <div class="opt" data-why="Assumes re-identification needs the fund's secrets: the study code was never used in the join" data-k="A">The key that maps study codes back to applicants</div>
+      <div class="opt" data-why="Thinks only direct identifiers re-identify: no name or national identifier was in the release" data-k="B">At least one direct identifier left in the release</div>
+      <div class="opt" data-ok data-k="C">An outside file sharing birth date, gender and postcode with the release</div>
+      <div class="opt" data-why="Confuses the harm with the means: income is what the link revealed, not what it used" data-k="D">The applicants' incomes, to match them to the release</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> A linkage attack needs only quasi-identifiers that an outside file shares with the release; the names come from the outside file.</div>
+  </div>
+  <aside class="notes"><p>Answer C. One minute. If B is popular, show the release columns again: pseudo_id, birth date, gender, postcode and the attributes, nothing else.</p></aside>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="4">
+  <div class="kicker">Session 1</div>
+  <h1>Generalisation and suppression</h1>
+  <ul class="bullets outcomes"><li>Generalise quasi-identifiers along a hierarchy</li><li>Suppress the records that stay below k</li><li>Measure the utility cost on key statistics</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="hierarchies" data-lo="LO2" data-label="Hierarchies" data-n="5" data-session="1">
+  <div class="kicker">Generalisation</div>
+  <h2>Each quasi-identifier climbs its own hierarchy, one level at a time</h2>
+  <table class="t small">
+    <tr><th>Level</th><th>birth</th><th>place</th></tr>
+    <tr><td>0</td><td>birth date 1989-10-20</td><td>postcode 10900</td></tr>
+    <tr><td>1</td><td>birth year 1989</td><td>district RYD-07</td></tr>
+    <tr class="hl"><td>2</td><td>five-year band 1985-1989</td><td>region Riyadh</td></tr>
+    <tr><td>3</td><td>ten-year band 1980-1989</td><td></td></tr>
+  </table>
+  <p class="small mt-s">Every level up merges classes. The anonymisation guideline names this technique: specific values replaced by more general ones, such as ages in bands.</p>
+  <aside class="notes"><p>The example values are the first applicant of the synthetic table. A hierarchy is a design decision written into the release log: who decided that five-year bands are acceptable, and why. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline (SDAIA), examples of techniques.</p></aside>
+</section>
+
+<section class="slide" id="lattice-search" data-lo="LO2" data-label="The lattice" data-n="6" data-session="1">
+  <div class="kicker">Lab 2.1, the reference run</div>
+  <h2>Search the lattice for the least general node that meets the target</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>Records below five</th><th class="num">postcode</th><th class="num">district</th><th class="num">region</th></tr>
+      <tr><td>birth date</td><td class="num">60,000</td><td class="num">60,000</td><td class="num">59,870</td></tr>
+      <tr><td>birth year</td><td class="num">41,404</td><td class="num">8,576</td><td class="num">1,744</td></tr>
+      <tr class="hl"><td>five-year band</td><td class="num">13,488</td><td class="num">1,728</td><td class="num">293</td></tr>
+      <tr><td>ten-year band</td><td class="num">7,669</td><td class="num">738</td><td class="num">84</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>Rule: suppress at most <b>1%</b> of records</li>
+      <li>Least general node that meets it: <b>five-year band and region</b></li>
+      <li>293 records left to suppress</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Read the table from top left: the birth date alone keeps almost everyone exposed whatever the place. Ten-year band and district (738, 1.2%) misses the 1% rule narrowly; the stretch asks what keeping the district would cost. ARX and sdcMicro search the same lattice with utility measures; the lab does it by hand so the mechanism is visible.</p></aside>
+</section>
+
+<section class="slide" id="suppression" data-lo="LO2" data-label="Suppression" data-n="7" data-session="1">
+  <div class="kicker">The last step</div>
+  <h2>Suppress the records still below five, and log how many</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="stat center"><div class="big">59,707</div><div class="lbl">records kept</div></div>
+    <div class="stat center"><div class="big">293</div><div class="lbl">suppressed (0.49%)</div></div>
+    <div class="stat center"><div class="big">k = 5</div><div class="lbl">every record hides among five</div></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> The suppressed records are not random. They are the rare combinations: mostly non-Saudi applicants in small regions. The cost of the control lands on the smallest groups.</div>
+  <aside class="notes"><p>From Lab 2.1. Ask who the 293 are before showing the warning. Yesterday's seven unique records in release C were all non-Saudi applicants in small regions; suppression removes their kind first. That is a fairness issue inside a privacy control, and the datasheet must say so.</p></aside>
+</section>
+
+<section class="slide" id="utility-cost" data-lo="LO2" data-label="Utility" data-n="8" data-session="1">
+  <div class="kicker">What the analysis lost</div>
+  <h2>The three key statistics moved by at most 1%</h2>
+  <table class="t small">
+    <tr><th>Statistic</th><th class="num">Before</th><th class="num">After</th><th class="num">Change</th></tr>
+    <tr><td>Approval rate, women</td><td class="num">0.5056</td><td class="num">0.5054</td><td class="num">-0.04%</td></tr>
+    <tr><td>Approval rate, men</td><td class="num">0.4266</td><td class="num">0.4265</td><td class="num">-0.02%</td></tr>
+    <tr class="hl"><td>Mean income, Northern Borders</td><td class="num">8,211</td><td class="num">8,128</td><td class="num">-1.01%</td></tr>
+    <tr><td>Mean income, Riyadh</td><td class="num">8,313</td><td class="num">8,313</td><td class="num">0.00%</td></tr>
+    <tr><td>Mean household size, non-Saudi</td><td class="num">4.526</td><td class="num">4.517</td><td class="num">-0.20%</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 2.1, task 4. The smallest region moved most, as the previous slide predicted. Whether 1% is acceptable is Waad's call for her question, which is why the statistics are chosen from her question before treatment, not after.</p></aside>
+</section>
+
+<section class="slide" id="linkage-after" data-lo="LO2" data-label="Attack again" data-n="9" data-session="1">
+  <div class="kicker">The attack, rerun</div>
+  <h2>The same register now links nobody to a single record</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">99.2% → 0</div><div class="lbl">register applicants linked to exactly one record, before and after treatment</div></div>
+    <div class="stack">
+      <div class="card c-teal flat"><h4>Identity disclosure</h4><p class="small mb0">Blocked for this outside file: every match now has at least five candidates.</p></div>
+      <div class="card c-coral flat"><h4>Attribute disclosure</h4><p class="small mb0">Not blocked: a class of five that all declined still tells the attacker the decision.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p>Zero claimed links in the reference run. Stress the qualifier "for this outside file": k-anonymity's guarantee is relative to the fields you declared quasi-identifiers. A file that holds the employment sector or household size could split the classes again.</p></aside>
+</section>
+
+<section class="slide" id="k-limits" data-lo="LO2" data-label="Limits" data-n="10" data-session="1">
+  <div class="kicker">When k-anonymity is not enough</div>
+  <h2>k protects the fields you chose against the attacks you imagined</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-coral flat"><h4>Homogeneity</h4><p class="small mb0">Everyone in the class shares the sensitive value.</p></div>
+    <div class="card c-amber flat"><h4>Background knowledge</h4><p class="small mb0">The attacker knows a field you did not treat as a quasi-identifier.</p></div>
+    <div class="card c-purple flat"><h4>Repeated releases</h4><p class="small mb0">Two treated versions of the same table, intersected, shrink the classes.</p></div>
+  </div>
+  <div class="callout tip mt"><b>Takeaway.</b> Treat row-level releases as personal data under an agreement, even at k of five. For published numbers, use a control with a guarantee: Session 2.</div>
+  <aside class="notes"><p>The guideline asks the controller to evaluate the effectiveness of anonymisation techniques and keep them up to date; these three limits are why. The repeated-release attack is the bridge to differential privacy, whose budget accounts for repetition by design.</p></aside>
+</section>
+
+<section class="slide" id="check-suppress" data-lo="LO2" data-n="11" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Suppress more, or generalise more?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="check-suppress-q1">
+    <p class="lead">At five-year band and district, 1,728 records (2.9%) are below five. Waad wants to keep the district. Malak can suppress those 1,728 or move to region and suppress 293. What should she weigh?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Which small groups the 1,728 are, and whether Waad's question needs the district</div>
+      <div class="opt" data-why="Thinks the least suppression always wins: it ignores what the question needs" data-k="B">Always the option with fewer suppressed records</div>
+      <div class="opt" data-why="Thinks suppression is free because rows are simply removed: they are the rare groups, so estimates for them shift" data-k="C">Always suppression, since it leaves every kept record exact</div>
+      <div class="opt" data-why="Confuses the target with a preference: k of five is met either way, so k cannot decide it" data-k="D">Whichever option gives the higher k</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Both meet k of five. The choice is about utility: what the question needs, and whose records the suppression removes.</div>
+  </div>
+  <aside class="notes"><p>Answer A. C is the most common wrong answer among analysts, who like exact values. Point back to the suppression slide: the rows removed are not random.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-1" data-auto="lab" data-lab="2.1" data-label="Lab 2.1" data-n="12" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.1 · 25 min</div><h2>Reach k of five</h2><p class="lead small">Reach k of at least five and measure the change in three key statistics.</p><a class="nb" href="../labs/D2_1_reach_k_least.ipynb">D2_1_reach_k_least.ipynb</a></div><ul class="checklist"><li>Three key statistics before treatment <span class="min">5 min</span></li><li>Generalise birth date and postcode step by step <span class="min">8 min</span></li><li>Suppress what is still below five <span class="min">4 min</span></li><li>The three statistics after treatment <span class="min">5 min</span></li><li>Rerun the linkage <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Find a second treatment that keeps the district, and compare its cost</li></ul></div>
+  <aside class="notes"><p>Expected: lattice as on the slide; chosen node five-year band and region; 59,707 kept, 293 suppressed, k = 5; largest change Northern Borders income, -1.01%; zero links after treatment. Typical error: generalising the register differently from the release, which makes the rerun meaningless. The reference generaliser is U.generalise if someone is stuck.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="13">
+  <div class="kicker">Session 2</div>
+  <h1>Differential privacy for counts</h1>
+  <ul class="bullets outcomes"><li>State what the differential privacy promise covers and what it does not</li><li>Add calibrated noise to counts with a library</li><li>Measure the error that a budget costs</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="dp-promise" data-lo="LO3" data-label="The promise" data-n="14" data-session="2">
+  <div class="kicker">Differential privacy</div>
+  <h2>The output barely depends on whether any one person is in the data</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Two datasets that differ by <b>one applicant</b></li>
+      <li>A randomised release gives almost the same <b>distribution of outputs</b> on both</li>
+      <li><b>Epsilon</b> bounds "almost": smaller epsilon, closer distributions, more privacy</li>
+      <li>It holds whatever the attacker knows, including every other record</li>
+    </ul>
+    <div class="card c-purple"><h4>What it does not promise</h4><p class="small mb0">That nothing about the population is learnt. A count shows that a district has many approvals; that is the point of publishing it.</p></div>
+  </div>
+  <aside class="notes"><p>Keep the formal definition in the notes: for neighbouring datasets D and D' and any set of outputs S, the probability of S under D is at most e to the epsilon times its probability under D'. The guarantee is about the individual's contribution, not about secrets of a group. Sources: Dwork and Roth, The Algorithmic Foundations of Differential Privacy.</p></aside>
+</section>
+
+<section class="slide" id="sensitivity" data-lo="LO3" data-label="Sensitivity" data-n="15" data-session="2">
+  <div class="kicker">How much noise</div>
+  <h2>Noise is scaled to the most one person can change the answer</h2>
+  <div class="flow">
+    <div class="step c-navy"><b>1 · Sensitivity</b>adding one applicant changes one district count by 1</div>
+    <div class="arrow">→</div>
+    <div class="step c-teal"><b>2 · Scale</b>sensitivity divided by epsilon</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Noise</b>drawn from a Laplace distribution with that scale</div>
+  </div>
+  <div class="cols cols-3 gap-s mt">
+    <div class="card c-teal flat"><h4>epsilon 1</h4><p class="small mb0">scale 1: typical error about one applicant</p></div>
+    <div class="card c-cyan flat"><h4>epsilon 0.5</h4><p class="small mb0">scale 2</p></div>
+    <div class="card c-coral flat"><h4>epsilon 0.1</h4><p class="small mb0">scale 10: typical error about ten</p></div>
+  </div>
+  <aside class="notes"><p>For integer counts the library uses the discrete version of the Laplace distribution, so released counts stay whole numbers. The whole vector of 59 counts has sensitivity 1, not 59, because each applicant is in exactly one district. That point returns in Session 3 as parallel composition.</p></aside>
+</section>
+
+<section class="slide" id="opendp-code" data-lo="LO3" data-label="The library" data-n="16" data-session="2">
+  <div class="kicker">Lab 2.2 in five lines</div>
+  <h2>The library builds the measurement and tells you what it spends</h2>
+  <pre class="code s" data-file="python"><code class="language-python"><span class="hljs-keyword">import</span> opendp.prelude <span class="hljs-keyword">as</span> dp
+dp.enable_features(<span class="hljs-string">&quot;contrib&quot;</span>)
+domain = dp.vector_domain(dp.atom_domain(T=<span class="hljs-built_in">int</span>), size=<span class="hljs-number">59</span>)
+meas = dp.m.make_laplace(domain, dp.l1_distance(T=<span class="hljs-built_in">int</span>), scale=<span class="hljs-number">1</span> / eps)
+released = meas(counts)          <span class="hljs-comment"># 59 noisy counts</span>
+meas.<span class="hljs-built_in">map</span>(d_in=<span class="hljs-number">1</span>)                 <span class="hljs-comment"># the epsilon spent when one person changes</span></code></pre>
+  <div class="callout tip mt"><b>Check the claim with the library.</b> <code>map</code> computes the privacy loss from the domain, the distance and the scale. Never trust an epsilon typed in a report.</div>
+  <aside class="notes"><p>OpenDP 0.16 was the current release when the course was built; check the version the week before the cohort, since its interfaces still move. diffprivlib is the other example in the tool slot, but at the time of writing its last release did not import with the current scikit-learn, which is why the labs use OpenDP. Sources: OpenDP library documentation.</p></aside>
+</section>
+
+<section class="slide" id="error-by-budget" data-lo="LO3" data-label="Error" data-n="17" data-session="2">
+  <div class="kicker">Lab 2.2, the reference run</div>
+  <h2>Ten times less budget costs about ten times more error</h2>
+  <table class="t small">
+    <tr><th class="num">epsilon</th><th class="num">Mean absolute error</th><th class="num">95th percentile</th><th class="num">Relative error, ten smallest districts</th></tr>
+    <tr><td class="num">0.1</td><td class="num">9.98</td><td class="num">30</td><td class="num">16.0%</td></tr>
+    <tr class="hl"><td class="num">0.5</td><td class="num">1.92</td><td class="num">6</td><td class="num">3.1%</td></tr>
+    <tr><td class="num">1.0</td><td class="num">0.85</td><td class="num">3</td><td class="num">1.5%</td></tr>
+  </table>
+  <p class="small mt-s">59 districts, 27,189 approved applicants, smallest district 36. 300 repeated releases per budget.</p>
+  <aside class="notes"><p>From Lab 2.2. The absolute error does not depend on the district's size; the relative error does, which is why small districts decide the budget. Participants' numbers will differ slightly because the noise is random each run: that is the point of repeating.</p></aside>
+</section>
+
+<section class="slide" id="recommend-budget" data-lo="LO3" data-label="Recommend" data-n="18" data-session="2">
+  <div class="kicker">From a curve to a decision</div>
+  <h2>Choose the smallest budget that meets the accuracy the use needs</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The use: a dashboard that compares districts</li>
+      <li>The rule agreed with Bashayer: typical error under <b>5%</b> in the smallest districts</li>
+      <li>0.1 fails (16%), <b>0.5 meets it (3.1%)</b>, 1.0 meets it with margin</li>
+      <li>Recommendation: <b>epsilon 0.5 per release</b></li>
+    </ul>
+    <div class="card c-coral"><h4>The budget is per release</h4><p class="small mb0">A monthly refresh at 0.5 spends 6 a year. Session 3 is about that.</p></div>
+  </div>
+  <aside class="notes"><p>The accuracy rule comes from the use, not from privacy. Write it down before looking at the errors, otherwise the budget is chosen to fit the result. The LO3 evidence is the error-against-budget plot that Lab 2.2 saves and this recommendation with its reason.</p></aside>
+</section>
+
+<section class="slide" id="post-processing" data-lo="LO3" data-label="Post-processing" data-n="19" data-session="2">
+  <div class="kicker">After the noise</div>
+  <h2>Anything computed from a released value spends no more budget</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>Clamp</h4><p class="small mb0">Negative counts set to zero.</p></div>
+    <div class="card c-cyan flat"><h4>Round</h4><p class="small mb0">Whole numbers for a dashboard.</p></div>
+    <div class="card c-purple flat"><h4>Aggregate</h4><p class="small mb0">Regional totals summed from district counts.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Recomputing from the true data "to fix" a strange noisy value is not post-processing. It spends budget, usually without anyone noticing.</div>
+  <aside class="notes"><p>Post-processing immunity is why a released noisy table can be published, charted and summed freely. The failure in the callout is common: someone sees a small district at 0 and "corrects" it from the source table, leaking exactly what the noise hid.</p></aside>
+</section>
+
+<section class="slide" id="check-epsilon" data-lo="LO3" data-n="20" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>What does a smaller epsilon buy?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-epsilon-q1">
+    <p class="lead">Malak releases the 59 district counts at epsilon 0.1 instead of 0.5. Bashayer asks what changed. Which statement is right?</p>
+    <div class="opts">
+      <div class="opt" data-why="Thinks noise grows with the count: the noise scale is set by sensitivity and epsilon, not by the district's size" data-k="A">The large districts now carry most of the error</div>
+      <div class="opt" data-why="Thinks privacy is binary: every epsilon gives a guarantee, a smaller one is a stronger one" data-k="B">The counts are now private, where before they were not</div>
+      <div class="opt" data-why="Confuses the sensitivity with the number of counts: one person changes one count, whatever the number of districts" data-k="C">The noise is 59 times larger, one share per district</div>
+      <div class="opt" data-ok data-k="D">Each count's noise is about five times larger, and the guarantee is stronger</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The scale is sensitivity over epsilon: going from 0.5 to 0.1 multiplies it by five, and a smaller epsilon bounds any one applicant's influence more tightly.</div>
+  </div>
+  <aside class="notes"><p>Answer D. The lab table shows it: mean absolute error 1.92 at 0.5 and 9.98 at 0.1.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-2" data-auto="lab" data-lab="2.2" data-label="Lab 2.2" data-n="21" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.2 · 25 min</div><h2>District counts at three budgets</h2><p class="lead small">Release district counts at three budgets and plot the error.</p><a class="nb" href="../labs/D2_2_release_district_counts.ipynb">D2_2_release_district_counts.ipynb</a></div><ul class="checklist"><li>True counts of approved applicants by district <span class="min">4 min</span></li><li>One noisy release with the library <span class="min">6 min</span></li><li>Repeat at three budgets <span class="min">7 min</span></li><li>Plot the error against the budget <span class="min">5 min</span></li><li>Recommend a budget <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Post-process the counts (no negatives, whole numbers) and check that the error does not grow</li></ul></div>
+  <aside class="notes"><p>Expected: epsilon spent exactly 1 for the first measurement; mean absolute errors near 10, 2 and 1; relative error in small districts near 16%, 3% and 1.5%; recommendation 0.5. If OpenDP fails to import in Colab, rerun the first cell: it installs from requirements-colab.txt. Run time is under half a minute.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="22">
+  <div class="kicker">Session 3</div>
+  <h1>Budgets and composition</h1>
+  <ul class="bullets outcomes"><li>Add up privacy loss under sequential and parallel composition</li><li>Release a bounded mean with a library</li><li>Allocate one budget across queries by need</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="composition" data-lo="LO3" data-label="Composition" data-n="23" data-session="3">
+  <div class="kicker">Spending a budget</div>
+  <h2>Epsilons add up over the same people, not over different people</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Sequential composition</h4><p class="small mb0">Two releases about the same applicants: the epsilons add. Mean income at 0.3 and household size at 0.2 spend 0.5.</p></div>
+    <div class="card c-teal"><h4>Parallel composition</h4><p class="small mb0">Releases about disjoint people: the largest epsilon counts once. 13 region counts at 0.1 spend 0.1, not 1.3.</p></div>
+  </div>
+  <aside class="notes"><p>The two rules are the whole of budget accounting in this course. Ask the room: the dashboard of Session 2, refreshed monthly at 0.5. Same people each month, so sequential: 6 a year. Advanced composition theorems give tighter totals; mention them by name only.</p></aside>
+</section>
+
+<section class="slide" id="four-queries" data-lo="LO3" data-label="Four queries" data-n="24" data-session="3">
+  <div class="kicker">Yahya's approved budget: epsilon 1 for the year</div>
+  <h2>Four queries share it, and each has its own sensitivity</h2>
+  <table class="t small">
+    <tr><th>Query</th><th>Released</th><th>One applicant changes it by</th></tr>
+    <tr><td>Q1</td><td>applicants per region, 13 counts</td><td>1 in one count</td></tr>
+    <tr><td>Q2</td><td>mean income, clamped to 0 to 30,000 riyals</td><td>sum by 30,000; count by 1</td></tr>
+    <tr><td>Q3</td><td>approved per district, 59 counts</td><td>1 in one count</td></tr>
+    <tr><td>Q4</td><td>mean household size, clamped to 1 to 12</td><td>sum by 12; count by 1</td></tr>
+  </table>
+  <p class="small mt-s">A mean is a noisy sum over a noisy count, each with half the query's epsilon.</p>
+  <aside class="notes"><p>Clamping is what gives the sum a finite sensitivity. The bounds are a choice with a cost: incomes above 30,000 are pulled down. Because the bounds must not be read from the data (that would leak), they come from policy: the fund's eligibility ceiling, for instance.</p></aside>
+</section>
+
+<section class="slide" id="equal-split" data-lo="LO3" data-label="Equal split" data-n="25" data-session="3">
+  <div class="kicker">Lab 2.3, the reference run</div>
+  <h2>An equal split wastes budget on the queries that do not need it</h2>
+  <div class="bars">
+    <div class="row"><span>Q3 district counts</span><div class="bar c-coral" style="--w:100%"></div><span class="val">2.05%</span></div>
+    <div class="row"><span>Q1 region counts</span><div class="bar c-amber" style="--w:12%"></div><span class="val">0.24%</span></div>
+    <div class="row"><span>Q2 mean income</span><div class="bar c-teal" style="--w:3%"></div><span class="val">0.05%</span></div>
+    <div class="row"><span>Q4 mean household</span><div class="bar c-cyan" style="--w:2%"></div><span class="val">0.04%</span></div>
+  </div>
+  <p class="small mt">Mean relative error with epsilon 0.25 each.</p>
+  <aside class="notes"><p>From Lab 2.3. The means are over tens of thousands of applicants, so noise barely moves them; the district counts are small. An equal split looks fair and is not efficient.</p></aside>
+</section>
+
+<section class="slide" id="split-by-need" data-lo="LO3" data-label="By need" data-n="26" data-session="3">
+  <div class="kicker">Allocate by need</div>
+  <h2>Give each query budget in proportion to its error at epsilon 1</h2>
+  <table class="t small">
+    <tr><th>Query</th><th class="num">Equal: epsilon</th><th class="num">Equal: error</th><th class="num">By need: epsilon</th><th class="num">By need: error</th></tr>
+    <tr><td>Q1</td><td class="num">0.25</td><td class="num">0.24%</td><td class="num">0.099</td><td class="num">0.61%</td></tr>
+    <tr><td>Q2</td><td class="num">0.25</td><td class="num">0.05%</td><td class="num">0.025</td><td class="num">0.57%</td></tr>
+    <tr class="hl"><td>Q3</td><td class="num">0.25</td><td class="num">2.05%</td><td class="num">0.857</td><td class="num">0.54%</td></tr>
+    <tr><td>Q4</td><td class="num">0.25</td><td class="num">0.04%</td><td class="num">0.019</td><td class="num">0.53%</td></tr>
+  </table>
+  <div class="callout tip mt"><b>Takeaway.</b> The worst error falls from 2.05% to 0.61% for the same total budget.</div>
+  <aside class="notes"><p>Relative error falls as one over epsilon, so a split proportional to each query's error at epsilon 1 equalises the errors. Other rules are defensible (protect the query that drives a decision); the point is that the split is argued from measured errors and written down.</p></aside>
+</section>
+
+<section class="slide" id="ledger" data-lo="LO3" data-label="Ledger" data-n="27" data-session="3">
+  <div class="kicker">Accounting</div>
+  <h2>Let the library keep the ledger, and check it adds up to the budget</h2>
+  <div class="cols cols-2">
+    <pre class="code s" data-file="Lab 2.3 output"><code class="language-python">{<span class="hljs-string">&#x27;Q1&#x27;</span>: <span class="hljs-number">0.099426</span>, <span class="hljs-string">&#x27;Q2&#x27;</span>: <span class="hljs-number">0.024857</span>,
+ <span class="hljs-string">&#x27;Q3&#x27;</span>: <span class="hljs-number">0.856597</span>, <span class="hljs-string">&#x27;Q4&#x27;</span>: <span class="hljs-number">0.01912</span>}  total <span class="hljs-number">1.0</span></code></pre>
+    <ul class="bullets">
+      <li>Each value is <code>map</code> of the measurement, not a typed number</li>
+      <li>Q2 and Q4 each sum two measurements: the sum and the count</li>
+      <li>The ledger goes into the release log, with the date and the approver</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The split shown is from the reference run; participants' splits differ slightly because the errors at epsilon 1 are themselves estimated by simulation. What must not differ is the total. In a production setting a compositor in the library refuses a query that would exceed the budget; the lab keeps the arithmetic visible instead.</p></aside>
+</section>
+
+<section class="slide" id="monthly-cost" data-lo="LO3" data-label="Repetition" data-n="28" data-session="3">
+  <div class="kicker">The cost of repetition</div>
+  <h2>Monthly releases from one yearly budget make every release noisier</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">0.61% → 7.2%</div><div class="lbl">worst mean relative error, one yearly release against twelve monthly releases from the same budget</div></div>
+    <div class="card c-purple"><h4>The decision is Bashayer's</h4><p class="small mb0">Fresher numbers or more accurate numbers. The budget makes the trade visible instead of hiding it in suppression rules.</p></div>
+  </div>
+  <aside class="notes"><p>From the stretch of Lab 2.3 on the reference run. Twelve releases each get a twelfth of the budget, so each error is about twelve times larger. This is the residual risk named for R5 in yesterday's decision table.</p></aside>
+</section>
+
+<section class="slide" id="check-parallel" data-lo="LO3" data-n="29" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>How much did the region counts spend?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="check-parallel-q1">
+    <p class="lead">Malak releases applicants per region, 13 counts, each with noise of scale 10 (epsilon 0.1 for a count). Every applicant is in exactly one region. What has the release spent?</p>
+    <div class="opts">
+      <div class="opt" data-why="Adds epsilons over disjoint groups: sequential composition applies only to releases about the same people" data-k="A">1.3, the sum over the 13 regions</div>
+      <div class="opt" data-ok data-k="B">0.1, because the regions hold disjoint applicants</div>
+      <div class="opt" data-why="Divides the budget instead of adding it: splitting into regions does not make each count cheaper" data-k="C">About 0.008, a thirteenth of 0.1</div>
+      <div class="opt" data-why="Thinks counts are free because they are aggregates: every noisy count spends budget" data-k="D">Nothing, since counts are aggregates</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Parallel composition: one applicant affects only one region's count, so the release spends the epsilon of one count.</div>
+  </div>
+  <aside class="notes"><p>Answer B. A is the usual mistake and it is costly: it makes people think they cannot afford detailed tables.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-3" data-auto="lab" data-lab="2.3" data-label="Lab 2.3" data-n="30" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.3 · 25 min</div><h2>Split one budget over four queries</h2><p class="lead small">Split one budget across four queries and justify the allocation.</p><a class="nb" href="../labs/D2_3_split_one_budget.ipynb">D2_3_split_one_budget.ipynb</a></div><ul class="checklist"><li>The four queries and their sensitivities <span class="min">5 min</span></li><li>An equal split and its errors <span class="min">6 min</span></li><li>A split by need <span class="min">7 min</span></li><li>Check that the ledger adds up to the budget <span class="min">4 min</span></li><li>Justify the allocation <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Work out what the same budget buys when the four queries are asked every month</li></ul></div>
+  <aside class="notes"><p>Expected: equal-split errors near 0.24%, 0.05%, 2.05% and 0.04%; the split by need gives Q3 about 0.86 of the budget and every error near 0.5% to 0.6%; ledger total 1.0. The lab takes about half a minute in full mode. The justification sentence is what Yahya signs; ask two participants to read theirs aloud.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="31">
+  <div class="kicker">Session 4</div>
+  <h1>Synthetic data and leakage</h1>
+  <ul class="bullets outcomes"><li>Generate a synthetic extract by sequential modelling</li><li>Measure its utility against the real table</li><li>Test it for record copying and membership inference</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="synthetic-idea" data-lo="LO4" data-label="Synthetic data" data-n="32" data-session="4">
+  <div class="kicker">A different kind of release</div>
+  <h2>A synthetic extract keeps the patterns and replaces the people</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Fit a model of the table, then <b>sample new rows</b> from it</li>
+      <li>Useful where the analyst needs rows: a hackathon, teaching, testing a pipeline</li>
+      <li>No row is a real person, <b>if</b> the model did not memorise them</li>
+      <li>That "if" is tested, every time, before release</li>
+    </ul>
+    <div class="card c-coral"><h4>No guarantee by default</h4><p class="small mb0">An ordinary generator gives no formal privacy guarantee. A generator trained with differential privacy does, at a cost in utility.</p></div>
+  </div>
+  <aside class="notes"><p>The capability slot is "synthetic tabular data", with the Synthetic Data Vault and synthpop as examples. The lab writes the sequential method in scikit-learn so that participants see why it can copy records. SDV 2.2 and synthpop 1.9 were the current releases when the course was built. Sources: Synthetic Data Vault documentation; synthpop on CRAN.</p></aside>
+</section>
+
+<section class="slide" id="sequential-cart" data-lo="LO4" data-label="Column by column" data-n="33" data-session="4">
+  <div class="kicker">How the lab's generator works</div>
+  <h2>Each column is drawn from a tree fitted on the columns before it</h2>
+  <div class="flow">
+    <div class="step c-navy"><b>1 · age</b>drawn from observed ages</div>
+    <div class="arrow">→</div>
+    <div class="step c-teal"><b>2 · gender</b>tree on age</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>3 · ...</b>tree on all earlier columns</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>4 · decision</b>value taken from a training row in the same leaf</div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> If a leaf may hold a single training row, the "donor" is always that row: the synthetic row becomes a copy of a real person.</div>
+  <aside class="notes"><p>This is the classification-and-regression-tree method that synthpop uses by default, written in about fifteen lines. The minimum leaf size is the knob that trades fidelity for privacy. Sources: Nowok, Raab and Dibben, synthpop: Bespoke Creation of Synthetic Data in R (2016).</p></aside>
+</section>
+
+<section class="slide" id="utility-measures" data-lo="LO4" data-label="Utility" data-n="34" data-session="4">
+  <div class="kicker">Is the file useful?</div>
+  <h2>Measure utility on the shares and on a model trained on synthetic rows</h2>
+  <div class="cols cols-2">
+    <div class="card c-teal"><h4>Marginal distance</h4><p class="small mb0">Total variation distance between real and synthetic shares of each categorical column, averaged. 0 is identical.</p></div>
+    <div class="card c-cyan"><h4>Train synthetic, test real</h4><p class="small mb0">A model predicting the officer's decision, trained on synthetic rows and scored on real rows it never saw. Compare with the same model trained on real rows: AUC 0.936.</p></div>
+  </div>
+  <aside class="notes"><p>The real-trained AUC 0.936 is from the reference run of Lab 2.4 on 8,000 training rows. Marginals check that the shares survive; the model checks that relationships survive, which is what an analyst uses.</p></aside>
+</section>
+
+<section class="slide" id="leakage-measures" data-lo="LO4" data-label="Leakage" data-n="35" data-session="4">
+  <div class="kicker">Does the file leak?</div>
+  <h2>Compare distances to the training rows with distances to unseen rows</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-coral flat"><h4>Exact copies</h4><p class="small mb0">Synthetic rows identical to a training row, against the same share for holdout rows.</p></div>
+    <div class="card c-amber flat"><h4>Distance to closest record</h4><p class="small mb0">Share of synthetic rows closer to the training set than to the holdout. 50% means no preference.</p></div>
+    <div class="card c-purple flat"><h4>Membership inference</h4><p class="small mb0">Score each real record by its nearest synthetic row. AUC 0.5 means the attacker cannot tell members.</p></div>
+  </div>
+  <aside class="notes"><p>The holdout is the control group: coarse data repeats naturally, so the question is never "are there copies?" but "are there more copies of training rows than of rows the generator never saw?". The membership attack used here is the simplest one; stronger attacks exist, so a pass is evidence, not proof.</p></aside>
+</section>
+
+<section class="slide" id="synthetic-results" data-lo="LO4" data-label="Results" data-n="36" data-session="4">
+  <div class="kicker">Lab 2.4, the reference run</div>
+  <h2>The most useful file is the one that copies people</h2>
+  <table class="t small">
+    <tr><th>Setting</th><th class="num">Marginal distance</th><th class="num">AUC, synthetic-trained</th><th class="num">Copies of training rows</th><th class="num">Copies of holdout rows</th><th class="num">Membership AUC</th></tr>
+    <tr><td>leaf = 1</td><td class="num">0.006</td><td class="num">0.935</td><td class="num">92.8%</td><td class="num">0.08%</td><td class="num">0.819</td></tr>
+    <tr class="hl"><td>leaf = 200</td><td class="num">0.006</td><td class="num">0.933</td><td class="num">0.10%</td><td class="num">0.05%</td><td class="num">0.511</td></tr>
+  </table>
+  <div class="callout warn mt"><b>Utility alone would pick the wrong file.</b> Both look equally useful; one of them is 93% real people.</div>
+  <aside class="notes"><p>From Lab 2.4 on 8,000 training rows. In an exploration run for the course, leaves of 50 still produced 0.66% copies against 0.03% for the holdout, so a leaf size that "sounds safe" is not evidence: test it. Release rule used in the lab: copies at most twice the holdout baseline with a floor of 0.1%, membership AUC below 0.55, synthetic-trained AUC within 0.05 of the real one.</p></aside>
+</section>
+
+<section class="slide" id="release-recommendation" data-lo="LO4" data-label="Recommend" data-n="37" data-session="4">
+  <div class="kicker">The recommendation</div>
+  <h2>Release the leaf = 200 file for the hackathon, under stated limits</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Passes</b>: copies near baseline, membership AUC 0.511, utility within 0.003 AUC</li>
+      <li><b>Limits</b>: for prototypes, not for statistics about small groups</li>
+      <li><b>Not a guarantee</b>: one attack was tested; the report says so</li>
+      <li><b>Rejected</b>: leaf = 1, which copies 92.8% of rows</li>
+    </ul>
+    <div class="card c-teal"><h4>LO4 evidence</h4><p class="small mb0">The utility and leakage report that Lab 2.4 saves, with this recommendation and its limits.</p></div>
+  </div>
+  <aside class="notes"><p>A recommendation names what passed, what it is for, and what it is not for. Small groups are poorly reproduced by any generator with large leaves: the stretch plants a rare combination to show it.</p></aside>
+</section>
+
+<section class="slide" id="check-synthetic" data-lo="LO4" data-n="38" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which result should block the release?</h2>
+  <div class="quiz" data-type="single" data-lo="LO4" data-id="check-synthetic-q1">
+    <p class="lead">A vendor's synthetic file matches the real one on utility. No row is an exact copy, and 31% of its rows are closer to the training data than to a holdout. What do you conclude?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Nothing blocks it on these tests: no copies, and no preference for training rows</div>
+      <div class="opt" data-why="Reads any share below 100% as leakage: the warning sign is a share well above 50%, not below it" data-k="B">It leaks: 31% of rows sit next to training records</div>
+      <div class="opt" data-why="Treats high utility as a leak in itself: utility is a warning only when copies or membership show memorising" data-k="C">It is too accurate to be private, so it must be copying</div>
+      <div class="opt" data-why="Thinks no copies means a formal guarantee: these tests are evidence against one attack, not a proof" data-k="D">It is differentially private, since no row is copied</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Leakage shows as more closeness to training rows than to unseen rows. 31% is below the 50% of no preference, and no row is copied.</div>
+  </div>
+  <aside class="notes"><p>Answer A. The unusual 31% might itself deserve a question (a holdout drawn from a different population?), which is a good discussion for strong groups. D is the misconception to correct firmly.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-2-4" data-auto="lab" data-lab="2.4" data-label="Lab 2.4" data-n="39" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 2.4 · 25 min</div><h2>Test a synthetic extract</h2><p class="lead small">Generate a synthetic extract and test it with distance-to-closest-record and membership-inference checks.</p><a class="nb" href="../labs/D2_4_generate_synthetic_extract.ipynb">D2_4_generate_synthetic_extract.ipynb</a></div><ul class="checklist"><li>Fit the generator at two settings <span class="min">6 min</span></li><li>Utility: marginals and a model trained on synthetic rows <span class="min">6 min</span></li><li>Distance to the closest record <span class="min">6 min</span></li><li>Membership inference <span class="min">4 min</span></li><li>Release recommendation <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Plant one rare combination and see whether the generator reproduces it</li></ul></div>
+  <aside class="notes"><p>Expected: leaf = 1 copies about 93% of training rows and has membership AUC near 0.82; leaf = 200 copies about 0.1% (baseline 0.05%) with membership AUC near 0.51; only leaf = 200 passes. The full run takes about 30 seconds; quick mode uses 3,000 rows. If a laptop is slow, set YUSR_QUICK=1.</p></aside>
+</section>
+
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up" data-n="40" data-session="4">
+  <div class="kicker">Day 2 · Three things to keep</div>
+  <h2>Every control has a guarantee, a cost and a test</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>k-anonymity</h4><p class="small mb0">k of five on the chosen fields; 293 records suppressed, mostly from small groups; no guarantee beyond those fields.</p></div>
+    <div class="card c-cyan"><h4>Differential privacy</h4><p class="small mb0">A guarantee whatever the attacker knows; error near one over epsilon; a budget that adds up.</p></div>
+    <div class="card c-coral"><h4>Synthetic data</h4><p class="small mb0">Rows without people only if tested: copies, distance and membership against a holdout.</p></div>
+  </div>
+  <aside class="notes"><p>Ask: which of today's controls would you put in front of the public dashboard, the researcher and the hackathon? The answers should match yesterday's decision table. Tomorrow moves from protecting people's data to the model's decisions about them.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Next" data-n="41" data-session="4">
+  <div class="kicker">Tomorrow · Day 3</div>
+  <h2>Audit for fairness</h2>
+  <ul class="bullets">
+    <li>Ahliya's errors by gender, region and nationality, with intervals, and one intersection</li>
+    <li>Two fairness criteria that cannot both hold, and how to choose</li>
+    <li>Five findings mapped to the national bias guide, then two mitigations and their cost</li>
+    <li>Before tomorrow: recall how a Wilson interval for a proportion is computed (DS-204)</li>
+  </ul>
+  <aside class="notes"><p>Day 3 uses a different reference state: 12,000 applications scored by Ahliya and reviewed in full. Nothing from today is needed.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:16:16Z","version":"2027.1.0","commit":"8cfd447"},"course":{"id":"ds-309","code":"DS-309","title":"Responsible Data Science: Privacy, Fairness and Documentation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-309/","repo":"SDAIAAcademy/ds-309","home":"../index.html"},"deck":{"id":"day2","kind":"day","day":2,"label":"Day 2","title":"Release with less risk","prev":"day1.html","next":"day3.html","md":"day2.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Generalisation and suppression","slide":"s1","outcomes":["Generalise quasi-identifiers along a hierarchy","Suppress the records that stay below k","Measure the utility cost on key statistics"],"minutes":50,"lab":{"id":"2.1","title":"Reach k of five","minutes":25,"href":"../labs/D2_1_reach_k_least.ipynb"}},{"n":2,"label":"Session 2","title":"Differential privacy for counts","slide":"s2","outcomes":["State what the differential privacy promise covers and what it does not","Add calibrated noise to counts with a library","Measure the error that a budget costs"],"minutes":50,"lab":{"id":"2.2","title":"District counts at three budgets","minutes":25,"href":"../labs/D2_2_release_district_counts.ipynb"}},{"n":3,"label":"Session 3","title":"Budgets and composition","slide":"s3","outcomes":["Add up privacy loss under sequential and parallel composition","Release a bounded mean with a library","Allocate one budget across queries by need"],"minutes":50,"lab":{"id":"2.3","title":"Split one budget over four queries","minutes":25,"href":"../labs/D2_3_split_one_budget.ipynb"}},{"n":4,"label":"Session 4","title":"Synthetic data and leakage","slide":"s4","outcomes":["Generate a synthetic extract by sequential modelling","Measure its utility against the real table","Test it for record copying and membership inference"],"minutes":50,"lab":{"id":"2.4","title":"Test a synthetic extract","minutes":25,"href":"../labs/D2_4_generate_synthetic_extract.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Release with less risk","kind":"title","session":0,"hash":"6318303c","md":"#### [day2#title] Release with less risk\n\n*SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation*\n\nDay 2: Generalisation, differential privacy, budgets and synthetic data\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-309","notes":"Day 2 turns yesterday's measurements into controls. Every session today ends with two numbers: how much risk the control removed and how much analysis it cost. Start with the review checkpoint on Day 1.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Release with less risk","kind":"content","session":0,"hash":"c00756ff","md":"#### [day2#agenda] Release with less risk\n\n*Today*\n\n- **Session 1 · Generalisation and suppression**: Generalise and suppress until every record hides among five, and measure what the analysis loses\n- **Session 2 · Differential privacy for counts**: The promise of differential privacy, calibrated noise on counts, and the error a budget costs\n- **Session 3 · Budgets and composition**: Sequential and parallel composition, bounded means, and one budget spread over several queries\n- **Session 4 · Synthetic data and leakage**: A synthetic extract generated column by column, its utility, and the tests that show it copies people","notes":"","minutes":null,"lo":[]},{"id":"review-day1","n":3,"title":"What did the linkage attack actually need?","kind":"quiz","session":0,"hash":"be742be8","md":"#### [day2#review-day1] What did the linkage attack actually need?\n\n*Review of Day 1*\n\n**Question:** Yesterday three fields linked 99.2% of the register's applicants to their income and decision. Yahya asks what the attacker had to have. Which answer is right?\n\n- A. The key that maps study codes back to applicants\n- B. At least one direct identifier left in the release\n- C. An outside file sharing birth date, gender and postcode with the release\n- D. The applicants' incomes, to match them to the release","notes":"Answer C. One minute. If B is popular, show the release columns again: pseudo_id, birth date, gender, postcode and the attributes, nothing else.","minutes":null,"lo":["LO2"]},{"id":"s1","n":4,"title":"Generalisation and suppression","kind":"section","session":1,"hash":"cbbcd065","md":"#### [day2#s1] Generalisation and suppression\n\n*Session 1*\n\n- Generalise quasi-identifiers along a hierarchy\n- Suppress the records that stay below k\n- Measure the utility cost on key statistics","notes":"","minutes":null,"lo":["LO2"]},{"id":"hierarchies","n":5,"title":"Each quasi-identifier climbs its own hierarchy, one level at a time","kind":"content","session":1,"hash":"b88a8e17","md":"#### [day2#hierarchies] Each quasi-identifier climbs its own hierarchy, one level at a time\n\n*Generalisation*\n\n| Level | birth | place |\n| --- | --- | --- |\n| 0 | birth date 1989-10-20 | postcode 10900 |\n| 1 | birth year 1989 | district RYD-07 |\n| 2 | five-year band 1985-1989 | region Riyadh |\n| 3 | ten-year band 1980-1989 |  |\n\nEvery level up merges classes. The anonymisation guideline names this technique: specific values replaced by more general ones, such as ages in bands.","notes":"The example values are the first applicant of the synthetic table. A hierarchy is a design decision written into the release log: who decided that five-year bands are acceptable, and why. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline (SDAIA), examples of techniques.","minutes":null,"lo":["LO2"]},{"id":"lattice-search","n":6,"title":"Search the lattice for the least general node that meets the target","kind":"content","session":1,"hash":"773286b3","md":"#### [day2#lattice-search] Search the lattice for the least general node that meets the target\n\n*Lab 2.1, the reference run*\n\n| Records below five | postcode | district | region |\n| --- | --- | --- | --- |\n| birth date | 60,000 | 60,000 | 59,870 |\n| birth year | 41,404 | 8,576 | 1,744 |\n| five-year band | 13,488 | 1,728 | 293 |\n| ten-year band | 7,669 | 738 | 84 |\n\n- Rule: suppress at most **1%** of records\n- Least general node that meets it: **five-year band and region**\n- 293 records left to suppress","notes":"Read the table from top left: the birth date alone keeps almost everyone exposed whatever the place. Ten-year band and district (738, 1.2%) misses the 1% rule narrowly; the stretch asks what keeping the district would cost. ARX and sdcMicro search the same lattice with utility measures; the lab does it by hand so the mechanism is visible.","minutes":null,"lo":["LO2"]},{"id":"suppression","n":7,"title":"Suppress the records still below five, and log how many","kind":"content","session":1,"hash":"c9bd8727","md":"#### [day2#suppression] Suppress the records still below five, and log how many\n\n*The last step*\n\n- **59,707** records kept\n- **293** suppressed (0.49%)\n- **k = 5** every record hides among five\n\n> **What goes wrong.** The suppressed records are not random. They are the rare combinations: mostly non-Saudi applicants in small regions. The cost of the control lands on the smallest groups.","notes":"From Lab 2.1. Ask who the 293 are before showing the warning. Yesterday's seven unique records in release C were all non-Saudi applicants in small regions; suppression removes their kind first. That is a fairness issue inside a privacy control, and the datasheet must say so.","minutes":null,"lo":["LO2"]},{"id":"utility-cost","n":8,"title":"The three key statistics moved by at most 1%","kind":"content","session":1,"hash":"4ede8b52","md":"#### [day2#utility-cost] The three key statistics moved by at most 1%\n\n*What the analysis lost*\n\n| Statistic | Before | After | Change |\n| --- | --- | --- | --- |\n| Approval rate, women | 0.5056 | 0.5054 | -0.04% |\n| Approval rate, men | 0.4266 | 0.4265 | -0.02% |\n| Mean income, Northern Borders | 8,211 | 8,128 | -1.01% |\n| Mean income, Riyadh | 8,313 | 8,313 | 0.00% |\n| Mean household size, non-Saudi | 4.526 | 4.517 | -0.20% |","notes":"From Lab 2.1, task 4. The smallest region moved most, as the previous slide predicted. Whether 1% is acceptable is Waad's call for her question, which is why the statistics are chosen from her question before treatment, not after.","minutes":null,"lo":["LO2"]},{"id":"linkage-after","n":9,"title":"The same register now links nobody to a single record","kind":"content","session":1,"hash":"c5b76143","md":"#### [day2#linkage-after] The same register now links nobody to a single record\n\n*The attack, rerun*\n\n**99.2% → 0** register applicants linked to exactly one record, before and after treatment\n\n- **Identity disclosure.** Blocked for this outside file: every match now has at least five candidates.\n- **Attribute disclosure.** Not blocked: a class of five that all declined still tells the attacker the decision.","notes":"Zero claimed links in the reference run. Stress the qualifier \"for this outside file\": k-anonymity's guarantee is relative to the fields you declared quasi-identifiers. A file that holds the employment sector or household size could split the classes again.","minutes":null,"lo":["LO2"]},{"id":"k-limits","n":10,"title":"k protects the fields you chose against the attacks you imagined","kind":"content","session":1,"hash":"52edec04","md":"#### [day2#k-limits] k protects the fields you chose against the attacks you imagined\n\n*When k-anonymity is not enough*\n\n- **Homogeneity.** Everyone in the class shares the sensitive value.\n- **Background knowledge.** The attacker knows a field you did not treat as a quasi-identifier.\n- **Repeated releases.** Two treated versions of the same table, intersected, shrink the classes.\n\n> **Takeaway.** Treat row-level releases as personal data under an agreement, even at k of five. For published numbers, use a control with a guarantee: Session 2.","notes":"The guideline asks the controller to evaluate the effectiveness of anonymisation techniques and keep them up to date; these three limits are why. The repeated-release attack is the bridge to differential privacy, whose budget accounts for repetition by design.","minutes":null,"lo":["LO2"]},{"id":"check-suppress","n":11,"title":"Suppress more, or generalise more?","kind":"quiz","session":1,"hash":"cbc632be","md":"#### [day2#check-suppress] Suppress more, or generalise more?\n\n*Checkpoint*\n\n**Question:** At five-year band and district, 1,728 records (2.9%) are below five. Waad wants to keep the district. Malak can suppress those 1,728 or move to region and suppress 293. What should she weigh?\n\n- A. Which small groups the 1,728 are, and whether Waad's question needs the district\n- B. Always the option with fewer suppressed records\n- C. Always suppression, since it leaves every kept record exact\n- D. Whichever option gives the higher k","notes":"Answer A. C is the most common wrong answer among analysts, who like exact values. Point back to the suppression slide: the rows removed are not random.","minutes":null,"lo":["LO2"]},{"id":"lab-2-1","n":12,"title":"Reach k of five","kind":"lab","session":1,"hash":"a186d962","md":"#### [day2#lab-2-1] Reach k of five\n\nLab 2.1 · 25 min\n\nReach k of at least five and measure the change in three key statistics.\n\n[D2_1_reach_k_least.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D2_1_reach_k_least.ipynb)\n\n- [ ] Three key statistics before treatment (5 min)\n- [ ] Generalise birth date and postcode step by step (8 min)\n- [ ] Suppress what is still below five (4 min)\n- [ ] The three statistics after treatment (5 min)\n- [ ] Rerun the linkage (3 min)\n- [ ] ✱ Stretch: Find a second treatment that keeps the district, and compare its cost","notes":"Expected: lattice as on the slide; chosen node five-year band and region; 59,707 kept, 293 suppressed, k = 5; largest change Northern Borders income, -1.01%; zero links after treatment. Typical error: generalising the register differently from the release, which makes the rerun meaningless. The reference generaliser is U.generalise if someone is stuck.","minutes":null,"lo":[]},{"id":"s2","n":13,"title":"Differential privacy for counts","kind":"section","session":2,"hash":"914fd12c","md":"#### [day2#s2] Differential privacy for counts\n\n*Session 2*\n\n- State what the differential privacy promise covers and what it does not\n- Add calibrated noise to counts with a library\n- Measure the error that a budget costs","notes":"","minutes":null,"lo":["LO3"]},{"id":"dp-promise","n":14,"title":"The output barely depends on whether any one person is in the data","kind":"content","session":2,"hash":"094d9865","md":"#### [day2#dp-promise] The output barely depends on whether any one person is in the data\n\n*Differential privacy*\n\n- Two datasets that differ by **one applicant**\n- A randomised release gives almost the same **distribution of outputs** on both\n- **Epsilon** bounds \"almost\": smaller epsilon, closer distributions, more privacy\n- It holds whatever the attacker knows, including every other record\n\n- **What it does not promise.** That nothing about the population is learnt. A count shows that a district has many approvals; that is the point of publishing it.","notes":"Keep the formal definition in the notes: for neighbouring datasets D and D' and any set of outputs S, the probability of S under D is at most e to the epsilon times its probability under D'. The guarantee is about the individual's contribution, not about secrets of a group. Sources: Dwork and Roth, The Algorithmic Foundations of Differential Privacy.","minutes":null,"lo":["LO3"]},{"id":"sensitivity","n":15,"title":"Noise is scaled to the most one person can change the answer","kind":"content","session":2,"hash":"94a88891","md":"#### [day2#sensitivity] Noise is scaled to the most one person can change the answer\n\n*How much noise*\n\n1. **1 · Sensitivity** adding one applicant changes one district count by 1\n2. **2 · Scale** sensitivity divided by epsilon\n3. **3 · Noise** drawn from a Laplace distribution with that scale\n\n- **epsilon 1.** scale 1: typical error about one applicant\n- **epsilon 0.5.** scale 2\n- **epsilon 0.1.** scale 10: typical error about ten","notes":"For integer counts the library uses the discrete version of the Laplace distribution, so released counts stay whole numbers. The whole vector of 59 counts has sensitivity 1, not 59, because each applicant is in exactly one district. That point returns in Session 3 as parallel composition.","minutes":null,"lo":["LO3"]},{"id":"opendp-code","n":16,"title":"The library builds the measurement and tells you what it spends","kind":"content","session":2,"hash":"cba834c7","md":"#### [day2#opendp-code] The library builds the measurement and tells you what it spends\n\n*Lab 2.2 in five lines*\n\n```python\n# file: python\nimport opendp.prelude as dp\ndp.enable_features(\"contrib\")\ndomain = dp.vector_domain(dp.atom_domain(T=int), size=59)\nmeas = dp.m.make_laplace(domain, dp.l1_distance(T=int), scale=1 / eps)\nreleased = meas(counts)          # 59 noisy counts\nmeas.map(d_in=1)                 # the epsilon spent when one person changes\n```\n\n> **Check the claim with the library.** `map` computes the privacy loss from the domain, the distance and the scale. Never trust an epsilon typed in a report.","notes":"OpenDP 0.16 was the current release when the course was built; check the version the week before the cohort, since its interfaces still move. diffprivlib is the other example in the tool slot, but at the time of writing its last release did not import with the current scikit-learn, which is why the labs use OpenDP. Sources: OpenDP library documentation.","minutes":null,"lo":["LO3"]},{"id":"error-by-budget","n":17,"title":"Ten times less budget costs about ten times more error","kind":"content","session":2,"hash":"7f31b27e","md":"#### [day2#error-by-budget] Ten times less budget costs about ten times more error\n\n*Lab 2.2, the reference run*\n\n| epsilon | Mean absolute error | 95th percentile | Relative error, ten smallest districts |\n| --- | --- | --- | --- |\n| 0.1 | 9.98 | 30 | 16.0% |\n| 0.5 | 1.92 | 6 | 3.1% |\n| 1.0 | 0.85 | 3 | 1.5% |\n\n59 districts, 27,189 approved applicants, smallest district 36. 300 repeated releases per budget.","notes":"From Lab 2.2. The absolute error does not depend on the district's size; the relative error does, which is why small districts decide the budget. Participants' numbers will differ slightly because the noise is random each run: that is the point of repeating.","minutes":null,"lo":["LO3"]},{"id":"recommend-budget","n":18,"title":"Choose the smallest budget that meets the accuracy the use needs","kind":"content","session":2,"hash":"13ff651c","md":"#### [day2#recommend-budget] Choose the smallest budget that meets the accuracy the use needs\n\n*From a curve to a decision*\n\n- The use: a dashboard that compares districts\n- The rule agreed with Bashayer: typical error under **5%** in the smallest districts\n- 0.1 fails (16%), **0.5 meets it (3.1%)**, 1.0 meets it with margin\n- Recommendation: **epsilon 0.5 per release**\n\n- **The budget is per release.** A monthly refresh at 0.5 spends 6 a year. Session 3 is about that.","notes":"The accuracy rule comes from the use, not from privacy. Write it down before looking at the errors, otherwise the budget is chosen to fit the result. The LO3 evidence is the error-against-budget plot that Lab 2.2 saves and this recommendation with its reason.","minutes":null,"lo":["LO3"]},{"id":"post-processing","n":19,"title":"Anything computed from a released value spends no more budget","kind":"content","session":2,"hash":"239a7267","md":"#### [day2#post-processing] Anything computed from a released value spends no more budget\n\n*After the noise*\n\n- **Clamp.** Negative counts set to zero.\n- **Round.** Whole numbers for a dashboard.\n- **Aggregate.** Regional totals summed from district counts.\n\n> **What goes wrong.** Recomputing from the true data \"to fix\" a strange noisy value is not post-processing. It spends budget, usually without anyone noticing.","notes":"Post-processing immunity is why a released noisy table can be published, charted and summed freely. The failure in the callout is common: someone sees a small district at 0 and \"corrects\" it from the source table, leaking exactly what the noise hid.","minutes":null,"lo":["LO3"]},{"id":"check-epsilon","n":20,"title":"What does a smaller epsilon buy?","kind":"quiz","session":2,"hash":"90e9609f","md":"#### [day2#check-epsilon] What does a smaller epsilon buy?\n\n*Checkpoint*\n\n**Question:** Malak releases the 59 district counts at epsilon 0.1 instead of 0.5. Bashayer asks what changed. Which statement is right?\n\n- A. The large districts now carry most of the error\n- B. The counts are now private, where before they were not\n- C. The noise is 59 times larger, one share per district\n- D. Each count's noise is about five times larger, and the guarantee is stronger","notes":"Answer D. The lab table shows it: mean absolute error 1.92 at 0.5 and 9.98 at 0.1.","minutes":null,"lo":["LO3"]},{"id":"lab-2-2","n":21,"title":"District counts at three budgets","kind":"lab","session":2,"hash":"4ff750e8","md":"#### [day2#lab-2-2] District counts at three budgets\n\nLab 2.2 · 25 min\n\nRelease district counts at three budgets and plot the error.\n\n[D2_2_release_district_counts.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D2_2_release_district_counts.ipynb)\n\n- [ ] True counts of approved applicants by district (4 min)\n- [ ] One noisy release with the library (6 min)\n- [ ] Repeat at three budgets (7 min)\n- [ ] Plot the error against the budget (5 min)\n- [ ] Recommend a budget (3 min)\n- [ ] ✱ Stretch: Post-process the counts (no negatives, whole numbers) and check that the error does not grow","notes":"Expected: epsilon spent exactly 1 for the first measurement; mean absolute errors near 10, 2 and 1; relative error in small districts near 16%, 3% and 1.5%; recommendation 0.5. If OpenDP fails to import in Colab, rerun the first cell: it installs from requirements-colab.txt. Run time is under half a minute.","minutes":null,"lo":[]},{"id":"s3","n":22,"title":"Budgets and composition","kind":"section","session":3,"hash":"8692d50e","md":"#### [day2#s3] Budgets and composition\n\n*Session 3*\n\n- Add up privacy loss under sequential and parallel composition\n- Release a bounded mean with a library\n- Allocate one budget across queries by need","notes":"","minutes":null,"lo":["LO3"]},{"id":"composition","n":23,"title":"Epsilons add up over the same people, not over different people","kind":"content","session":3,"hash":"eda16c56","md":"#### [day2#composition] Epsilons add up over the same people, not over different people\n\n*Spending a budget*\n\n- **Sequential composition.** Two releases about the same applicants: the epsilons add. Mean income at 0.3 and household size at 0.2 spend 0.5.\n- **Parallel composition.** Releases about disjoint people: the largest epsilon counts once. 13 region counts at 0.1 spend 0.1, not 1.3.","notes":"The two rules are the whole of budget accounting in this course. Ask the room: the dashboard of Session 2, refreshed monthly at 0.5. Same people each month, so sequential: 6 a year. Advanced composition theorems give tighter totals; mention them by name only.","minutes":null,"lo":["LO3"]},{"id":"four-queries","n":24,"title":"Four queries share it, and each has its own sensitivity","kind":"content","session":3,"hash":"c40b800f","md":"#### [day2#four-queries] Four queries share it, and each has its own sensitivity\n\n*Yahya's approved budget: epsilon 1 for the year*\n\n| Query | Released | One applicant changes it by |\n| --- | --- | --- |\n| Q1 | applicants per region, 13 counts | 1 in one count |\n| Q2 | mean income, clamped to 0 to 30,000 riyals | sum by 30,000; count by 1 |\n| Q3 | approved per district, 59 counts | 1 in one count |\n| Q4 | mean household size, clamped to 1 to 12 | sum by 12; count by 1 |\n\nA mean is a noisy sum over a noisy count, each with half the query's epsilon.","notes":"Clamping is what gives the sum a finite sensitivity. The bounds are a choice with a cost: incomes above 30,000 are pulled down. Because the bounds must not be read from the data (that would leak), they come from policy: the fund's eligibility ceiling, for instance.","minutes":null,"lo":["LO3"]},{"id":"equal-split","n":25,"title":"An equal split wastes budget on the queries that do not need it","kind":"content","session":3,"hash":"058de948","md":"#### [day2#equal-split] An equal split wastes budget on the queries that do not need it\n\n*Lab 2.3, the reference run*\n\n| Item | Value |\n| --- | --- |\n| Q3 district counts | 2.05% |\n| Q1 region counts | 0.24% |\n| Q2 mean income | 0.05% |\n| Q4 mean household | 0.04% |\n\nMean relative error with epsilon 0.25 each.","notes":"From Lab 2.3. The means are over tens of thousands of applicants, so noise barely moves them; the district counts are small. An equal split looks fair and is not efficient.","minutes":null,"lo":["LO3"]},{"id":"split-by-need","n":26,"title":"Give each query budget in proportion to its error at epsilon 1","kind":"content","session":3,"hash":"ba76c030","md":"#### [day2#split-by-need] Give each query budget in proportion to its error at epsilon 1\n\n*Allocate by need*\n\n| Query | Equal: epsilon | Equal: error | By need: epsilon | By need: error |\n| --- | --- | --- | --- | --- |\n| Q1 | 0.25 | 0.24% | 0.099 | 0.61% |\n| Q2 | 0.25 | 0.05% | 0.025 | 0.57% |\n| Q3 | 0.25 | 2.05% | 0.857 | 0.54% |\n| Q4 | 0.25 | 0.04% | 0.019 | 0.53% |\n\n> **Takeaway.** The worst error falls from 2.05% to 0.61% for the same total budget.","notes":"Relative error falls as one over epsilon, so a split proportional to each query's error at epsilon 1 equalises the errors. Other rules are defensible (protect the query that drives a decision); the point is that the split is argued from measured errors and written down.","minutes":null,"lo":["LO3"]},{"id":"ledger","n":27,"title":"Let the library keep the ledger, and check it adds up to the budget","kind":"content","session":3,"hash":"8c9cc9d6","md":"#### [day2#ledger] Let the library keep the ledger, and check it adds up to the budget\n\n*Accounting*\n\n```python\n# file: Lab 2.3 output\n{'Q1': 0.099426, 'Q2': 0.024857,\n 'Q3': 0.856597, 'Q4': 0.01912}  total 1.0\n```\n\n- Each value is `map` of the measurement, not a typed number\n- Q2 and Q4 each sum two measurements: the sum and the count\n- The ledger goes into the release log, with the date and the approver","notes":"The split shown is from the reference run; participants' splits differ slightly because the errors at epsilon 1 are themselves estimated by simulation. What must not differ is the total. In a production setting a compositor in the library refuses a query that would exceed the budget; the lab keeps the arithmetic visible instead.","minutes":null,"lo":["LO3"]},{"id":"monthly-cost","n":28,"title":"Monthly releases from one yearly budget make every release noisier","kind":"content","session":3,"hash":"858be0d5","md":"#### [day2#monthly-cost] Monthly releases from one yearly budget make every release noisier\n\n*The cost of repetition*\n\n**0.61% → 7.2%** worst mean relative error, one yearly release against twelve monthly releases from the same budget\n\n- **The decision is Bashayer's.** Fresher numbers or more accurate numbers. The budget makes the trade visible instead of hiding it in suppression rules.","notes":"From the stretch of Lab 2.3 on the reference run. Twelve releases each get a twelfth of the budget, so each error is about twelve times larger. This is the residual risk named for R5 in yesterday's decision table.","minutes":null,"lo":["LO3"]},{"id":"check-parallel","n":29,"title":"How much did the region counts spend?","kind":"quiz","session":3,"hash":"4def58fb","md":"#### [day2#check-parallel] How much did the region counts spend?\n\n*Checkpoint*\n\n**Question:** Malak releases applicants per region, 13 counts, each with noise of scale 10 (epsilon 0.1 for a count). Every applicant is in exactly one region. What has the release spent?\n\n- A. 1.3, the sum over the 13 regions\n- B. 0.1, because the regions hold disjoint applicants\n- C. About 0.008, a thirteenth of 0.1\n- D. Nothing, since counts are aggregates","notes":"Answer B. A is the usual mistake and it is costly: it makes people think they cannot afford detailed tables.","minutes":null,"lo":["LO3"]},{"id":"lab-2-3","n":30,"title":"Split one budget over four queries","kind":"lab","session":3,"hash":"79790d27","md":"#### [day2#lab-2-3] Split one budget over four queries\n\nLab 2.3 · 25 min\n\nSplit one budget across four queries and justify the allocation.\n\n[D2_3_split_one_budget.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D2_3_split_one_budget.ipynb)\n\n- [ ] The four queries and their sensitivities (5 min)\n- [ ] An equal split and its errors (6 min)\n- [ ] A split by need (7 min)\n- [ ] Check that the ledger adds up to the budget (4 min)\n- [ ] Justify the allocation (3 min)\n- [ ] ✱ Stretch: Work out what the same budget buys when the four queries are asked every month","notes":"Expected: equal-split errors near 0.24%, 0.05%, 2.05% and 0.04%; the split by need gives Q3 about 0.86 of the budget and every error near 0.5% to 0.6%; ledger total 1.0. The lab takes about half a minute in full mode. The justification sentence is what Yahya signs; ask two participants to read theirs aloud.","minutes":null,"lo":[]},{"id":"s4","n":31,"title":"Synthetic data and leakage","kind":"section","session":4,"hash":"7bca8da8","md":"#### [day2#s4] Synthetic data and leakage\n\n*Session 4*\n\n- Generate a synthetic extract by sequential modelling\n- Measure its utility against the real table\n- Test it for record copying and membership inference","notes":"","minutes":null,"lo":["LO4"]},{"id":"synthetic-idea","n":32,"title":"A synthetic extract keeps the patterns and replaces the people","kind":"content","session":4,"hash":"c060fb12","md":"#### [day2#synthetic-idea] A synthetic extract keeps the patterns and replaces the people\n\n*A different kind of release*\n\n- Fit a model of the table, then **sample new rows** from it\n- Useful where the analyst needs rows: a hackathon, teaching, testing a pipeline\n- No row is a real person, **if** the model did not memorise them\n- That \"if\" is tested, every time, before release\n\n- **No guarantee by default.** An ordinary generator gives no formal privacy guarantee. A generator trained with differential privacy does, at a cost in utility.","notes":"The capability slot is \"synthetic tabular data\", with the Synthetic Data Vault and synthpop as examples. The lab writes the sequential method in scikit-learn so that participants see why it can copy records. SDV 2.2 and synthpop 1.9 were the current releases when the course was built. Sources: Synthetic Data Vault documentation; synthpop on CRAN.","minutes":null,"lo":["LO4"]},{"id":"sequential-cart","n":33,"title":"Each column is drawn from a tree fitted on the columns before it","kind":"content","session":4,"hash":"1a0d7b7b","md":"#### [day2#sequential-cart] Each column is drawn from a tree fitted on the columns before it\n\n*How the lab's generator works*\n\n1. **1 · age** drawn from observed ages\n2. **2 · gender** tree on age\n3. **3 · ...** tree on all earlier columns\n4. **4 · decision** value taken from a training row in the same leaf\n\n> **What goes wrong.** If a leaf may hold a single training row, the \"donor\" is always that row: the synthetic row becomes a copy of a real person.","notes":"This is the classification-and-regression-tree method that synthpop uses by default, written in about fifteen lines. The minimum leaf size is the knob that trades fidelity for privacy. Sources: Nowok, Raab and Dibben, synthpop: Bespoke Creation of Synthetic Data in R (2016).","minutes":null,"lo":["LO4"]},{"id":"utility-measures","n":34,"title":"Measure utility on the shares and on a model trained on synthetic rows","kind":"content","session":4,"hash":"a1b00832","md":"#### [day2#utility-measures] Measure utility on the shares and on a model trained on synthetic rows\n\n*Is the file useful?*\n\n- **Marginal distance.** Total variation distance between real and synthetic shares of each categorical column, averaged. 0 is identical.\n- **Train synthetic, test real.** A model predicting the officer's decision, trained on synthetic rows and scored on real rows it never saw. Compare with the same model trained on real rows: AUC 0.936.","notes":"The real-trained AUC 0.936 is from the reference run of Lab 2.4 on 8,000 training rows. Marginals check that the shares survive; the model checks that relationships survive, which is what an analyst uses.","minutes":null,"lo":["LO4"]},{"id":"leakage-measures","n":35,"title":"Compare distances to the training rows with distances to unseen rows","kind":"content","session":4,"hash":"ce36874a","md":"#### [day2#leakage-measures] Compare distances to the training rows with distances to unseen rows\n\n*Does the file leak?*\n\n- **Exact copies.** Synthetic rows identical to a training row, against the same share for holdout rows.\n- **Distance to closest record.** Share of synthetic rows closer to the training set than to the holdout. 50% means no preference.\n- **Membership inference.** Score each real record by its nearest synthetic row. AUC 0.5 means the attacker cannot tell members.","notes":"The holdout is the control group: coarse data repeats naturally, so the question is never \"are there copies?\" but \"are there more copies of training rows than of rows the generator never saw?\". The membership attack used here is the simplest one; stronger attacks exist, so a pass is evidence, not proof.","minutes":null,"lo":["LO4"]},{"id":"synthetic-results","n":36,"title":"The most useful file is the one that copies people","kind":"content","session":4,"hash":"2fd52160","md":"#### [day2#synthetic-results] The most useful file is the one that copies people\n\n*Lab 2.4, the reference run*\n\n| Setting | Marginal distance | AUC, synthetic-trained | Copies of training rows | Copies of holdout rows | Membership AUC |\n| --- | --- | --- | --- | --- | --- |\n| leaf = 1 | 0.006 | 0.935 | 92.8% | 0.08% | 0.819 |\n| leaf = 200 | 0.006 | 0.933 | 0.10% | 0.05% | 0.511 |\n\n> **Utility alone would pick the wrong file.** Both look equally useful; one of them is 93% real people.","notes":"From Lab 2.4 on 8,000 training rows. In an exploration run for the course, leaves of 50 still produced 0.66% copies against 0.03% for the holdout, so a leaf size that \"sounds safe\" is not evidence: test it. Release rule used in the lab: copies at most twice the holdout baseline with a floor of 0.1%, membership AUC below 0.55, synthetic-trained AUC within 0.05 of the real one.","minutes":null,"lo":["LO4"]},{"id":"release-recommendation","n":37,"title":"Release the leaf = 200 file for the hackathon, under stated limits","kind":"content","session":4,"hash":"4d26c43f","md":"#### [day2#release-recommendation] Release the leaf = 200 file for the hackathon, under stated limits\n\n*The recommendation*\n\n- **Passes**: copies near baseline, membership AUC 0.511, utility within 0.003 AUC\n- **Limits**: for prototypes, not for statistics about small groups\n- **Not a guarantee**: one attack was tested; the report says so\n- **Rejected**: leaf = 1, which copies 92.8% of rows\n\n- **LO4 evidence.** The utility and leakage report that Lab 2.4 saves, with this recommendation and its limits.","notes":"A recommendation names what passed, what it is for, and what it is not for. Small groups are poorly reproduced by any generator with large leaves: the stretch plants a rare combination to show it.","minutes":null,"lo":["LO4"]},{"id":"check-synthetic","n":38,"title":"Which result should block the release?","kind":"quiz","session":4,"hash":"f302d7a7","md":"#### [day2#check-synthetic] Which result should block the release?\n\n*Checkpoint*\n\n**Question:** A vendor's synthetic file matches the real one on utility. No row is an exact copy, and 31% of its rows are closer to the training data than to a holdout. What do you conclude?\n\n- A. Nothing blocks it on these tests: no copies, and no preference for training rows\n- B. It leaks: 31% of rows sit next to training records\n- C. It is too accurate to be private, so it must be copying\n- D. It is differentially private, since no row is copied","notes":"Answer A. The unusual 31% might itself deserve a question (a holdout drawn from a different population?), which is a good discussion for strong groups. D is the misconception to correct firmly.","minutes":null,"lo":["LO4"]},{"id":"lab-2-4","n":39,"title":"Test a synthetic extract","kind":"lab","session":4,"hash":"f5c45a5a","md":"#### [day2#lab-2-4] Test a synthetic extract\n\nLab 2.4 · 25 min\n\nGenerate a synthetic extract and test it with distance-to-closest-record and membership-inference checks.\n\n[D2_4_generate_synthetic_extract.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D2_4_generate_synthetic_extract.ipynb)\n\n- [ ] Fit the generator at two settings (6 min)\n- [ ] Utility: marginals and a model trained on synthetic rows (6 min)\n- [ ] Distance to the closest record (6 min)\n- [ ] Membership inference (4 min)\n- [ ] Release recommendation (3 min)\n- [ ] ✱ Stretch: Plant one rare combination and see whether the generator reproduces it","notes":"Expected: leaf = 1 copies about 93% of training rows and has membership AUC near 0.82; leaf = 200 copies about 0.1% (baseline 0.05%) with membership AUC near 0.51; only leaf = 200 passes. The full run takes about 30 seconds; quick mode uses 3,000 rows. If a laptop is slow, set YUSR_QUICK=1.","minutes":null,"lo":[]},{"id":"wrap-up","n":40,"title":"Every control has a guarantee, a cost and a test","kind":"content","session":4,"hash":"917d34bb","md":"#### [day2#wrap-up] Every control has a guarantee, a cost and a test\n\n*Day 2 · Three things to keep*\n\n- **k-anonymity.** k of five on the chosen fields; 293 records suppressed, mostly from small groups; no guarantee beyond those fields.\n- **Differential privacy.** A guarantee whatever the attacker knows; error near one over epsilon; a budget that adds up.\n- **Synthetic data.** Rows without people only if tested: copies, distance and membership against a holdout.","notes":"Ask: which of today's controls would you put in front of the public dashboard, the researcher and the hackathon? The answers should match yesterday's decision table. Tomorrow moves from protecting people's data to the model's decisions about them.","minutes":null,"lo":[]},{"id":"next","n":41,"title":"Audit for fairness","kind":"content","session":4,"hash":"37970806","md":"#### [day2#next] Audit for fairness\n\n*Tomorrow · Day 3*\n\n- Ahliya's errors by gender, region and nationality, with intervals, and one intersection\n- Two fairness criteria that cannot both hold, and how to choose\n- Five findings mapped to the national bias guide, then two mitigations and their cost\n- Before tomorrow: recall how a Wilson interval for a proportion is computed (DS-204)","notes":"Day 3 uses a different reference state: 12,000 applications scored by Ahliya and reviewed in full. Nothing from today is needed.","minutes":null,"lo":[]}],"activities":[{"id":"review-day1-q1","slide":"review-day1","type":"single","prompt":"Yesterday three fields linked 99.2% of the register's applicants to their income and decision. Yahya asks what the attacker had to have. Which answer is right?","options":[{"key":"A","text":"The key that maps study codes back to applicants"},{"key":"B","text":"At least one direct identifier left in the release"},{"key":"C","text":"An outside file sharing birth date, gender and postcode with the release"},{"key":"D","text":"The applicants' incomes, to match them to the release"}],"correct":[2],"explanation":"A linkage attack needs only quasi-identifiers that an outside file shares with the release; the names come from the outside file.","misconceptions":["Assumes re-identification needs the fund's secrets: the study code was never used in the join","Thinks only direct identifiers re-identify: no name or national identifier was in the release","","Confuses the harm with the means: income is what the link revealed, not what it used"],"lo":["LO2"]},{"id":"check-suppress-q1","slide":"check-suppress","type":"single","prompt":"At five-year band and district, 1,728 records (2.9%) are below five. Waad wants to keep the district. Malak can suppress those 1,728 or move to region and suppress 293. What should she weigh?","options":[{"key":"A","text":"Which small groups the 1,728 are, and whether Waad's question needs the district"},{"key":"B","text":"Always the option with fewer suppressed records"},{"key":"C","text":"Always suppression, since it leaves every kept record exact"},{"key":"D","text":"Whichever option gives the higher k"}],"correct":[0],"explanation":"Both meet k of five. The choice is about utility: what the question needs, and whose records the suppression removes.","misconceptions":["","Thinks the least suppression always wins: it ignores what the question needs","Thinks suppression is free because rows are simply removed: they are the rare groups, so estimates for them shift","Confuses the target with a preference: k of five is met either way, so k cannot decide it"],"lo":["LO2"]},{"id":"check-epsilon-q1","slide":"check-epsilon","type":"single","prompt":"Malak releases the 59 district counts at epsilon 0.1 instead of 0.5. Bashayer asks what changed. Which statement is right?","options":[{"key":"A","text":"The large districts now carry most of the error"},{"key":"B","text":"The counts are now private, where before they were not"},{"key":"C","text":"The noise is 59 times larger, one share per district"},{"key":"D","text":"Each count's noise is about five times larger, and the guarantee is stronger"}],"correct":[3],"explanation":"The scale is sensitivity over epsilon: going from 0.5 to 0.1 multiplies it by five, and a smaller epsilon bounds any one applicant's influence more tightly.","misconceptions":["Thinks noise grows with the count: the noise scale is set by sensitivity and epsilon, not by the district's size","Thinks privacy is binary: every epsilon gives a guarantee, a smaller one is a stronger one","Confuses the sensitivity with the number of counts: one person changes one count, whatever the number of districts",""],"lo":["LO3"]},{"id":"check-parallel-q1","slide":"check-parallel","type":"single","prompt":"Malak releases applicants per region, 13 counts, each with noise of scale 10 (epsilon 0.1 for a count). Every applicant is in exactly one region. What has the release spent?","options":[{"key":"A","text":"1.3, the sum over the 13 regions"},{"key":"B","text":"0.1, because the regions hold disjoint applicants"},{"key":"C","text":"About 0.008, a thirteenth of 0.1"},{"key":"D","text":"Nothing, since counts are aggregates"}],"correct":[1],"explanation":"Parallel composition: one applicant affects only one region's count, so the release spends the epsilon of one count.","misconceptions":["Adds epsilons over disjoint groups: sequential composition applies only to releases about the same people","","Divides the budget instead of adding it: splitting into regions does not make each count cheaper","Thinks counts are free because they are aggregates: every noisy count spends budget"],"lo":["LO3"]},{"id":"check-synthetic-q1","slide":"check-synthetic","type":"single","prompt":"A vendor's synthetic file matches the real one on utility. No row is an exact copy, and 31% of its rows are closer to the training data than to a holdout. What do you conclude?","options":[{"key":"A","text":"Nothing blocks it on these tests: no copies, and no preference for training rows"},{"key":"B","text":"It leaks: 31% of rows sit next to training records"},{"key":"C","text":"It is too accurate to be private, so it must be copying"},{"key":"D","text":"It is differentially private, since no row is copied"}],"correct":[0],"explanation":"Leakage shows as more closeness to training rows than to unseen rows. 31% is below the 50% of no preference, and no row is copied.","misconceptions":["","Reads any share below 100% as leakage: the warning sign is a share well above 50%, not below it","Treats high utility as a leak in itself: utility is a warning only when copies or membership show memorising","Thinks no copies means a formal guarantee: these tests are evidence against one attack, not a proof"],"lo":["LO4"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day2.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

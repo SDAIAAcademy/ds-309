@@ -1,0 +1,1066 @@
+{
+  "v": 1,
+  "engine": "1.0.0",
+  "build": {
+    "at": "2026-11-15T16:16:16Z",
+    "version": "2027.1.0",
+    "commit": "8cfd447"
+  },
+  "lang": "en",
+  "dir": "ltr",
+  "langs": [
+    "en"
+  ],
+  "alt": {},
+  "course": {
+    "id": "ds-309",
+    "code": "DS-309",
+    "version": "2027.1.0",
+    "title": "Responsible Data Science: Privacy, Fairness and Documentation",
+    "tagline": "Measure and reduce re-identification risk, release counts under a privacy budget, test synthetic data for leakage, audit a screening model for subgroup errors, and document a release so that someone else can rerun it",
+    "description": "Participants take the synthetic applicant data and eligibility-screening model of Yusr Housing Support Fund, a fictional public fund, through the checks a release needs: they measure re-identification risk and de-identify the table, publish differentially private counts under a budget, test a synthetic extract for leakage, audit subgroup errors against the bias types in SDAIA's AI Bias Reference Guide, and write the datasheet, model card and impact assessment a reviewer needs. Calibration and explanation are DS-305.",
+    "track": "data-science",
+    "track_name": "Data Science Track",
+    "level": 300,
+    "badge": {
+      "name": "Data Science",
+      "level": "Associate"
+    },
+    "audience": "Practitioners. Data scientists and analysts who have completed the level 200 set or can show equivalent work: an analysis they framed, carried out and explained to a stakeholder.",
+    "prerequisites": [
+      "DS-204 Machine Learning for Tabular Data: Baselines and Validation",
+      "DS-207 Responsible Data Practice and Conduct in Analytical Work",
+      "Trains and evaluates a classifier in Python",
+      "Computes error rates and confidence intervals for proportions",
+      "Setup: a laptop CPU with uv, or Google Colab. No lab calls or downloads a model. See labs/README.md."
+    ],
+    "url": "https://sdaiaacademy.github.io/ds-309/",
+    "repo": "SDAIAAcademy/ds-309",
+    "home": "../index.html",
+    "format": "intensive",
+    "format_note": "Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task",
+    "shape": "4 teaching days + capstone day",
+    "hours": {
+      "instruction": 6,
+      "lab": 7,
+      "guided_self_study": 6,
+      "assessment": 1,
+      "capstone": 6,
+      "total": 26
+    },
+    "unit": "day",
+    "outcomes": [
+      {
+        "id": "LO1",
+        "text": "Distinguish pseudonymisation, de-identification, aggregation, synthetic data and differential privacy by the guarantee and cost of each, given five described data releases",
+        "level": "Awareness",
+        "evidence": "a decision table naming the fitting control and the residual risk for each"
+      },
+      {
+        "id": "LO2",
+        "text": "Measure re-identification risk from quasi-identifiers and reduce it while tracking analytic utility, given 60,000 synthetic applicant records and a linkable external file",
+        "level": "Applied",
+        "evidence": "unique records, linkage success and three key statistics before and after treatment"
+      },
+      {
+        "id": "LO3",
+        "text": "Compute differentially private counts and means and state the accuracy cost of a privacy budget, given three candidate budgets",
+        "level": "Applied",
+        "evidence": "error-against-budget curves and a recommended setting"
+      },
+      {
+        "id": "LO4",
+        "text": "Test a synthetic extract for analytic utility and membership-inference leakage, given a generator trained on the applicant table",
+        "level": "Applied",
+        "evidence": "a utility and leakage report with a release recommendation"
+      },
+      {
+        "id": "LO5",
+        "text": "Audit a screening model for subgroup disparities, choose fairness criteria that fit the decision and evaluate two mitigations, given a scored test set with protected and intersectional attributes",
+        "level": "Performance",
+        "evidence": "an audit report with disaggregated error rates, intervals and a recommendation"
+      },
+      {
+        "id": "LO6",
+        "text": "Build the datasheet, model card and impact assessment a reviewer needs to judge and rerun a release, given the participant's capstone release",
+        "level": "Performance",
+        "evidence": "a pack that a peer reruns and challenges, with a likelihood and impact score for each risk"
+      }
+    ],
+    "case_study": {
+      "name": "Yusr Housing Support Fund",
+      "summary": "Yusr Housing Support Fund is a fictional public fund that screens applications for housing support with an eligibility screening model, Ahliya. A researcher asks for an extract, the fund wants to publish district counts and a synthetic extract, and internal audit wants the model audited: participants take 60,000 synthetic applicant records, a linkable public register and 12,000 scored and reviewed applications through every check a release needs. All data is synthetic, generated with a fixed seed, and planted with the problems the labs find."
+    },
+    "days": [
+      {
+        "id": "day1",
+        "kind": "day",
+        "n": 1,
+        "number": 1,
+        "label": "Day 1",
+        "title": "Find the personal data",
+        "subtitle": "Identifiers, classification, linkage and disclosure risk",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day1.html",
+        "md": "../slides/day1.md",
+        "url": "https://sdaiaacademy.github.io/ds-309/slides/day1.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Personal data in an analysis",
+            "summary": "Which applicant fields identify a person directly, which do it in combination, and which are sensitive",
+            "outcomes": [
+              "Tell direct identifiers, quasi-identifiers and sensitive attributes apart in a real table",
+              "Find identifiers hiding in free-text fields",
+              "Decide keep, drop or transform for each field against a stated purpose"
+            ],
+            "lo": [
+              "LO1"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.1",
+              "title": "Tag the applicant fields (AI-off)",
+              "summary": "Tag each applicant field by identifiability and decide what to drop (AI-off).",
+              "minutes": 25,
+              "href": "../labs/D1_1_tag_each_applicant.ipynb",
+              "steps": [
+                {
+                  "text": "Load the table and list its fields",
+                  "minutes": 3
+                },
+                {
+                  "text": "Tag each field by identifiability",
+                  "minutes": 8
+                },
+                {
+                  "text": "Find identifiers in the case notes",
+                  "minutes": 6
+                },
+                {
+                  "text": "Keep, drop or transform, with a reason",
+                  "minutes": 6
+                },
+                {
+                  "text": "Count what the purpose still needs",
+                  "minutes": 2
+                }
+              ],
+              "stretch": "Hash the national identifier and decide whether the hash is still personal data"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Classification and permitted use",
+            "summary": "The national classification levels, the secondary use rules, and five release controls by guarantee and cost",
+            "outcomes": [
+              "Assign a national classification level to an extract from its impact",
+              "State when an extract may leave the fund under the secondary use rules",
+              "Match five release controls to their guarantee and their cost"
+            ],
+            "lo": [
+              "LO1"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.2",
+              "title": "Classify three extracts",
+              "summary": "Assign classification levels to three extracts and decide which may leave the fund.",
+              "minutes": 25,
+              "href": "../labs/D1_2_assign_classification_levels.ipynb",
+              "steps": [
+                {
+                  "text": "Read the three extracts",
+                  "minutes": 3
+                },
+                {
+                  "text": "Score the impact and the level of each",
+                  "minutes": 7
+                },
+                {
+                  "text": "Decide which may leave the fund, and on what conditions",
+                  "minutes": 7
+                },
+                {
+                  "text": "Five releases, five controls: the decision table",
+                  "minutes": 8
+                }
+              ],
+              "stretch": "Rewrite the researcher's request so that it asks for the minimum necessary"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Linkage attacks",
+            "summary": "How a release with no names is joined to an outside file, and what a link discloses",
+            "outcomes": [
+              "Explain how a linkage attack joins a release to an outside file",
+              "Run a linkage on quasi-identifiers and measure its success",
+              "Name what a successful link discloses"
+            ],
+            "lo": [
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.3",
+              "title": "Link the release to the register",
+              "summary": "Re-identify applicants by linking a release to a synthetic public register.",
+              "minutes": 25,
+              "href": "../labs/D1_3_re_identify_applicants.ipynb",
+              "steps": [
+                {
+                  "text": "Load the release and the register",
+                  "minutes": 3
+                },
+                {
+                  "text": "Join on birth date, gender and postcode",
+                  "minutes": 7
+                },
+                {
+                  "text": "Keep unique matches and score them against the truth key",
+                  "minutes": 7
+                },
+                {
+                  "text": "What the links reveal",
+                  "minutes": 5
+                },
+                {
+                  "text": "Try a coarser join",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Link on the district in place of the postcode and compare the success"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Measuring disclosure risk",
+            "summary": "Equivalence classes, uniqueness and k, and why k alone misses what a group reveals",
+            "outcomes": [
+              "Compute equivalence classes, uniqueness and k for a release",
+              "Compare candidate releases by record-level risk",
+              "Explain why k alone misses attribute disclosure"
+            ],
+            "lo": [
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "1.4",
+              "title": "Uniqueness and k for three releases",
+              "summary": "Compute unique quasi-identifier combinations and k for three candidate releases.",
+              "minutes": 25,
+              "href": "../labs/D1_4_compute_unique_quasi.ipynb",
+              "steps": [
+                {
+                  "text": "Build the three candidate releases",
+                  "minutes": 5
+                },
+                {
+                  "text": "Equivalence class sizes",
+                  "minutes": 6
+                },
+                {
+                  "text": "Unique records, k and records below five",
+                  "minutes": 7
+                },
+                {
+                  "text": "Average re-identification risk",
+                  "minutes": 4
+                },
+                {
+                  "text": "Pick the release to treat",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Measure the l-diversity of social security status in release B"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day2",
+        "kind": "day",
+        "n": 2,
+        "number": 2,
+        "label": "Day 2",
+        "title": "Release with less risk",
+        "subtitle": "Generalisation, differential privacy, budgets and synthetic data",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day2.html",
+        "md": "../slides/day2.md",
+        "url": "https://sdaiaacademy.github.io/ds-309/slides/day2.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Generalisation and suppression",
+            "summary": "Generalise and suppress until every record hides among five, and measure what the analysis loses",
+            "outcomes": [
+              "Generalise quasi-identifiers along a hierarchy",
+              "Suppress the records that stay below k",
+              "Measure the utility cost on key statistics"
+            ],
+            "lo": [
+              "LO2"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.1",
+              "title": "Reach k of five",
+              "summary": "Reach k of at least five and measure the change in three key statistics.",
+              "minutes": 25,
+              "href": "../labs/D2_1_reach_k_least.ipynb",
+              "steps": [
+                {
+                  "text": "Three key statistics before treatment",
+                  "minutes": 5
+                },
+                {
+                  "text": "Generalise birth date and postcode step by step",
+                  "minutes": 8
+                },
+                {
+                  "text": "Suppress what is still below five",
+                  "minutes": 4
+                },
+                {
+                  "text": "The three statistics after treatment",
+                  "minutes": 5
+                },
+                {
+                  "text": "Rerun the linkage",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Find a second treatment that keeps the district, and compare its cost"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Differential privacy for counts",
+            "summary": "The promise of differential privacy, calibrated noise on counts, and the error a budget costs",
+            "outcomes": [
+              "State what the differential privacy promise covers and what it does not",
+              "Add calibrated noise to counts with a library",
+              "Measure the error that a budget costs"
+            ],
+            "lo": [
+              "LO3"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.2",
+              "title": "District counts at three budgets",
+              "summary": "Release district counts at three budgets and plot the error.",
+              "minutes": 25,
+              "href": "../labs/D2_2_release_district_counts.ipynb",
+              "steps": [
+                {
+                  "text": "True counts of approved applicants by district",
+                  "minutes": 4
+                },
+                {
+                  "text": "One noisy release with the library",
+                  "minutes": 6
+                },
+                {
+                  "text": "Repeat at three budgets",
+                  "minutes": 7
+                },
+                {
+                  "text": "Plot the error against the budget",
+                  "minutes": 5
+                },
+                {
+                  "text": "Recommend a budget",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Post-process the counts (no negatives, whole numbers) and check that the error does not grow"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Budgets and composition",
+            "summary": "Sequential and parallel composition, bounded means, and one budget spread over several queries",
+            "outcomes": [
+              "Add up privacy loss under sequential and parallel composition",
+              "Release a bounded mean with a library",
+              "Allocate one budget across queries by need"
+            ],
+            "lo": [
+              "LO3"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.3",
+              "title": "Split one budget over four queries",
+              "summary": "Split one budget across four queries and justify the allocation.",
+              "minutes": 25,
+              "href": "../labs/D2_3_split_one_budget.ipynb",
+              "steps": [
+                {
+                  "text": "The four queries and their sensitivities",
+                  "minutes": 5
+                },
+                {
+                  "text": "An equal split and its errors",
+                  "minutes": 6
+                },
+                {
+                  "text": "A split by need",
+                  "minutes": 7
+                },
+                {
+                  "text": "Check that the ledger adds up to the budget",
+                  "minutes": 4
+                },
+                {
+                  "text": "Justify the allocation",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Work out what the same budget buys when the four queries are asked every month"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Synthetic data and leakage",
+            "summary": "A synthetic extract generated column by column, its utility, and the tests that show it copies people",
+            "outcomes": [
+              "Generate a synthetic extract by sequential modelling",
+              "Measure its utility against the real table",
+              "Test it for record copying and membership inference"
+            ],
+            "lo": [
+              "LO4"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "2.4",
+              "title": "Test a synthetic extract",
+              "summary": "Generate a synthetic extract and test it with distance-to-closest-record and membership-inference checks.",
+              "minutes": 25,
+              "href": "../labs/D2_4_generate_synthetic_extract.ipynb",
+              "steps": [
+                {
+                  "text": "Fit the generator at two settings",
+                  "minutes": 6
+                },
+                {
+                  "text": "Utility: marginals and a model trained on synthetic rows",
+                  "minutes": 6
+                },
+                {
+                  "text": "Distance to the closest record",
+                  "minutes": 6
+                },
+                {
+                  "text": "Membership inference",
+                  "minutes": 4
+                },
+                {
+                  "text": "Release recommendation",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Plant one rare combination and see whether the generator reproduces it"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day3",
+        "kind": "day",
+        "n": 3,
+        "number": 3,
+        "label": "Day 3",
+        "title": "Audit for fairness",
+        "subtitle": "Disaggregated errors, conflicting criteria, bias types and mitigation",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day3.html",
+        "md": "../slides/day3.md",
+        "url": "https://sdaiaacademy.github.io/ds-309/slides/day3.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Disaggregating errors",
+            "summary": "Error rates by group and by intersection, with intervals that say how much a small group can tell",
+            "outcomes": [
+              "Compute false negative and false positive rates by group with intervals",
+              "Slice by an intersection of two attributes",
+              "Report a small group without overclaiming"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.1",
+              "title": "Error rates with intervals",
+              "summary": "Compute error rates by gender, region and nationality with intervals.",
+              "minutes": 25,
+              "href": "../labs/D3_1_compute_error_rates.ipynb",
+              "steps": [
+                {
+                  "text": "Confusion counts by group",
+                  "minutes": 6
+                },
+                {
+                  "text": "Rates with Wilson intervals",
+                  "minutes": 7
+                },
+                {
+                  "text": "One intersection",
+                  "minutes": 6
+                },
+                {
+                  "text": "Mark the cells too small to read",
+                  "minutes": 3
+                },
+                {
+                  "text": "One sentence per finding",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Rebuild the table with Fairlearn's MetricFrame and compare"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Criteria that conflict",
+            "summary": "Demographic parity, equal opportunity and predictive parity, why they conflict, and how to choose",
+            "outcomes": [
+              "Compute demographic parity, equal opportunity and predictive parity gaps",
+              "Show why they cannot all hold when base rates differ",
+              "Choose a criterion from the harm of each kind of error"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.2",
+              "title": "Two criteria in conflict",
+              "summary": "Show two fairness criteria conflicting on the test set and choose one.",
+              "minutes": 25,
+              "href": "../labs/D3_2_show_two_fairness.ipynb",
+              "steps": [
+                {
+                  "text": "Three gaps at the current threshold",
+                  "minutes": 6
+                },
+                {
+                  "text": "Equalise selection rates and watch the other gaps",
+                  "minutes": 8
+                },
+                {
+                  "text": "Equalise false negative rates instead",
+                  "minutes": 6
+                },
+                {
+                  "text": "Choose and justify",
+                  "minutes": 5
+                }
+              ],
+              "stretch": "Find the thresholds that equalise predictive parity and read the other gaps"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Bias across the lifecycle",
+            "summary": "Where in the lifecycle a bias enters, its name in the national guide, and the check that tells two apart",
+            "outcomes": [
+              "Place a finding in a stage of the AI system lifecycle",
+              "Name its bias type from the national bias guide",
+              "Run the check that separates two neighbouring types"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.3",
+              "title": "Five findings, five types",
+              "summary": "Map five findings to bias types in the national guide.",
+              "minutes": 25,
+              "href": "../labs/D3_3_map_five_findings.ipynb",
+              "steps": [
+                {
+                  "text": "Read the five findings",
+                  "minutes": 3
+                },
+                {
+                  "text": "Run the evidence check for each",
+                  "minutes": 12
+                },
+                {
+                  "text": "Map each to a type and a stage",
+                  "minutes": 6
+                },
+                {
+                  "text": "Check the mapping",
+                  "minutes": 4
+                }
+              ],
+              "stretch": "Write the sixth finding you would look for next, and its check"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Mitigation and its cost",
+            "summary": "Reweighting before training, group thresholds after it, and what each costs in accuracy and disparity",
+            "outcomes": [
+              "Apply reweighting before training",
+              "Apply group thresholds after training",
+              "Compare accuracy and disparity, and recommend"
+            ],
+            "lo": [
+              "LO5"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "3.4",
+              "title": "Reweighting and a threshold change",
+              "summary": "Apply reweighting and a threshold change and compare accuracy and disparity.",
+              "minutes": 25,
+              "href": "../labs/D3_4_apply_reweighting_threshold.ipynb",
+              "steps": [
+                {
+                  "text": "The baseline: accuracy and gaps",
+                  "minutes": 4
+                },
+                {
+                  "text": "Reweight the training data and retrain",
+                  "minutes": 8
+                },
+                {
+                  "text": "Group thresholds on the baseline model",
+                  "minutes": 7
+                },
+                {
+                  "text": "One comparison table and a recommendation",
+                  "minutes": 6
+                }
+              ],
+              "stretch": "Repeat the threshold change for the intersection of Day 3 Session 1"
+            }
+          }
+        ]
+      },
+      {
+        "id": "day4",
+        "kind": "day",
+        "n": 4,
+        "number": 4,
+        "label": "Day 4",
+        "title": "Document and assess",
+        "subtitle": "Datasheets, model cards, impact assessment and review by a peer",
+        "shape": "4 sessions · 4 labs",
+        "deck": "../slides/day4.html",
+        "md": "../slides/day4.md",
+        "url": "https://sdaiaacademy.github.io/ds-309/slides/day4.html",
+        "sessions": [
+          {
+            "n": 1,
+            "label": "Session 1",
+            "title": "Datasheets",
+            "summary": "What a datasheet of a de-identified release must answer, filled from the release log",
+            "outcomes": [
+              "List what a datasheet of a de-identified release must answer",
+              "Fill each answer from a log, not from memory",
+              "Test a datasheet for completeness"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.1",
+              "title": "The datasheet of the release",
+              "summary": "Write the datasheet for the de-identified release.",
+              "minutes": 25,
+              "href": "../labs/D4_1_write_datasheet_de.ipynb",
+              "steps": [
+                {
+                  "text": "Read the release log",
+                  "minutes": 4
+                },
+                {
+                  "text": "Fill the composition and collection sections",
+                  "minutes": 7
+                },
+                {
+                  "text": "Fill the de-identification and residual risk sections",
+                  "minutes": 7
+                },
+                {
+                  "text": "Run the completeness check",
+                  "minutes": 5
+                },
+                {
+                  "text": "Name what a reader still cannot rerun",
+                  "minutes": 2
+                }
+              ],
+              "stretch": "Add the distribution terms for the researcher: licence, retention and destruction"
+            }
+          },
+          {
+            "n": 2,
+            "label": "Session 2",
+            "title": "Model cards",
+            "summary": "A model card with intended use, disaggregated results and the fairness criterion it was held to",
+            "outcomes": [
+              "Write the intended and out-of-scope uses of a model",
+              "Report disaggregated results with intervals",
+              "State the fairness criterion and what it costs"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.2",
+              "title": "The model card of Ahliya",
+              "summary": "Write a model card with disaggregated results and intended use.",
+              "minutes": 25,
+              "href": "../labs/D4_2_write_model_card.ipynb",
+              "steps": [
+                {
+                  "text": "Model details and intended use",
+                  "minutes": 5
+                },
+                {
+                  "text": "The disaggregated results table",
+                  "minutes": 8
+                },
+                {
+                  "text": "Fairness criterion, mitigation and cost",
+                  "minutes": 5
+                },
+                {
+                  "text": "Limits and out-of-scope uses",
+                  "minutes": 4
+                },
+                {
+                  "text": "Run the card check",
+                  "minutes": 3
+                }
+              ],
+              "stretch": "Write a one-paragraph summary of the card for applicants"
+            }
+          },
+          {
+            "n": 3,
+            "label": "Session 3",
+            "title": "Impact assessment",
+            "summary": "Risks scored on the national framework: likelihood, impact, level, treatment, residual risk and a reviewer",
+            "outcomes": [
+              "Score a risk's likelihood and impact on the national framework's scales",
+              "Choose a treatment and score the residual risk",
+              "Name a human reviewer for every high risk"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.3",
+              "title": "Score four risks",
+              "summary": "Score four risks on the national framework's likelihood and impact matrix and propose treatments.",
+              "minutes": 25,
+              "href": "../labs/D4_3_score_four_risks.ipynb",
+              "steps": [
+                {
+                  "text": "Read the four risks and their evidence",
+                  "minutes": 4
+                },
+                {
+                  "text": "Score likelihood and impact",
+                  "minutes": 7
+                },
+                {
+                  "text": "Treat and score again",
+                  "minutes": 7
+                },
+                {
+                  "text": "Name owners and reviewers",
+                  "minutes": 3
+                },
+                {
+                  "text": "Run the register check",
+                  "minutes": 4
+                }
+              ],
+              "stretch": "Add a fifth risk from your own audit and score it"
+            }
+          },
+          {
+            "n": 4,
+            "label": "Session 4",
+            "title": "Review by someone else",
+            "summary": "A colleague's result rerun from their notebook and data, and the documentation gaps that changed it",
+            "outcomes": [
+              "Rerun a colleague's result from their notebook and data",
+              "Find the undocumented choices that change a number",
+              "Record documentation gaps that a reviewer can act on"
+            ],
+            "lo": [
+              "LO6"
+            ],
+            "minutes": 50,
+            "lab": {
+              "id": "4.4",
+              "title": "Rerun a peer's result",
+              "summary": "Rerun one result from a peer's day 2 or day 3 notebook and record the documentation gaps.",
+              "minutes": 25,
+              "href": "../labs/D4_4_rerun_one_result.ipynb",
+              "steps": [
+                {
+                  "text": "Run the peer's code as given",
+                  "minutes": 5
+                },
+                {
+                  "text": "Compare with the claimed number",
+                  "minutes": 4
+                },
+                {
+                  "text": "Find the choices that move it",
+                  "minutes": 9
+                },
+                {
+                  "text": "Record the gaps",
+                  "minutes": 5
+                },
+                {
+                  "text": "State the corrected result",
+                  "minutes": 2
+                }
+              ],
+              "stretch": "Swap notebooks with a neighbour and rerun one of their Day 2 or Day 3 results"
+            }
+          }
+        ]
+      },
+      {
+        "id": "capstone",
+        "kind": "capstone",
+        "n": 5,
+        "number": null,
+        "label": "Capstone",
+        "title": "Capstone: the release pack",
+        "subtitle": "Ten-minute reviews of the Sabeel Scholarship Fund release pack, with one disparity recomputed live",
+        "shape": "",
+        "deck": "../slides/capstone.html",
+        "md": "../slides/capstone.md",
+        "url": "https://sdaiaacademy.github.io/ds-309/slides/capstone.html",
+        "sessions": []
+      }
+    ],
+    "capstone": {
+      "summary": "A release pack for a second synthetic case (a scholarship allocation model): treated extract, fairness audit, datasheet, model card and impact assessment, in a public repository whose README reports measured risk, utility and disparities, defended in a ten-minute review",
+      "submission": "A link to a public GitHub repository holding the release pack for the Sabeel Scholarship Fund case: the treated extract with its release log, the fairness audit with disaggregated error rates and intervals, the datasheet, the model card and the impact assessment, with a README that reports the measured risk, utility and disparities and how to rerun them. The commit history is part of the evidence. Then a ten-minute review in which the assessor picks a slice and the participant recomputes one disparity live.",
+      "talk_minutes": 10,
+      "qa_minutes": null,
+      "rubric": [
+        {
+          "criterion": "Privacy",
+          "weight": 25
+        },
+        {
+          "criterion": "Fairness audit",
+          "weight": 25
+        },
+        {
+          "criterion": "Documentation",
+          "weight": 20
+        },
+        {
+          "criterion": "Impact assessment",
+          "weight": 20
+        },
+        {
+          "criterion": "Reproducibility",
+          "weight": 10
+        }
+      ]
+    },
+    "labs": {
+      "kind": "notebooks",
+      "base": "labs/"
+    },
+    "tools": [
+      {
+        "slot": "De-identification and disclosure risk",
+        "examples": [
+          "ARX",
+          "sdcMicro"
+        ]
+      },
+      {
+        "slot": "Differential privacy library",
+        "examples": [
+          "OpenDP",
+          "diffprivlib"
+        ]
+      },
+      {
+        "slot": "Synthetic tabular data",
+        "examples": [
+          "Synthetic Data Vault",
+          "synthpop"
+        ]
+      },
+      {
+        "slot": "Fairness metrics and mitigation",
+        "examples": [
+          "Fairlearn",
+          "AIF360",
+          "Aequitas"
+        ]
+      },
+      {
+        "slot": "Notebooks with pinned environments",
+        "examples": [
+          "Jupyter or marimo with uv",
+          "R with Quarto and renv"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "group": "National references",
+        "items": [
+          {
+            "title": "Personal Data Protection Law (SDAIA)",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf"
+          },
+          {
+            "title": "Implementing Regulation of the Personal Data Protection Law (SDAIA)",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf"
+          },
+          {
+            "title": "Personal Data Destruction, Anonymization and Pseudonymisation Guideline, version 1.0 (SDAIA, August 2024)",
+            "url": "https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf"
+          },
+          {
+            "title": "Data Classification Policy (National Data Management Office, SDAIA)",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf"
+          },
+          {
+            "title": "General Rules for Secondary Use of Data (SDAIA)",
+            "url": "https://sdaia.gov.sa/Documents/GeneralRulesForSecondaryUseOfData_EN.pdf"
+          },
+          {
+            "title": "AI Ethics Principles, with Annexure A (AI ethics tools) and Annexure B (tools by lifecycle stage) (SDAIA)",
+            "url": "https://sdaia.gov.sa/en/SDAIA/about/Documents/ai-principles.pdf"
+          },
+          {
+            "title": "AI Bias Reference Guide, first edition (SDAIA, May 2026)",
+            "url": "https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/EN-AI-BIAS.pdf"
+          },
+          {
+            "title": "National AI Risk Management Framework, full text in Arabic (SDAIA, April 2026)",
+            "url": "https://sdaia.gov.sa/ar/MediaCenter/KnowledgeCenter/ResearchLibrary/ExecutiveSummaryAr.pdf"
+          },
+          {
+            "title": "National AI Risk Management Framework, English executive summary (SDAIA, April 2026)",
+            "url": "https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/ExecutiveSummaryEn.pdf"
+          }
+        ]
+      },
+      {
+        "group": "Methods",
+        "items": [
+          {
+            "title": "Sweeney, Simple Demographics Often Identify People Uniquely (Carnegie Mellon University, 2000)",
+            "url": "https://dataprivacylab.org/projects/identifiability/paper1.pdf"
+          },
+          {
+            "title": "Dwork and Roth, The Algorithmic Foundations of Differential Privacy",
+            "url": "https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf"
+          },
+          {
+            "title": "Nowok, Raab and Dibben, synthpop: Bespoke Creation of Synthetic Data in R (Journal of Statistical Software, 2016)",
+            "url": "https://www.jstatsoft.org/article/view/v074i11"
+          },
+          {
+            "title": "Kleinberg, Mullainathan and Raghavan, Inherent Trade-Offs in the Fair Determination of Risk Scores",
+            "url": "https://arxiv.org/abs/1609.05807"
+          },
+          {
+            "title": "Kamiran and Calders, Data preprocessing techniques for classification without discrimination (Knowledge and Information Systems, 2012)",
+            "url": "https://link.springer.com/article/10.1007/s10115-011-0463-8"
+          },
+          {
+            "title": "Hardt, Price and Srebro, Equality of Opportunity in Supervised Learning",
+            "url": "https://arxiv.org/abs/1610.02413"
+          },
+          {
+            "title": "Gebru and others, Datasheets for Datasets",
+            "url": "https://arxiv.org/abs/1803.09010"
+          },
+          {
+            "title": "Mitchell and others, Model Cards for Model Reporting",
+            "url": "https://arxiv.org/abs/1810.03993"
+          }
+        ]
+      },
+      {
+        "group": "Tools",
+        "items": [
+          {
+            "title": "OpenDP library documentation",
+            "url": "https://docs.opendp.org/"
+          },
+          {
+            "title": "Fairlearn documentation",
+            "url": "https://fairlearn.org/"
+          },
+          {
+            "title": "ARX data anonymization tool",
+            "url": "https://arx.deidentifier.org/"
+          },
+          {
+            "title": "sdcMicro on CRAN",
+            "url": "https://cran.r-project.org/package=sdcMicro"
+          },
+          {
+            "title": "synthpop on CRAN",
+            "url": "https://cran.r-project.org/package=synthpop"
+          },
+          {
+            "title": "Synthetic Data Vault documentation",
+            "url": "https://docs.sdv.dev/sdv"
+          },
+          {
+            "title": "AI Fairness 360",
+            "url": "https://github.com/Trusted-AI/AIF360"
+          },
+          {
+            "title": "Aequitas",
+            "url": "https://github.com/dssg/aequitas"
+          },
+          {
+            "title": "uv documentation",
+            "url": "https://docs.astral.sh/uv/"
+          }
+        ]
+      }
+    ]
+  }
+}

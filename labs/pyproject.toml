@@ -1,0 +1,20 @@
+[project]
+name = "ds-309-labs"
+version = "2027.1.0"
+description = "Lab notebooks for the SDAIA Academy course DS-309 Responsible Data Science: Privacy, Fairness and Documentation"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "scikit-learn>=1.6",
+    "matplotlib>=3.9",
+    "opendp>=0.16",
+    "fairlearn>=0.13",
+    "jupyterlab>=4.4",
+    "nbclient>=0.10",
+    "ipykernel>=6.29",
+]
+
+[tool.uv]
+package = false
+# Nothing in these labs calls a language model or downloads one.

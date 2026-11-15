@@ -1,0 +1,56 @@
+{
+ "__frame__": {
+  "columns": [
+   "statistic",
+   "before",
+   "after",
+   "change_%"
+  ],
+  "index": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "data": [
+   [
+    "S1 approval, women",
+    0.5056,
+    0.5054,
+    -0.04
+   ],
+   [
+    "S1 approval, men",
+    0.4266,
+    0.4265,
+    -0.02
+   ],
+   [
+    "S2 income, Northern Borders",
+    8211.0,
+    8128.0,
+    -1.01
+   ],
+   [
+    "S2 income, Riyadh",
+    8313.0,
+    8313.0,
+    0.0
+   ],
+   [
+    "S3 household, Non-Saudi",
+    4.526,
+    4.517,
+    -0.2
+   ],
+   [
+    "S3 household, Saudi",
+    4.49,
+    4.49,
+    0.0
+   ]
+  ]
+ }
+}

@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 3 · Audit for fairness · Responsible Data Science: Privacy, Fairness and Documentation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day3.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Responsible Data Science: Privacy, Fairness and Documentation" data-track="data-science" data-day="Day 3">
+<!-- ======================= OPENING ======================= -->
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation</div>
+  <h1>Audit for fairness</h1>
+  <p class="lead mt">Day 3: Disaggregated errors, conflicting criteria, bias types and mitigation</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-309</span></div>
+  <aside class="notes"><p>Day 3 moves from the data to the model's decisions. The reference state changes: 12,000 applications that Ahliya scored and that a full review then settled, so for once we know who was really eligible. Start with the review checkpoint on Day 2.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Audit for fairness</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Disaggregating errors</b><small>Error rates by group and by intersection, with intervals that say how much a small group can tell</small></div></div><div class="item"><div><b>Session 2 · Criteria that conflict</b><small>Demographic parity, equal opportunity and predictive parity, why they conflict, and how to choose</small></div></div><div class="item"><div><b>Session 3 · Bias across the lifecycle</b><small>Where in the lifecycle a bias enters, its name in the national guide, and the check that tells two apart</small></div></div><div class="item"><div><b>Session 4 · Mitigation and its cost</b><small>Reweighting before training, group thresholds after it, and what each costs in accuracy and disparity</small></div></div></div>
+</section>
+
+<section class="slide" id="review-day2" data-lo="LO3" data-n="3">
+  <div class="kicker">Review of Day 2</div>
+  <h2>A monthly dashboard at epsilon 0.5: what is spent in a year?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3" data-id="review-day2-q1">
+    <p class="lead">Bashayer approves the district counts at epsilon 0.5 and asks for them every month. Yahya asks what the fund will have spent after a year.</p>
+    <div class="opts">
+      <div class="opt" data-why="Applies parallel composition across months: the months are about the same applicants, so the epsilons add" data-k="A">0.5, because each month is a separate table</div>
+      <div class="opt" data-ok data-k="B">6, because the same applicants are counted twelve times</div>
+      <div class="opt" data-why="Thinks post-processing covers new releases: each month is a new measurement on the data, not a computation on last month's output" data-k="C">0.5, because later months are post-processing</div>
+      <div class="opt" data-why="Divides instead of adding: splitting a budget into months is a choice, not what happens by default" data-k="D">About 0.04, a twelfth of 0.5</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Sequential composition: twelve releases about the same people spend twelve times 0.5.</div>
+  </div>
+  <aside class="notes"><p>Answer B. If the room is split, return to the Lab 2.3 stretch: one yearly budget spread over twelve releases makes each one far noisier.</p></aside>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="4">
+  <div class="kicker">Session 1</div>
+  <h1>Disaggregating errors</h1>
+  <ul class="bullets outcomes"><li>Compute false negative and false positive rates by group with intervals</li><li>Slice by an intersection of two attributes</li><li>Report a small group without overclaiming</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="two-errors" data-lo="LO5" data-label="Two errors" data-n="5" data-session="1">
+  <div class="kicker">What an audit counts</div>
+  <h2>For a support decision, the two errors do different harm</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>False negative</h4><p class="small mb0">An eligible applicant declined by Ahliya. The harm the fund exists to prevent. <b>FNR</b> = missed eligible / all eligible.</p></div>
+    <div class="card c-amber"><h4>False positive</h4><p class="small mb0">Support passed to someone not eligible. A cost to the fund, caught later by an officer. <b>FPR</b> = wrongly passed / all not eligible.</p></div>
+  </div>
+  <p class="small mt">In the reference data: 12,000 reviewed applications, 6,341 eligible, 5,280 passed by Ahliya at a threshold of 0.5.</p>
+  <aside class="notes"><p>The reviewed outcome is the audit's ground truth: in practice a reviewed sample is expensive, which is why audits run on samples. Ask the room which error Bashayer would rather reduce; most will say false negatives. Keep that answer: it decides Session 2's criterion.</p></aside>
+</section>
+
+<section class="slide" id="recap-intervals" data-lo="LO5" data-label="Intervals" data-n="6" data-session="1">
+  <div class="kicker">Recap from DS-204 and DS-207</div>
+  <h2>Every rate gets an interval, and small groups get wide ones</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A rate from 2,413 eligible women is precise</li>
+      <li>A rate from 4 eligible applicants is a guess</li>
+      <li>The <b>Wilson interval</b> stays inside 0 to 1 and behaves for small counts</li>
+      <li>Report the count beside every rate</li>
+    </ul>
+    <div class="card c-teal"><h4>Same 50% rate</h4><p class="small mb0">From 200 eligible: 43% to 57%. From 4 eligible: 15% to 85%.</p></div>
+  </div>
+  <aside class="notes"><p>One slide only: the prerequisites taught intervals. The two example intervals are computed with the Wilson formula in yusr.py (U.wilson). The point for today is the small intersections in Lab 3.1, task 4.</p></aside>
+</section>
+
+<section class="slide" id="by-gender" data-lo="LO5" data-label="By gender" data-n="7" data-session="1">
+  <div class="kicker">Lab 3.1, the reference run</div>
+  <h2>By gender alone, Ahliya misses eligible women and men at the same rate</h2>
+  <table class="t small">
+    <tr><th>Group</th><th class="num">Eligible</th><th class="num">FNR</th><th class="num">95% interval</th><th class="num">FPR</th></tr>
+    <tr><td>Women</td><td class="num">2,413</td><td class="num">22.7%</td><td class="num">21.0 to 24.4</td><td class="num">9.6%</td></tr>
+    <tr><td>Men</td><td class="num">3,928</td><td class="num">22.8%</td><td class="num">21.6 to 24.2</td><td class="num">5.6%</td></tr>
+    <tr><td>Non-Saudi</td><td class="num">511</td><td class="num">28.6%</td><td class="num">24.8 to 32.6</td><td class="num">6.5%</td></tr>
+    <tr><td>Saudi</td><td class="num">5,830</td><td class="num">22.3%</td><td class="num">21.2 to 23.4</td><td class="num">6.8%</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 3.1. Gender looks even on FNR; women have a higher FPR, which Session 2 explains through base rates. Nationality shows a gap whose intervals do not overlap. Hold the region table for Session 3: Qassim's FNR is 31.6% (26.4 to 37.2), the highest.</p></aside>
+</section>
+
+<section class="slide" id="intersection" data-lo="LO5" data-label="Intersection" data-n="8" data-session="1">
+  <div class="kicker">Slice by two attributes at once</div>
+  <h2>Non-Saudi women are missed most, and gender alone hides it</h2>
+  <div class="bars">
+    <div class="row"><span>Women, non-Saudi</span><div class="bar c-coral" style="--w:100%"></div><span class="val">29.8%</span></div>
+    <div class="row"><span>Men, non-Saudi</span><div class="bar c-amber" style="--w:90%"></div><span class="val">26.9%</span></div>
+    <div class="row"><span>Men, Saudi</span><div class="bar c-teal" style="--w:76%"></div><span class="val">22.6%</span></div>
+    <div class="row"><span>Women, Saudi</span><div class="bar c-teal" style="--w:73%"></div><span class="val">21.7%</span></div>
+  </div>
+  <p class="small mt">False negative rate. Non-Saudi women: 295 eligible, interval 24.9% to 35.3%.</p>
+  <aside class="notes"><p>From Lab 3.1, task 3. The planted cause, which Session 3 uncovers: income is missing far more often for non-Saudi women, and the model learnt from officers that a missing income usually meant a decline. A gap inside an intersection can be invisible in both margins; here the gender margin shows none at all.</p></aside>
+</section>
+
+<section class="slide" id="small-cells" data-lo="LO5" data-label="Small cells" data-n="9" data-session="1">
+  <div class="kicker">How far to slice</div>
+  <h2>Each extra attribute splits the data until the rates mean nothing</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">23 of 52</div><div class="lbl">region by gender by nationality cells with fewer than 30 eligible applicants</div></div>
+    <div class="card c-coral"><h4>Al-Jouf, non-Saudi women</h4><p class="small mb0">4 eligible, 3 missed: FNR 75%, interval 30% to 95%. Report "too few to estimate (4)", not 75%.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Fifty-two cells, one of them extreme by chance, and a headline about Al-Jouf. Many comparisons produce false alarms; small cells produce loud ones.</div>
+  <aside class="notes"><p>The minimum of 30 eligible applicants is a reporting rule for this course, not a law; write yours into the audit's method section. This is also what the bias guide calls sample size bias: a sample too small to support the conclusion drawn from it.</p></aside>
+</section>
+
+<section class="slide" id="finding-sentence" data-lo="LO5" data-label="Write it" data-n="10" data-session="1">
+  <div class="kicker">Reporting a finding</div>
+  <h2>One sentence: the group, the rate, the interval, the comparison, the limit</h2>
+  <div class="prompt" data-tool="Audit report, finding 1">Ahliya declines 30% of eligible non-Saudi women (95% interval 25% to 35%) against 22% of all other eligible applicants; gender alone shows no gap, so the margins understate it.</div>
+  <div class="cols cols-3 gap-s mt">
+    <div class="card c-teal flat"><h4>Rate and interval</h4><p class="small mb0">Never a bare percentage.</p></div>
+    <div class="card c-cyan flat"><h4>Against whom</h4><p class="small mb0">The comparison group is named.</p></div>
+    <div class="card c-purple flat"><h4>What is not claimed</h4><p class="small mb0">No cause yet: that is Session 3.</p></div>
+  </div>
+  <aside class="notes"><p>The sentence is printed by Lab 3.1 from the participant's own numbers. The LO5 evidence is an audit report with disaggregated error rates, intervals and a recommendation; these sentences are its findings section.</p></aside>
+</section>
+
+<section class="slide" id="calibration-pointer" data-lo="LO5" data-label="Not today" data-n="11" data-session="1">
+  <div class="kicker">What this audit does not cover</div>
+  <h2>Calibration by group and explanations are DS-305</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Today: errors at the decision threshold, by group</li>
+      <li>Not today: whether a score of 0.7 means the same chance for every group (calibration)</li>
+      <li>Not today: why a particular applicant was scored low (explanation)</li>
+    </ul>
+    <div class="card c-purple"><h4>Next course</h4><p class="small mb0">DS-305 Uncertainty, Interpretability and Model Validation takes both further.</p></div>
+  </div>
+  <aside class="notes"><p>The catalog entry assigns calibration and explanation to DS-305, so answer questions briefly and point there. Predictive parity, which appears in Session 2, is the threshold-level cousin of calibration.</p></aside>
+</section>
+
+<section class="slide" id="check-interval" data-lo="LO5" data-n="12" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>What can the audit say about Hail?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="check-interval-q1">
+    <p class="lead">Hail has an FNR of 18.2% from 110 eligible applicants, interval 12.1% to 26.4%. The FNR over all 6,341 eligible applicants is 22.8%. Wiam asks whether Ahliya treats Hail's applicants better.</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads a point estimate without its interval: the interval includes the overall rate" data-k="A">Yes: 18.2% is lower than 22.8%, so Hail is treated better</div>
+      <div class="opt" data-why="Treats a wide interval as no information: it still rules out very high or very low rates" data-k="B">Nothing at all, since 110 applicants is too few to compute a rate</div>
+      <div class="opt" data-ok data-k="C">No difference is shown: the interval includes the overall rate</div>
+      <div class="opt" data-why="Confuses a smaller group with a worse outcome: size widens the interval, it does not move the rate" data-k="D">No: small regions are always disadvantaged by the model</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The interval from 12.1% to 26.4% contains 22.8%, so the data do not show that Hail differs.</div>
+  </div>
+  <aside class="notes"><p>Answer C. 110 eligible applicants is above the course's minimum of 30, so a rate is reported, with its interval. B is the overcorrection some participants make after the small-cells slide.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-1" data-auto="lab" data-lab="3.1" data-label="Lab 3.1" data-n="13" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.1 · 25 min</div><h2>Error rates with intervals</h2><p class="lead small">Compute error rates by gender, region and nationality with intervals.</p><a class="nb" href="../labs/D3_1_compute_error_rates.ipynb">D3_1_compute_error_rates.ipynb</a></div><ul class="checklist"><li>Confusion counts by group <span class="min">6 min</span></li><li>Rates with Wilson intervals <span class="min">7 min</span></li><li>One intersection <span class="min">6 min</span></li><li>Mark the cells too small to read <span class="min">3 min</span></li><li>One sentence per finding <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Rebuild the table with Fairlearn's MetricFrame and compare</li></ul></div>
+  <aside class="notes"><p>Expected: FNR women 0.227, men 0.228; non-Saudi 0.286; Qassim 0.316; intersection non-Saudi women 0.298 (0.249 to 0.353); 52 cells, 23 below 30 eligible. Common error: computing FNR over all applicants instead of the eligible. The stretch shows Fairlearn's MetricFrame giving the same table in four lines.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="14">
+  <div class="kicker">Session 2</div>
+  <h1>Criteria that conflict</h1>
+  <ul class="bullets outcomes"><li>Compute demographic parity, equal opportunity and predictive parity gaps</li><li>Show why they cannot all hold when base rates differ</li><li>Choose a criterion from the harm of each kind of error</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="three-criteria" data-lo="LO5" data-label="Four criteria" data-n="15" data-session="2">
+  <div class="kicker">What "fair" can mean</div>
+  <h2>Four criteria, each reasonable, each equalising something different</h2>
+  <table class="t small">
+    <tr><th>Criterion</th><th>Equal across groups</th><th>Plain words</th></tr>
+    <tr><td><b>Demographic parity</b></td><td>selection rate</td><td>pass the same share of each group</td></tr>
+    <tr><td><b>Equal opportunity</b></td><td>false negative rate</td><td>miss eligible people equally often</td></tr>
+    <tr><td><b>Equalised odds</b></td><td>false negative and false positive rates</td><td>both errors equal</td></tr>
+    <tr><td><b>Predictive parity</b></td><td>precision</td><td>a pass is equally reliable for each group</td></tr>
+  </table>
+  <aside class="notes"><p>Equal opportunity is the name Hardt, Price and Srebro gave to equal true positive rates, which is the same as equal false negative rates. Sources: Hardt, Price and Srebro, Equality of Opportunity in Supervised Learning.</p></aside>
+</section>
+
+<section class="slide" id="base-rates-differ" data-lo="LO5" data-label="Base rates" data-n="16" data-session="2">
+  <div class="kicker">The fact that forces a choice</div>
+  <h2>Eligibility is more common among women applicants than among men</h2>
+  <div class="cols cols-2">
+    <div class="bars">
+      <div class="row"><span>Women</span><div class="bar c-coral" style="--w:60%"></div><span class="val">59.7%</span></div>
+      <div class="row"><span>Men</span><div class="bar c-teal" style="--w:49%"></div><span class="val">49.3%</span></div>
+    </div>
+    <ul class="bullets">
+      <li>Share eligible after full review (Lab 3.2)</li>
+      <li>Women applicants are more often heads of lower-income households in this data</li>
+      <li>When base rates differ, a model that is not perfect cannot satisfy all criteria at once</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The impossibility result: with different base rates and an imperfect classifier, calibration-type criteria and error-rate criteria cannot all hold. Do not prove it; Lab 3.2 shows it on the data in eight minutes. Sources: Kleinberg, Mullainathan and Raghavan, Inherent Trade-Offs in the Fair Determination of Risk Scores.</p></aside>
+</section>
+
+<section class="slide" id="at-one-threshold" data-lo="LO5" data-label="One threshold" data-n="17" data-session="2">
+  <div class="kicker">Lab 3.2, the reference run</div>
+  <h2>At one threshold, misses are equal and selection is not</h2>
+  <table class="t small">
+    <tr><th>Threshold 0.5 for all</th><th class="num">Selection</th><th class="num">FNR</th><th class="num">Precision</th></tr>
+    <tr><td>Women</td><td class="num">50.1%</td><td class="num">22.7%</td><td class="num">92.3%</td></tr>
+    <tr><td>Men</td><td class="num">40.9%</td><td class="num">22.8%</td><td class="num">93.0%</td></tr>
+    <tr class="hl"><td>Gap</td><td class="num">+9.1 pts</td><td class="num">-0.2 pts</td><td class="num">-0.8 pts</td></tr>
+  </table>
+  <p class="small mt-s">Equal opportunity holds almost exactly; demographic parity does not.</p>
+  <aside class="notes"><p>Someone will say the 9-point selection gap is discrimination against men. Ask: is it, when 10 points more of the women are eligible? The gap in selection follows the gap in need. That is the argument the next slide makes with numbers.</p></aside>
+</section>
+
+<section class="slide" id="force-parity" data-lo="LO5" data-label="Force parity" data-n="18" data-session="2">
+  <div class="kicker">Force demographic parity</div>
+  <h2>Equal selection makes Ahliya miss eligible women far more often</h2>
+  <table class="t small">
+    <tr><th>Equal selection (thresholds 0.620 and 0.432)</th><th class="num">Selection</th><th class="num">FNR</th><th class="num">Precision</th></tr>
+    <tr><td>Women</td><td class="num">44.0%</td><td class="num">30.9%</td><td class="num">93.8%</td></tr>
+    <tr><td>Men</td><td class="num">44.0%</td><td class="num">18.5%</td><td class="num">91.4%</td></tr>
+    <tr class="hl"><td>Gap</td><td class="num">0</td><td class="num">+12.4 pts</td><td class="num">+2.4 pts</td></tr>
+  </table>
+  <div class="callout warn mt"><b>The trade.</b> One gap closes, another opens. Here the gap that opens is in the harmful error.</div>
+  <aside class="notes"><p>From Lab 3.2, task 2. Women's threshold rises to 0.620 and men's falls to 0.432. Equalising FNR instead (task 3) needs almost no change: thresholds 0.501 and 0.499, with the selection gap staying at 9.0 points.</p></aside>
+</section>
+
+<section class="slide" id="choose-by-harm" data-lo="LO5" data-label="Choose" data-n="19" data-session="2">
+  <div class="kicker">How to choose</div>
+  <h2>Choose the criterion from the decision and the harm of each error</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>SDAIA's AI Ethics Principles ask that fairness metrics be chosen at design time from the kind of decision and the harm and benefit of correct and incorrect predictions</li>
+      <li>Ahliya allocates <b>support by need</b>; the harmful error is the <b>missed eligible applicant</b></li>
+      <li>So: <b>equal opportunity</b>, with the selection gap explained by need</li>
+    </ul>
+    <div class="card c-purple"><h4>When parity fits</h4><p class="small mb0">When need is believed equal and the labels are suspect, or when a fixed opportunity is shared out.</p></div>
+  </div>
+  <aside class="notes"><p>The principles also ask for the allowed threshold of the metric to be defined at the plan-and-design stage, before results are seen. Ahliya had none: that becomes a gap in the model card on Day 4. Sources: AI Ethics Principles (SDAIA), fairness principle, plan and design.</p></aside>
+</section>
+
+<section class="slide" id="check-criterion" data-lo="LO5" data-n="20" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which criterion for a support decision?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="check-criterion-q1">
+    <p class="lead">Ahliya decides who is passed to an officer for housing support. Eligible applicants are more common among women. Bashayer asks which fairness criterion the fund should commit to.</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Equal false negative rates: miss eligible applicants equally in each group</div>
+      <div class="opt" data-why="Ignores the different need: equal selection would decline eligible women to match men's rate" data-k="B">Equal selection rates: pass the same share of women and men</div>
+      <div class="opt" data-why="Thinks all criteria can be met together: with different base rates they conflict" data-k="C">All three criteria at once, to be safe</div>
+      <div class="opt" data-why="Equates removing an input with fair outcomes: outcomes still differ through other features" data-k="D">None: Ahliya does not use gender, so it is fair</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The harmful error in a support decision is the missed eligible applicant, and need differs between groups, so error rates among the eligible are what must be equal.</div>
+  </div>
+  <aside class="notes"><p>Answer A. D deserves a minute: "fairness through unawareness" fails because proxies (marital status, employment, missing income) carry the information.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-2" data-auto="lab" data-lab="3.2" data-label="Lab 3.2" data-n="21" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.2 · 25 min</div><h2>Two criteria in conflict</h2><p class="lead small">Show two fairness criteria conflicting on the test set and choose one.</p><a class="nb" href="../labs/D3_2_show_two_fairness.ipynb">D3_2_show_two_fairness.ipynb</a></div><ul class="checklist"><li>Three gaps at the current threshold <span class="min">6 min</span></li><li>Equalise selection rates and watch the other gaps <span class="min">8 min</span></li><li>Equalise false negative rates instead <span class="min">6 min</span></li><li>Choose and justify <span class="min">5 min</span></li><li class="stretch">✱ Stretch: Find the thresholds that equalise predictive parity and read the other gaps</li></ul></div>
+  <aside class="notes"><p>Expected: base rates 0.597 and 0.493; at 0.5 gaps of +9.1 points in selection, -0.2 in FNR, -0.8 in precision; at equal selection the FNR gap becomes +12.4 points; at equal FNR the thresholds are 0.501 and 0.499. The choice in task 4 is open to argument; insist only that it names the harm.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="22">
+  <div class="kicker">Session 3</div>
+  <h1>Bias across the lifecycle</h1>
+  <ul class="bullets outcomes"><li>Place a finding in a stage of the AI system lifecycle</li><li>Name its bias type from the national bias guide</li><li>Run the check that separates two neighbouring types</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="lifecycle" data-lo="LO5" data-label="Lifecycle" data-n="23" data-session="3">
+  <div class="kicker">Where bias enters</div>
+  <h2>The AI Ethics Principles name four stages, and bias can enter at each</h2>
+  <div class="flow">
+    <div class="step c-navy"><b>1 · Plan and Design</b>purpose, target, the fairness metric and its threshold</div>
+    <div class="arrow">→</div>
+    <div class="step c-teal"><b>2 · Prepare Input Data</b>collection, recording, labels</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>3 · Build and Validate</b>features, model choice, evaluation</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>4 · Deploy and Monitor</b>use, feedback, retraining</div>
+  </div>
+  <aside class="notes"><p>The stage names are those of SDAIA's AI Ethics Principles, whose Annexure B maps ethics tools to the same four stages. Placing a finding in a stage tells you who fixes it: the data owner, the modeller or operations. Sources: AI Ethics Principles (SDAIA), Annexure B.</p></aside>
+</section>
+
+<section class="slide" id="bias-guide" data-lo="LO5" data-label="The guide" data-n="24" data-session="3">
+  <div class="kicker">The national vocabulary</div>
+  <h2>SDAIA's AI Bias Reference Guide defines more than a hundred bias types</h2>
+  <table class="t small">
+    <tr><th>Type</th><th>In the guide's terms</th></tr>
+    <tr><td><b>Historical Bias</b></td><td>training data carries past circumstances that no longer hold</td></tr>
+    <tr><td><b>Measurement Bias</b></td><td>values systematically over- or under-recorded</td></tr>
+    <tr><td><b>Labeling Bias</b></td><td>labels shaped by the people who assigned them</td></tr>
+    <tr><td><b>Evaluation Bias</b></td><td>evaluation data or metrics that do not reflect real use</td></tr>
+    <tr><td><b>Feedback Loop Bias</b></td><td>the system's outputs become its future inputs</td></tr>
+  </table>
+  <aside class="notes"><p>Paraphrases of the guide's definitions, first edition, May 2026; each entry also gives the impact, an example and mitigations. DS-207 introduced the guide; today the skill is to tell neighbouring types apart with evidence. Sources: AI Bias Reference Guide (SDAIA).</p></aside>
+</section>
+
+<section class="slide" id="same-gap-two-causes" data-lo="LO5" data-label="Two causes" data-n="25" data-session="3">
+  <div class="kicker">Why the type matters</div>
+  <h2>The same gap can have two causes that need opposite fixes</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Measurement or labelling?</h4><p class="small mb0">Measurement: a feature is recorded wrongly (fix the recording). Labelling: the outcome used for training is wrong (fix the labels).</p></div>
+    <div class="card c-teal"><h4>Historical or labelling?</h4><p class="small mb0">Historical: labels followed a rule that has since changed (retrain on the current rule). Labelling: labels were wrong when made (relabel or review).</p></div>
+  </div>
+  <aside class="notes"><p>These two tests are the core of Lab 3.3, task 3. Ask for an example from participants' own work of a gap they explained without checking which cause it was.</p></aside>
+</section>
+
+<section class="slide" id="evidence-f1-f3" data-lo="LO5" data-label="Evidence 1" data-n="26" data-session="3">
+  <div class="kicker">Lab 3.3, the reference run</div>
+  <h2>Three findings, three checks, three different types</h2>
+  <table class="t small">
+    <tr><th>Finding</th><th>Check</th><th>Result</th><th>Type</th></tr>
+    <tr><td>Self-employed: FNR 65%</td><td>recorded against verified income</td><td>median ratio 1.73; others 1.00</td><td>Measurement</td></tr>
+    <tr><td>Family home: FNR 36% against 17% for renters</td><td>officers' approvals before and after the July 2024 rule change</td><td>22% before, 49% after; renters 49% throughout</td><td>Historical</td></tr>
+    <tr><td>Qassim: highest FNR</td><td>officers' declines of eligible applicants, by office and gender</td><td>women 43% in Qassim, 23% elsewhere; men equal</td><td>Labelling</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 3.3. Self-employed income is recorded as turnover, so they look richer than they are. Family-home applicants were declined under a rule that ended in July 2024, and the model learnt it. In Qassim one office declined eligible women-headed households; men there are treated like everywhere else, which rules out a regional effect.</p></aside>
+</section>
+
+<section class="slide" id="evidence-f4-f5" data-lo="LO5" data-label="Evidence 2" data-n="27" data-session="3">
+  <div class="kicker">Lab 3.3, the reference run</div>
+  <h2>Two findings sit outside the data: in validation and in deployment</h2>
+  <div class="cols cols-2">
+    <div class="card c-purple"><h4>Evaluation Bias · Build and Validate</h4><p class="small mb0">The validation report claimed accuracy 0.881 on officers' decisions in Riyadh and Makkah. Against the reviewed outcome: 0.845 there, 0.850 elsewhere.</p></div>
+    <div class="card c-coral"><h4>Feedback Loop Bias · Deploy and Monitor</h4><p class="small mb0">37.4% of applications are auto-declined and never reviewed, so they never get a label. Retraining cannot see its own misses; 62.8% of self-employed applicants are auto-declined.</p></div>
+  </div>
+  <aside class="notes"><p>The validation report measured agreement with officers, who share the measurement and labelling problems, so it flattered the model. The deployment finding is the one with no error rate today: it makes tomorrow's model worse for exactly the group that is already missed. Remedy: review a random sample of auto-declined applications.</p></aside>
+</section>
+
+<section class="slide" id="check-bias-type" data-lo="LO5" data-n="28" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Measurement or labelling?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="check-bias-type-q1">
+    <p class="lead">Self-employed applicants are missed by Ahliya far more often. An income audit shows their recorded income is 1.73 times the verified income; for employees it is 1.00. Which type fits, and what is the first fix?</p>
+    <div class="opts">
+      <div class="opt" data-why="Blames the outcome when the evidence points at a feature: the officers applied the rule correctly to the income they were given" data-k="A">Labeling Bias: retrain on corrected decisions</div>
+      <div class="opt" data-why="Reaches for a mitigation that cannot repair a wrong input: weights change counts, not recorded incomes" data-k="B">Sampling Bias: reweight the self-employed in training</div>
+      <div class="opt" data-why="Treats every old pattern as historical: nothing here changed over time" data-k="C">Historical Bias: retrain on recent applications only</div>
+      <div class="opt" data-ok data-k="D">Measurement Bias: record net income for the self-employed</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The feature itself is systematically over-recorded for one group, which is the guide's measurement bias; the fix is at the point of recording.</div>
+  </div>
+  <aside class="notes"><p>Answer D. Session 4 will show that reweighting barely moves this kind of gap, which confirms the diagnosis.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-3" data-auto="lab" data-lab="3.3" data-label="Lab 3.3" data-n="29" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.3 · 25 min</div><h2>Five findings, five types</h2><p class="lead small">Map five findings to bias types in the national guide.</p><a class="nb" href="../labs/D3_3_map_five_findings.ipynb">D3_3_map_five_findings.ipynb</a></div><ul class="checklist"><li>Read the five findings <span class="min">3 min</span></li><li>Run the evidence check for each <span class="min">12 min</span></li><li>Map each to a type and a stage <span class="min">6 min</span></li><li>Check the mapping <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Write the sixth finding you would look for next, and its check</li></ul></div>
+  <aside class="notes"><p>Expected mapping: F1 Measurement, F2 Historical, F3 Labeling, F4 Evaluation, F5 Feedback Loop; stages Prepare Input Data for the first three, Build and Validate, Deploy and Monitor. Accept Plan and Design for F2 if the participant argues that choosing past decisions as the target was a design decision. The three distractor types (Sampling, Aggregation, Sample Size) are from the guide too.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="30">
+  <div class="kicker">Session 4</div>
+  <h1>Mitigation and its cost</h1>
+  <ul class="bullets outcomes"><li>Apply reweighting before training</li><li>Apply group thresholds after training</li><li>Compare accuracy and disparity, and recommend</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="three-points" data-lo="LO5" data-label="Where to act" data-n="31" data-session="4">
+  <div class="kicker">Mitigation</div>
+  <h2>You can act before training, during it, or after it</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>Before: pre-processing</h4><p class="small mb0">Change the training data: <b>reweighting</b>, resampling, relabelling, fixing a feature.</p></div>
+    <div class="card c-cyan"><h4>During: in-processing</h4><p class="small mb0">A constraint in the fitting, such as Fairlearn's reductions. Named here, not practised.</p></div>
+    <div class="card c-coral"><h4>After: post-processing</h4><p class="small mb0">Change the decision rule: <b>a threshold per group</b>.</p></div>
+  </div>
+  <aside class="notes"><p>The lab tries one pre-processing and one post-processing method, as the catalog entry asks. In-processing needs more time than a 25-minute lab allows. All three are in the AI Ethics Principles' list of fairness tools through Fairlearn, AI Fairness 360 and Aequitas. Sources: Fairlearn documentation; AI Ethics Principles, Annexure A.</p></aside>
+</section>
+
+<section class="slide" id="reweighting" data-lo="LO5" data-label="Reweighting" data-n="32" data-session="4">
+  <div class="kicker">Pre-processing</div>
+  <h2>Reweighting makes group and label independent in the training data</h2>
+  <div class="cols cols-2">
+    <pre class="code s" data-file="python"><code class="language-python">pg  = df[<span class="hljs-string">&quot;group&quot;</span>].value_counts(normalize=<span class="hljs-literal">True</span>)
+py  = df[<span class="hljs-string">&quot;y&quot;</span>].value_counts(normalize=<span class="hljs-literal">True</span>)
+pgy = df.groupby([<span class="hljs-string">&quot;group&quot;</span>, <span class="hljs-string">&quot;y&quot;</span>]).size() / <span class="hljs-built_in">len</span>(df)
+idx = pd.MultiIndex.from_arrays([df[<span class="hljs-string">&quot;group&quot;</span>], df[<span class="hljs-string">&quot;y&quot;</span>]])
+w   = (pg[df[<span class="hljs-string">&quot;group&quot;</span>]].to_numpy() * py[df[<span class="hljs-string">&quot;y&quot;</span>]].to_numpy()
+       / pgy.reindex(idx).to_numpy())
+model.fit(X, y, logisticregression__sample_weight=w)</code></pre>
+    <ul class="bullets">
+      <li>Rare combinations, such as approved non-Saudi women, weigh more</li>
+      <li>The weights average 1</li>
+      <li>It can only fix what the <b>labels' balance</b> causes</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>Kamiran and Calders' method. The last bullet is the lesson of the lab: Session 3 found the gap comes from income features, so reweighting should not help much. Sources: Kamiran and Calders, Data preprocessing techniques for classification without discrimination (2012).</p></aside>
+</section>
+
+<section class="slide" id="group-thresholds" data-lo="LO5" data-label="Thresholds" data-n="33" data-session="4">
+  <div class="kicker">Post-processing</div>
+  <h2>A threshold per group, tuned on one half and reported on the other</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Target: each group's FNR equal to the overall 22.5%</li>
+      <li>Tuned thresholds: non-Saudi women 0.468, Saudi women 0.511, non-Saudi men 0.470, Saudi men 0.499</li>
+      <li>Reported on reviewed applications not used to tune</li>
+    </ul>
+    <div class="card c-coral"><h4>A legal question, not only a technical one</h4><p class="small mb0">The rule now uses gender and nationality at the moment of decision. The data protection officer and legal counsel decide whether that is allowed and how it is explained.</p></div>
+  </div>
+  <aside class="notes"><p>From Lab 3.4. Tuning and reporting on the same rows would overstate the effect. The AI Ethics Principles ask that sensitive attributes be kept out of model inputs, or that their use be justified: a group threshold is such a use, so it needs that justification in writing.</p></aside>
+</section>
+
+<section class="slide" id="mitigation-results" data-lo="LO5" data-label="Results" data-n="34" data-session="4">
+  <div class="kicker">Lab 3.4, the reference run</div>
+  <h2>Thresholds narrow the gap a little; reweighting barely moves it</h2>
+  <table class="t small">
+    <tr><th>Reported on 6,050 reviewed applications</th><th class="num">Accuracy</th><th class="num">Largest FNR gap</th><th class="num">FNR, non-Saudi women</th></tr>
+    <tr><td>Baseline</td><td class="num">84.5%</td><td class="num">12.9 pts</td><td class="num">34.9%</td></tr>
+    <tr><td>Reweighting</td><td class="num">84.5%</td><td class="num">12.6 pts</td><td class="num">34.9%</td></tr>
+    <tr class="hl"><td>Group thresholds</td><td class="num">84.5%</td><td class="num">10.0 pts</td><td class="num">32.2%</td></tr>
+  </table>
+  <div class="callout note mt"><b>Accuracy did not fall.</b> The cost here is not accuracy: it is a rule that uses protected attributes, and a gap that remains.</div>
+  <aside class="notes"><p>From Lab 3.4. The non-Saudi women's rate stays far from the 22.5% target on the reporting half because their threshold rests on 143 eligible applicants in the tuning half. Honest reporting of a mitigation includes what it did not achieve.</p></aside>
+</section>
+
+<section class="slide" id="recommendation" data-lo="LO5" data-label="Recommend" data-n="35" data-session="4">
+  <div class="kicker">The audit's recommendation</div>
+  <h2>Fix the source, use thresholds only as an interim, and say what remains</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Source</b>verify or impute income properly; net income for the self-employed</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Interim</b>group thresholds, if legally approved, with officer review of declines</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Monitor</b>review a sample of auto-declines, so retraining sees its misses</div>
+  </div>
+  <aside class="notes"><p>Each step maps to a Session 3 finding: measurement (1), the intersection gap (2), the feedback loop (3). The recommendation is the last section of the LO5 audit report. On Day 4 it reappears as treatments in the impact assessment.</p></aside>
+</section>
+
+<section class="slide" id="check-mitigation" data-lo="LO5" data-n="36" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which mitigation would you recommend?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="check-mitigation-q1">
+    <p class="lead">Reweighting moved the FNR gap from 12.9 to 12.6 points. Group thresholds moved it to 10.0, at the same accuracy. The gap comes mostly from missing and mis-recorded income. What do you recommend to Bashayer?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads an unchanged accuracy as a free fix: the rule uses protected attributes and the gap remains" data-k="A">Group thresholds as the permanent fix, since accuracy did not fall</div>
+      <div class="opt" data-ok data-k="B">Fix income recording first; thresholds only as an approved interim measure</div>
+      <div class="opt" data-why="Ignores what the evidence showed: the weights cannot repair a wrong feature" data-k="C">Reweighting, because pre-processing is always preferable</div>
+      <div class="opt" data-why="Treats an unfinished fix as no fix: a narrowed gap with monitoring is better than the baseline" data-k="D">Neither, since the gap is not closed completely</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The cause is in the income feature, so the lasting fix is at the source; the threshold change helps meanwhile but needs approval because it uses gender and nationality.</div>
+  </div>
+  <aside class="notes"><p>Answer B. This is also the shape of the capstone's recommendation section: cause, interim measure, cost, approval.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-3-4" data-auto="lab" data-lab="3.4" data-label="Lab 3.4" data-n="37" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 3.4 · 25 min</div><h2>Reweighting and a threshold change</h2><p class="lead small">Apply reweighting and a threshold change and compare accuracy and disparity.</p><a class="nb" href="../labs/D3_4_apply_reweighting_threshold.ipynb">D3_4_apply_reweighting_threshold.ipynb</a></div><ul class="checklist"><li>The baseline: accuracy and gaps <span class="min">4 min</span></li><li>Reweight the training data and retrain <span class="min">8 min</span></li><li>Group thresholds on the baseline model <span class="min">7 min</span></li><li>One comparison table and a recommendation <span class="min">6 min</span></li><li class="stretch">✱ Stretch: Repeat the threshold change for the intersection of Day 3 Session 1</li></ul></div>
+  <aside class="notes"><p>Expected on the reporting half: baseline accuracy 0.845, gap 0.129; reweighting 0.845 and 0.126; thresholds 0.845 and 0.100. The full run takes about 20 seconds (two fits on 48,000 rows). If the weights cell is slow, the participant probably used apply row by row: show the vectorised version on the reweighting slide.</p></aside>
+</section>
+
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up" data-n="38" data-session="4">
+  <div class="kicker">Day 3 · Three things to keep</div>
+  <h2>Disaggregate, choose the criterion by the harm, diagnose before mitigating</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>Disaggregate</h4><p class="small mb0">Gender alone showed no gap; non-Saudi women are missed at 30%. Intervals and counts beside every rate.</p></div>
+    <div class="card c-cyan"><h4>Choose</h4><p class="small mb0">Different base rates make criteria conflict. For support by need: equal false negative rates.</p></div>
+    <div class="card c-coral"><h4>Diagnose</h4><p class="small mb0">Five findings, five types. Reweighting failed where the cause was a feature.</p></div>
+  </div>
+  <aside class="notes"><p>Ask each table which finding they would put first in the report to internal audit, and why. Tomorrow turns today's numbers into a model card and an impact assessment that someone else can check.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Next" data-n="39" data-session="4">
+  <div class="kicker">Tomorrow · Day 4</div>
+  <h2>Document and assess</h2>
+  <ul class="bullets">
+    <li>The datasheet of the de-identified release, filled from its log</li>
+    <li>The model card of Ahliya with disaggregated results</li>
+    <li>Four risks scored on the national framework's likelihood and impact matrix</li>
+    <li>A peer's result rerun, and the gaps that changed the number</li>
+  </ul>
+  <aside class="notes"><p>Day 4 labs supply reference logs and results, so nothing from today is required. Encourage participants to keep their own Lab 3.1 and 3.4 outputs: they can use them in place of the supplied ones.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:16:16Z","version":"2027.1.0","commit":"8cfd447"},"course":{"id":"ds-309","code":"DS-309","title":"Responsible Data Science: Privacy, Fairness and Documentation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-309/","repo":"SDAIAAcademy/ds-309","home":"../index.html"},"deck":{"id":"day3","kind":"day","day":3,"label":"Day 3","title":"Audit for fairness","prev":"day2.html","next":"day4.html","md":"day3.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Disaggregating errors","slide":"s1","outcomes":["Compute false negative and false positive rates by group with intervals","Slice by an intersection of two attributes","Report a small group without overclaiming"],"minutes":50,"lab":{"id":"3.1","title":"Error rates with intervals","minutes":25,"href":"../labs/D3_1_compute_error_rates.ipynb"}},{"n":2,"label":"Session 2","title":"Criteria that conflict","slide":"s2","outcomes":["Compute demographic parity, equal opportunity and predictive parity gaps","Show why they cannot all hold when base rates differ","Choose a criterion from the harm of each kind of error"],"minutes":50,"lab":{"id":"3.2","title":"Two criteria in conflict","minutes":25,"href":"../labs/D3_2_show_two_fairness.ipynb"}},{"n":3,"label":"Session 3","title":"Bias across the lifecycle","slide":"s3","outcomes":["Place a finding in a stage of the AI system lifecycle","Name its bias type from the national bias guide","Run the check that separates two neighbouring types"],"minutes":50,"lab":{"id":"3.3","title":"Five findings, five types","minutes":25,"href":"../labs/D3_3_map_five_findings.ipynb"}},{"n":4,"label":"Session 4","title":"Mitigation and its cost","slide":"s4","outcomes":["Apply reweighting before training","Apply group thresholds after training","Compare accuracy and disparity, and recommend"],"minutes":50,"lab":{"id":"3.4","title":"Reweighting and a threshold change","minutes":25,"href":"../labs/D3_4_apply_reweighting_threshold.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Audit for fairness","kind":"title","session":0,"hash":"c4388f20","md":"#### [day3#title] Audit for fairness\n\n*SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation*\n\nDay 3: Disaggregated errors, conflicting criteria, bias types and mitigation\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-309","notes":"Day 3 moves from the data to the model's decisions. The reference state changes: 12,000 applications that Ahliya scored and that a full review then settled, so for once we know who was really eligible. Start with the review checkpoint on Day 2.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Audit for fairness","kind":"content","session":0,"hash":"8fcf305e","md":"#### [day3#agenda] Audit for fairness\n\n*Today*\n\n- **Session 1 · Disaggregating errors**: Error rates by group and by intersection, with intervals that say how much a small group can tell\n- **Session 2 · Criteria that conflict**: Demographic parity, equal opportunity and predictive parity, why they conflict, and how to choose\n- **Session 3 · Bias across the lifecycle**: Where in the lifecycle a bias enters, its name in the national guide, and the check that tells two apart\n- **Session 4 · Mitigation and its cost**: Reweighting before training, group thresholds after it, and what each costs in accuracy and disparity","notes":"","minutes":null,"lo":[]},{"id":"review-day2","n":3,"title":"A monthly dashboard at epsilon 0.5: what is spent in a year?","kind":"quiz","session":0,"hash":"0dfd22a3","md":"#### [day3#review-day2] A monthly dashboard at epsilon 0.5: what is spent in a year?\n\n*Review of Day 2*\n\n**Question:** Bashayer approves the district counts at epsilon 0.5 and asks for them every month. Yahya asks what the fund will have spent after a year.\n\n- A. 0.5, because each month is a separate table\n- B. 6, because the same applicants are counted twelve times\n- C. 0.5, because later months are post-processing\n- D. About 0.04, a twelfth of 0.5","notes":"Answer B. If the room is split, return to the Lab 2.3 stretch: one yearly budget spread over twelve releases makes each one far noisier.","minutes":null,"lo":["LO3"]},{"id":"s1","n":4,"title":"Disaggregating errors","kind":"section","session":1,"hash":"72a8ba83","md":"#### [day3#s1] Disaggregating errors\n\n*Session 1*\n\n- Compute false negative and false positive rates by group with intervals\n- Slice by an intersection of two attributes\n- Report a small group without overclaiming","notes":"","minutes":null,"lo":["LO5"]},{"id":"two-errors","n":5,"title":"For a support decision, the two errors do different harm","kind":"content","session":1,"hash":"4704e9d3","md":"#### [day3#two-errors] For a support decision, the two errors do different harm\n\n*What an audit counts*\n\n- **False negative.** An eligible applicant declined by Ahliya. The harm the fund exists to prevent. **FNR** = missed eligible / all eligible.\n- **False positive.** Support passed to someone not eligible. A cost to the fund, caught later by an officer. **FPR** = wrongly passed / all not eligible.\n\nIn the reference data: 12,000 reviewed applications, 6,341 eligible, 5,280 passed by Ahliya at a threshold of 0.5.","notes":"The reviewed outcome is the audit's ground truth: in practice a reviewed sample is expensive, which is why audits run on samples. Ask the room which error Bashayer would rather reduce; most will say false negatives. Keep that answer: it decides Session 2's criterion.","minutes":null,"lo":["LO5"]},{"id":"recap-intervals","n":6,"title":"Every rate gets an interval, and small groups get wide ones","kind":"content","session":1,"hash":"e45a8882","md":"#### [day3#recap-intervals] Every rate gets an interval, and small groups get wide ones\n\n*Recap from DS-204 and DS-207*\n\n- A rate from 2,413 eligible women is precise\n- A rate from 4 eligible applicants is a guess\n- The **Wilson interval** stays inside 0 to 1 and behaves for small counts\n- Report the count beside every rate\n\n- **Same 50% rate.** From 200 eligible: 43% to 57%. From 4 eligible: 15% to 85%.","notes":"One slide only: the prerequisites taught intervals. The two example intervals are computed with the Wilson formula in yusr.py (U.wilson). The point for today is the small intersections in Lab 3.1, task 4.","minutes":null,"lo":["LO5"]},{"id":"by-gender","n":7,"title":"By gender alone, Ahliya misses eligible women and men at the same rate","kind":"content","session":1,"hash":"b4d2ce63","md":"#### [day3#by-gender] By gender alone, Ahliya misses eligible women and men at the same rate\n\n*Lab 3.1, the reference run*\n\n| Group | Eligible | FNR | 95% interval | FPR |\n| --- | --- | --- | --- | --- |\n| Women | 2,413 | 22.7% | 21.0 to 24.4 | 9.6% |\n| Men | 3,928 | 22.8% | 21.6 to 24.2 | 5.6% |\n| Non-Saudi | 511 | 28.6% | 24.8 to 32.6 | 6.5% |\n| Saudi | 5,830 | 22.3% | 21.2 to 23.4 | 6.8% |","notes":"From Lab 3.1. Gender looks even on FNR; women have a higher FPR, which Session 2 explains through base rates. Nationality shows a gap whose intervals do not overlap. Hold the region table for Session 3: Qassim's FNR is 31.6% (26.4 to 37.2), the highest.","minutes":null,"lo":["LO5"]},{"id":"intersection","n":8,"title":"Non-Saudi women are missed most, and gender alone hides it","kind":"content","session":1,"hash":"5550cf95","md":"#### [day3#intersection] Non-Saudi women are missed most, and gender alone hides it\n\n*Slice by two attributes at once*\n\n| Item | Value |\n| --- | --- |\n| Women, non-Saudi | 29.8% |\n| Men, non-Saudi | 26.9% |\n| Men, Saudi | 22.6% |\n| Women, Saudi | 21.7% |\n\nFalse negative rate. Non-Saudi women: 295 eligible, interval 24.9% to 35.3%.","notes":"From Lab 3.1, task 3. The planted cause, which Session 3 uncovers: income is missing far more often for non-Saudi women, and the model learnt from officers that a missing income usually meant a decline. A gap inside an intersection can be invisible in both margins; here the gender margin shows none at all.","minutes":null,"lo":["LO5"]},{"id":"small-cells","n":9,"title":"Each extra attribute splits the data until the rates mean nothing","kind":"content","session":1,"hash":"dfe3d579","md":"#### [day3#small-cells] Each extra attribute splits the data until the rates mean nothing\n\n*How far to slice*\n\n**23 of 52** region by gender by nationality cells with fewer than 30 eligible applicants\n\n- **Al-Jouf, non-Saudi women.** 4 eligible, 3 missed: FNR 75%, interval 30% to 95%. Report \"too few to estimate (4)\", not 75%.\n\n> **What goes wrong.** Fifty-two cells, one of them extreme by chance, and a headline about Al-Jouf. Many comparisons produce false alarms; small cells produce loud ones.","notes":"The minimum of 30 eligible applicants is a reporting rule for this course, not a law; write yours into the audit's method section. This is also what the bias guide calls sample size bias: a sample too small to support the conclusion drawn from it.","minutes":null,"lo":["LO5"]},{"id":"finding-sentence","n":10,"title":"One sentence: the group, the rate, the interval, the comparison, the limit","kind":"content","session":1,"hash":"8deb7992","md":"#### [day3#finding-sentence] One sentence: the group, the rate, the interval, the comparison, the limit\n\n*Reporting a finding*\n\nPrompt for Audit report, finding 1:\n\n```text\nAhliya declines 30% of eligible non-Saudi women (95% interval 25% to 35%) against 22% of all other eligible applicants; gender alone shows no gap, so the margins understate it.\n```\n\n- **Rate and interval.** Never a bare percentage.\n- **Against whom.** The comparison group is named.\n- **What is not claimed.** No cause yet: that is Session 3.","notes":"The sentence is printed by Lab 3.1 from the participant's own numbers. The LO5 evidence is an audit report with disaggregated error rates, intervals and a recommendation; these sentences are its findings section.","minutes":null,"lo":["LO5"]},{"id":"calibration-pointer","n":11,"title":"Calibration by group and explanations are DS-305","kind":"content","session":1,"hash":"43a489b2","md":"#### [day3#calibration-pointer] Calibration by group and explanations are DS-305\n\n*What this audit does not cover*\n\n- Today: errors at the decision threshold, by group\n- Not today: whether a score of 0.7 means the same chance for every group (calibration)\n- Not today: why a particular applicant was scored low (explanation)\n\n- **Next course.** DS-305 Uncertainty, Interpretability and Model Validation takes both further.","notes":"The catalog entry assigns calibration and explanation to DS-305, so answer questions briefly and point there. Predictive parity, which appears in Session 2, is the threshold-level cousin of calibration.","minutes":null,"lo":["LO5"]},{"id":"check-interval","n":12,"title":"What can the audit say about Hail?","kind":"quiz","session":1,"hash":"1a114ae7","md":"#### [day3#check-interval] What can the audit say about Hail?\n\n*Checkpoint*\n\n**Question:** Hail has an FNR of 18.2% from 110 eligible applicants, interval 12.1% to 26.4%. The FNR over all 6,341 eligible applicants is 22.8%. Wiam asks whether Ahliya treats Hail's applicants better.\n\n- A. Yes: 18.2% is lower than 22.8%, so Hail is treated better\n- B. Nothing at all, since 110 applicants is too few to compute a rate\n- C. No difference is shown: the interval includes the overall rate\n- D. No: small regions are always disadvantaged by the model","notes":"Answer C. 110 eligible applicants is above the course's minimum of 30, so a rate is reported, with its interval. B is the overcorrection some participants make after the small-cells slide.","minutes":null,"lo":["LO5"]},{"id":"lab-3-1","n":13,"title":"Error rates with intervals","kind":"lab","session":1,"hash":"ee1b735a","md":"#### [day3#lab-3-1] Error rates with intervals\n\nLab 3.1 · 25 min\n\nCompute error rates by gender, region and nationality with intervals.\n\n[D3_1_compute_error_rates.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D3_1_compute_error_rates.ipynb)\n\n- [ ] Confusion counts by group (6 min)\n- [ ] Rates with Wilson intervals (7 min)\n- [ ] One intersection (6 min)\n- [ ] Mark the cells too small to read (3 min)\n- [ ] One sentence per finding (3 min)\n- [ ] ✱ Stretch: Rebuild the table with Fairlearn's MetricFrame and compare","notes":"Expected: FNR women 0.227, men 0.228; non-Saudi 0.286; Qassim 0.316; intersection non-Saudi women 0.298 (0.249 to 0.353); 52 cells, 23 below 30 eligible. Common error: computing FNR over all applicants instead of the eligible. The stretch shows Fairlearn's MetricFrame giving the same table in four lines.","minutes":null,"lo":[]},{"id":"s2","n":14,"title":"Criteria that conflict","kind":"section","session":2,"hash":"72960ef0","md":"#### [day3#s2] Criteria that conflict\n\n*Session 2*\n\n- Compute demographic parity, equal opportunity and predictive parity gaps\n- Show why they cannot all hold when base rates differ\n- Choose a criterion from the harm of each kind of error","notes":"","minutes":null,"lo":["LO5"]},{"id":"three-criteria","n":15,"title":"Four criteria, each reasonable, each equalising something different","kind":"content","session":2,"hash":"3d18a7c2","md":"#### [day3#three-criteria] Four criteria, each reasonable, each equalising something different\n\n*What \"fair\" can mean*\n\n| Criterion | Equal across groups | Plain words |\n| --- | --- | --- |\n| **Demographic parity** | selection rate | pass the same share of each group |\n| **Equal opportunity** | false negative rate | miss eligible people equally often |\n| **Equalised odds** | false negative and false positive rates | both errors equal |\n| **Predictive parity** | precision | a pass is equally reliable for each group |","notes":"Equal opportunity is the name Hardt, Price and Srebro gave to equal true positive rates, which is the same as equal false negative rates. Sources: Hardt, Price and Srebro, Equality of Opportunity in Supervised Learning.","minutes":null,"lo":["LO5"]},{"id":"base-rates-differ","n":16,"title":"Eligibility is more common among women applicants than among men","kind":"content","session":2,"hash":"91083534","md":"#### [day3#base-rates-differ] Eligibility is more common among women applicants than among men\n\n*The fact that forces a choice*\n\n| Item | Value |\n| --- | --- |\n| Women | 59.7% |\n| Men | 49.3% |\n\n- Share eligible after full review (Lab 3.2)\n- Women applicants are more often heads of lower-income households in this data\n- When base rates differ, a model that is not perfect cannot satisfy all criteria at once","notes":"The impossibility result: with different base rates and an imperfect classifier, calibration-type criteria and error-rate criteria cannot all hold. Do not prove it; Lab 3.2 shows it on the data in eight minutes. Sources: Kleinberg, Mullainathan and Raghavan, Inherent Trade-Offs in the Fair Determination of Risk Scores.","minutes":null,"lo":["LO5"]},{"id":"at-one-threshold","n":17,"title":"At one threshold, misses are equal and selection is not","kind":"content","session":2,"hash":"5c013da4","md":"#### [day3#at-one-threshold] At one threshold, misses are equal and selection is not\n\n*Lab 3.2, the reference run*\n\n| Threshold 0.5 for all | Selection | FNR | Precision |\n| --- | --- | --- | --- |\n| Women | 50.1% | 22.7% | 92.3% |\n| Men | 40.9% | 22.8% | 93.0% |\n| Gap | +9.1 pts | -0.2 pts | -0.8 pts |\n\nEqual opportunity holds almost exactly; demographic parity does not.","notes":"Someone will say the 9-point selection gap is discrimination against men. Ask: is it, when 10 points more of the women are eligible? The gap in selection follows the gap in need. That is the argument the next slide makes with numbers.","minutes":null,"lo":["LO5"]},{"id":"force-parity","n":18,"title":"Equal selection makes Ahliya miss eligible women far more often","kind":"content","session":2,"hash":"429ddb3c","md":"#### [day3#force-parity] Equal selection makes Ahliya miss eligible women far more often\n\n*Force demographic parity*\n\n| Equal selection (thresholds 0.620 and 0.432) | Selection | FNR | Precision |\n| --- | --- | --- | --- |\n| Women | 44.0% | 30.9% | 93.8% |\n| Men | 44.0% | 18.5% | 91.4% |\n| Gap | 0 | +12.4 pts | +2.4 pts |\n\n> **The trade.** One gap closes, another opens. Here the gap that opens is in the harmful error.","notes":"From Lab 3.2, task 2. Women's threshold rises to 0.620 and men's falls to 0.432. Equalising FNR instead (task 3) needs almost no change: thresholds 0.501 and 0.499, with the selection gap staying at 9.0 points.","minutes":null,"lo":["LO5"]},{"id":"choose-by-harm","n":19,"title":"Choose the criterion from the decision and the harm of each error","kind":"content","session":2,"hash":"b1146500","md":"#### [day3#choose-by-harm] Choose the criterion from the decision and the harm of each error\n\n*How to choose*\n\n- SDAIA's AI Ethics Principles ask that fairness metrics be chosen at design time from the kind of decision and the harm and benefit of correct and incorrect predictions\n- Ahliya allocates **support by need**; the harmful error is the **missed eligible applicant**\n- So: **equal opportunity**, with the selection gap explained by need\n\n- **When parity fits.** When need is believed equal and the labels are suspect, or when a fixed opportunity is shared out.","notes":"The principles also ask for the allowed threshold of the metric to be defined at the plan-and-design stage, before results are seen. Ahliya had none: that becomes a gap in the model card on Day 4. Sources: AI Ethics Principles (SDAIA), fairness principle, plan and design.","minutes":null,"lo":["LO5"]},{"id":"check-criterion","n":20,"title":"Which criterion for a support decision?","kind":"quiz","session":2,"hash":"77206142","md":"#### [day3#check-criterion] Which criterion for a support decision?\n\n*Checkpoint*\n\n**Question:** Ahliya decides who is passed to an officer for housing support. Eligible applicants are more common among women. Bashayer asks which fairness criterion the fund should commit to.\n\n- A. Equal false negative rates: miss eligible applicants equally in each group\n- B. Equal selection rates: pass the same share of women and men\n- C. All three criteria at once, to be safe\n- D. None: Ahliya does not use gender, so it is fair","notes":"Answer A. D deserves a minute: \"fairness through unawareness\" fails because proxies (marital status, employment, missing income) carry the information.","minutes":null,"lo":["LO5"]},{"id":"lab-3-2","n":21,"title":"Two criteria in conflict","kind":"lab","session":2,"hash":"cf7e4d56","md":"#### [day3#lab-3-2] Two criteria in conflict\n\nLab 3.2 · 25 min\n\nShow two fairness criteria conflicting on the test set and choose one.\n\n[D3_2_show_two_fairness.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D3_2_show_two_fairness.ipynb)\n\n- [ ] Three gaps at the current threshold (6 min)\n- [ ] Equalise selection rates and watch the other gaps (8 min)\n- [ ] Equalise false negative rates instead (6 min)\n- [ ] Choose and justify (5 min)\n- [ ] ✱ Stretch: Find the thresholds that equalise predictive parity and read the other gaps","notes":"Expected: base rates 0.597 and 0.493; at 0.5 gaps of +9.1 points in selection, -0.2 in FNR, -0.8 in precision; at equal selection the FNR gap becomes +12.4 points; at equal FNR the thresholds are 0.501 and 0.499. The choice in task 4 is open to argument; insist only that it names the harm.","minutes":null,"lo":[]},{"id":"s3","n":22,"title":"Bias across the lifecycle","kind":"section","session":3,"hash":"527f18d3","md":"#### [day3#s3] Bias across the lifecycle\n\n*Session 3*\n\n- Place a finding in a stage of the AI system lifecycle\n- Name its bias type from the national bias guide\n- Run the check that separates two neighbouring types","notes":"","minutes":null,"lo":["LO5"]},{"id":"lifecycle","n":23,"title":"The AI Ethics Principles name four stages, and bias can enter at each","kind":"content","session":3,"hash":"32e14bbd","md":"#### [day3#lifecycle] The AI Ethics Principles name four stages, and bias can enter at each\n\n*Where bias enters*\n\n1. **1 · Plan and Design** purpose, target, the fairness metric and its threshold\n2. **2 · Prepare Input Data** collection, recording, labels\n3. **3 · Build and Validate** features, model choice, evaluation\n4. **4 · Deploy and Monitor** use, feedback, retraining","notes":"The stage names are those of SDAIA's AI Ethics Principles, whose Annexure B maps ethics tools to the same four stages. Placing a finding in a stage tells you who fixes it: the data owner, the modeller or operations. Sources: AI Ethics Principles (SDAIA), Annexure B.","minutes":null,"lo":["LO5"]},{"id":"bias-guide","n":24,"title":"SDAIA's AI Bias Reference Guide defines more than a hundred bias types","kind":"content","session":3,"hash":"0137466d","md":"#### [day3#bias-guide] SDAIA's AI Bias Reference Guide defines more than a hundred bias types\n\n*The national vocabulary*\n\n| Type | In the guide's terms |\n| --- | --- |\n| **Historical Bias** | training data carries past circumstances that no longer hold |\n| **Measurement Bias** | values systematically over- or under-recorded |\n| **Labeling Bias** | labels shaped by the people who assigned them |\n| **Evaluation Bias** | evaluation data or metrics that do not reflect real use |\n| **Feedback Loop Bias** | the system's outputs become its future inputs |","notes":"Paraphrases of the guide's definitions, first edition, May 2026; each entry also gives the impact, an example and mitigations. DS-207 introduced the guide; today the skill is to tell neighbouring types apart with evidence. Sources: AI Bias Reference Guide (SDAIA).","minutes":null,"lo":["LO5"]},{"id":"same-gap-two-causes","n":25,"title":"The same gap can have two causes that need opposite fixes","kind":"content","session":3,"hash":"6a7268b0","md":"#### [day3#same-gap-two-causes] The same gap can have two causes that need opposite fixes\n\n*Why the type matters*\n\n- **Measurement or labelling?** Measurement: a feature is recorded wrongly (fix the recording). Labelling: the outcome used for training is wrong (fix the labels).\n- **Historical or labelling?** Historical: labels followed a rule that has since changed (retrain on the current rule). Labelling: labels were wrong when made (relabel or review).","notes":"These two tests are the core of Lab 3.3, task 3. Ask for an example from participants' own work of a gap they explained without checking which cause it was.","minutes":null,"lo":["LO5"]},{"id":"evidence-f1-f3","n":26,"title":"Three findings, three checks, three different types","kind":"content","session":3,"hash":"8ade83c9","md":"#### [day3#evidence-f1-f3] Three findings, three checks, three different types\n\n*Lab 3.3, the reference run*\n\n| Finding | Check | Result | Type |\n| --- | --- | --- | --- |\n| Self-employed: FNR 65% | recorded against verified income | median ratio 1.73; others 1.00 | Measurement |\n| Family home: FNR 36% against 17% for renters | officers' approvals before and after the July 2024 rule change | 22% before, 49% after; renters 49% throughout | Historical |\n| Qassim: highest FNR | officers' declines of eligible applicants, by office and gender | women 43% in Qassim, 23% elsewhere; men equal | Labelling |","notes":"From Lab 3.3. Self-employed income is recorded as turnover, so they look richer than they are. Family-home applicants were declined under a rule that ended in July 2024, and the model learnt it. In Qassim one office declined eligible women-headed households; men there are treated like everywhere else, which rules out a regional effect.","minutes":null,"lo":["LO5"]},{"id":"evidence-f4-f5","n":27,"title":"Two findings sit outside the data: in validation and in deployment","kind":"content","session":3,"hash":"a97f306f","md":"#### [day3#evidence-f4-f5] Two findings sit outside the data: in validation and in deployment\n\n*Lab 3.3, the reference run*\n\n- **Evaluation Bias · Build and Validate.** The validation report claimed accuracy 0.881 on officers' decisions in Riyadh and Makkah. Against the reviewed outcome: 0.845 there, 0.850 elsewhere.\n- **Feedback Loop Bias · Deploy and Monitor.** 37.4% of applications are auto-declined and never reviewed, so they never get a label. Retraining cannot see its own misses; 62.8% of self-employed applicants are auto-declined.","notes":"The validation report measured agreement with officers, who share the measurement and labelling problems, so it flattered the model. The deployment finding is the one with no error rate today: it makes tomorrow's model worse for exactly the group that is already missed. Remedy: review a random sample of auto-declined applications.","minutes":null,"lo":["LO5"]},{"id":"check-bias-type","n":28,"title":"Measurement or labelling?","kind":"quiz","session":3,"hash":"d9423495","md":"#### [day3#check-bias-type] Measurement or labelling?\n\n*Checkpoint*\n\n**Question:** Self-employed applicants are missed by Ahliya far more often. An income audit shows their recorded income is 1.73 times the verified income; for employees it is 1.00. Which type fits, and what is the first fix?\n\n- A. Labeling Bias: retrain on corrected decisions\n- B. Sampling Bias: reweight the self-employed in training\n- C. Historical Bias: retrain on recent applications only\n- D. Measurement Bias: record net income for the self-employed","notes":"Answer D. Session 4 will show that reweighting barely moves this kind of gap, which confirms the diagnosis.","minutes":null,"lo":["LO5"]},{"id":"lab-3-3","n":29,"title":"Five findings, five types","kind":"lab","session":3,"hash":"9e9a702b","md":"#### [day3#lab-3-3] Five findings, five types\n\nLab 3.3 · 25 min\n\nMap five findings to bias types in the national guide.\n\n[D3_3_map_five_findings.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D3_3_map_five_findings.ipynb)\n\n- [ ] Read the five findings (3 min)\n- [ ] Run the evidence check for each (12 min)\n- [ ] Map each to a type and a stage (6 min)\n- [ ] Check the mapping (4 min)\n- [ ] ✱ Stretch: Write the sixth finding you would look for next, and its check","notes":"Expected mapping: F1 Measurement, F2 Historical, F3 Labeling, F4 Evaluation, F5 Feedback Loop; stages Prepare Input Data for the first three, Build and Validate, Deploy and Monitor. Accept Plan and Design for F2 if the participant argues that choosing past decisions as the target was a design decision. The three distractor types (Sampling, Aggregation, Sample Size) are from the guide too.","minutes":null,"lo":[]},{"id":"s4","n":30,"title":"Mitigation and its cost","kind":"section","session":4,"hash":"a8fe85ca","md":"#### [day3#s4] Mitigation and its cost\n\n*Session 4*\n\n- Apply reweighting before training\n- Apply group thresholds after training\n- Compare accuracy and disparity, and recommend","notes":"","minutes":null,"lo":["LO5"]},{"id":"three-points","n":31,"title":"You can act before training, during it, or after it","kind":"content","session":4,"hash":"a1255b03","md":"#### [day3#three-points] You can act before training, during it, or after it\n\n*Mitigation*\n\n- **Before: pre-processing.** Change the training data: **reweighting**, resampling, relabelling, fixing a feature.\n- **During: in-processing.** A constraint in the fitting, such as Fairlearn's reductions. Named here, not practised.\n- **After: post-processing.** Change the decision rule: **a threshold per group**.","notes":"The lab tries one pre-processing and one post-processing method, as the catalog entry asks. In-processing needs more time than a 25-minute lab allows. All three are in the AI Ethics Principles' list of fairness tools through Fairlearn, AI Fairness 360 and Aequitas. Sources: Fairlearn documentation; AI Ethics Principles, Annexure A.","minutes":null,"lo":["LO5"]},{"id":"reweighting","n":32,"title":"Reweighting makes group and label independent in the training data","kind":"content","session":4,"hash":"34a91ff5","md":"#### [day3#reweighting] Reweighting makes group and label independent in the training data\n\n*Pre-processing*\n\n```python\n# file: python\npg  = df[\"group\"].value_counts(normalize=True)\npy  = df[\"y\"].value_counts(normalize=True)\npgy = df.groupby([\"group\", \"y\"]).size() / len(df)\nidx = pd.MultiIndex.from_arrays([df[\"group\"], df[\"y\"]])\nw   = (pg[df[\"group\"]].to_numpy() * py[df[\"y\"]].to_numpy()\n       / pgy.reindex(idx).to_numpy())\nmodel.fit(X, y, logisticregression__sample_weight=w)\n```\n\n- Rare combinations, such as approved non-Saudi women, weigh more\n- The weights average 1\n- It can only fix what the **labels' balance** causes","notes":"Kamiran and Calders' method. The last bullet is the lesson of the lab: Session 3 found the gap comes from income features, so reweighting should not help much. Sources: Kamiran and Calders, Data preprocessing techniques for classification without discrimination (2012).","minutes":null,"lo":["LO5"]},{"id":"group-thresholds","n":33,"title":"A threshold per group, tuned on one half and reported on the other","kind":"content","session":4,"hash":"71973ff0","md":"#### [day3#group-thresholds] A threshold per group, tuned on one half and reported on the other\n\n*Post-processing*\n\n- Target: each group's FNR equal to the overall 22.5%\n- Tuned thresholds: non-Saudi women 0.468, Saudi women 0.511, non-Saudi men 0.470, Saudi men 0.499\n- Reported on reviewed applications not used to tune\n\n- **A legal question, not only a technical one.** The rule now uses gender and nationality at the moment of decision. The data protection officer and legal counsel decide whether that is allowed and how it is explained.","notes":"From Lab 3.4. Tuning and reporting on the same rows would overstate the effect. The AI Ethics Principles ask that sensitive attributes be kept out of model inputs, or that their use be justified: a group threshold is such a use, so it needs that justification in writing.","minutes":null,"lo":["LO5"]},{"id":"mitigation-results","n":34,"title":"Thresholds narrow the gap a little; reweighting barely moves it","kind":"content","session":4,"hash":"9dd20559","md":"#### [day3#mitigation-results] Thresholds narrow the gap a little; reweighting barely moves it\n\n*Lab 3.4, the reference run*\n\n| Reported on 6,050 reviewed applications | Accuracy | Largest FNR gap | FNR, non-Saudi women |\n| --- | --- | --- | --- |\n| Baseline | 84.5% | 12.9 pts | 34.9% |\n| Reweighting | 84.5% | 12.6 pts | 34.9% |\n| Group thresholds | 84.5% | 10.0 pts | 32.2% |\n\n> **Accuracy did not fall.** The cost here is not accuracy: it is a rule that uses protected attributes, and a gap that remains.","notes":"From Lab 3.4. The non-Saudi women's rate stays far from the 22.5% target on the reporting half because their threshold rests on 143 eligible applicants in the tuning half. Honest reporting of a mitigation includes what it did not achieve.","minutes":null,"lo":["LO5"]},{"id":"recommendation","n":35,"title":"Fix the source, use thresholds only as an interim, and say what remains","kind":"content","session":4,"hash":"42ee1a8a","md":"#### [day3#recommendation] Fix the source, use thresholds only as an interim, and say what remains\n\n*The audit's recommendation*\n\n1. **1 · Source** verify or impute income properly; net income for the self-employed\n2. **2 · Interim** group thresholds, if legally approved, with officer review of declines\n3. **3 · Monitor** review a sample of auto-declines, so retraining sees its misses","notes":"Each step maps to a Session 3 finding: measurement (1), the intersection gap (2), the feedback loop (3). The recommendation is the last section of the LO5 audit report. On Day 4 it reappears as treatments in the impact assessment.","minutes":null,"lo":["LO5"]},{"id":"check-mitigation","n":36,"title":"Which mitigation would you recommend?","kind":"quiz","session":4,"hash":"b6a1db2f","md":"#### [day3#check-mitigation] Which mitigation would you recommend?\n\n*Checkpoint*\n\n**Question:** Reweighting moved the FNR gap from 12.9 to 12.6 points. Group thresholds moved it to 10.0, at the same accuracy. The gap comes mostly from missing and mis-recorded income. What do you recommend to Bashayer?\n\n- A. Group thresholds as the permanent fix, since accuracy did not fall\n- B. Fix income recording first; thresholds only as an approved interim measure\n- C. Reweighting, because pre-processing is always preferable\n- D. Neither, since the gap is not closed completely","notes":"Answer B. This is also the shape of the capstone's recommendation section: cause, interim measure, cost, approval.","minutes":null,"lo":["LO5"]},{"id":"lab-3-4","n":37,"title":"Reweighting and a threshold change","kind":"lab","session":4,"hash":"c02569d9","md":"#### [day3#lab-3-4] Reweighting and a threshold change\n\nLab 3.4 · 25 min\n\nApply reweighting and a threshold change and compare accuracy and disparity.\n\n[D3_4_apply_reweighting_threshold.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D3_4_apply_reweighting_threshold.ipynb)\n\n- [ ] The baseline: accuracy and gaps (4 min)\n- [ ] Reweight the training data and retrain (8 min)\n- [ ] Group thresholds on the baseline model (7 min)\n- [ ] One comparison table and a recommendation (6 min)\n- [ ] ✱ Stretch: Repeat the threshold change for the intersection of Day 3 Session 1","notes":"Expected on the reporting half: baseline accuracy 0.845, gap 0.129; reweighting 0.845 and 0.126; thresholds 0.845 and 0.100. The full run takes about 20 seconds (two fits on 48,000 rows). If the weights cell is slow, the participant probably used apply row by row: show the vectorised version on the reweighting slide.","minutes":null,"lo":[]},{"id":"wrap-up","n":38,"title":"Disaggregate, choose the criterion by the harm, diagnose before mitigating","kind":"content","session":4,"hash":"744c788c","md":"#### [day3#wrap-up] Disaggregate, choose the criterion by the harm, diagnose before mitigating\n\n*Day 3 · Three things to keep*\n\n- **Disaggregate.** Gender alone showed no gap; non-Saudi women are missed at 30%. Intervals and counts beside every rate.\n- **Choose.** Different base rates make criteria conflict. For support by need: equal false negative rates.\n- **Diagnose.** Five findings, five types. Reweighting failed where the cause was a feature.","notes":"Ask each table which finding they would put first in the report to internal audit, and why. Tomorrow turns today's numbers into a model card and an impact assessment that someone else can check.","minutes":null,"lo":[]},{"id":"next","n":39,"title":"Document and assess","kind":"content","session":4,"hash":"565aa551","md":"#### [day3#next] Document and assess\n\n*Tomorrow · Day 4*\n\n- The datasheet of the de-identified release, filled from its log\n- The model card of Ahliya with disaggregated results\n- Four risks scored on the national framework's likelihood and impact matrix\n- A peer's result rerun, and the gaps that changed the number","notes":"Day 4 labs supply reference logs and results, so nothing from today is required. Encourage participants to keep their own Lab 3.1 and 3.4 outputs: they can use them in place of the supplied ones.","minutes":null,"lo":[]}],"activities":[{"id":"review-day2-q1","slide":"review-day2","type":"single","prompt":"Bashayer approves the district counts at epsilon 0.5 and asks for them every month. Yahya asks what the fund will have spent after a year.","options":[{"key":"A","text":"0.5, because each month is a separate table"},{"key":"B","text":"6, because the same applicants are counted twelve times"},{"key":"C","text":"0.5, because later months are post-processing"},{"key":"D","text":"About 0.04, a twelfth of 0.5"}],"correct":[1],"explanation":"Sequential composition: twelve releases about the same people spend twelve times 0.5.","misconceptions":["Applies parallel composition across months: the months are about the same applicants, so the epsilons add","","Thinks post-processing covers new releases: each month is a new measurement on the data, not a computation on last month's output","Divides instead of adding: splitting a budget into months is a choice, not what happens by default"],"lo":["LO3"]},{"id":"check-interval-q1","slide":"check-interval","type":"single","prompt":"Hail has an FNR of 18.2% from 110 eligible applicants, interval 12.1% to 26.4%. The FNR over all 6,341 eligible applicants is 22.8%. Wiam asks whether Ahliya treats Hail's applicants better.","options":[{"key":"A","text":"Yes: 18.2% is lower than 22.8%, so Hail is treated better"},{"key":"B","text":"Nothing at all, since 110 applicants is too few to compute a rate"},{"key":"C","text":"No difference is shown: the interval includes the overall rate"},{"key":"D","text":"No: small regions are always disadvantaged by the model"}],"correct":[2],"explanation":"The interval from 12.1% to 26.4% contains 22.8%, so the data do not show that Hail differs.","misconceptions":["Reads a point estimate without its interval: the interval includes the overall rate","Treats a wide interval as no information: it still rules out very high or very low rates","","Confuses a smaller group with a worse outcome: size widens the interval, it does not move the rate"],"lo":["LO5"]},{"id":"check-criterion-q1","slide":"check-criterion","type":"single","prompt":"Ahliya decides who is passed to an officer for housing support. Eligible applicants are more common among women. Bashayer asks which fairness criterion the fund should commit to.","options":[{"key":"A","text":"Equal false negative rates: miss eligible applicants equally in each group"},{"key":"B","text":"Equal selection rates: pass the same share of women and men"},{"key":"C","text":"All three criteria at once, to be safe"},{"key":"D","text":"None: Ahliya does not use gender, so it is fair"}],"correct":[0],"explanation":"The harmful error in a support decision is the missed eligible applicant, and need differs between groups, so error rates among the eligible are what must be equal.","misconceptions":["","Ignores the different need: equal selection would decline eligible women to match men's rate","Thinks all criteria can be met together: with different base rates they conflict","Equates removing an input with fair outcomes: outcomes still differ through other features"],"lo":["LO5"]},{"id":"check-bias-type-q1","slide":"check-bias-type","type":"single","prompt":"Self-employed applicants are missed by Ahliya far more often. An income audit shows their recorded income is 1.73 times the verified income; for employees it is 1.00. Which type fits, and what is the first fix?","options":[{"key":"A","text":"Labeling Bias: retrain on corrected decisions"},{"key":"B","text":"Sampling Bias: reweight the self-employed in training"},{"key":"C","text":"Historical Bias: retrain on recent applications only"},{"key":"D","text":"Measurement Bias: record net income for the self-employed"}],"correct":[3],"explanation":"The feature itself is systematically over-recorded for one group, which is the guide's measurement bias; the fix is at the point of recording.","misconceptions":["Blames the outcome when the evidence points at a feature: the officers applied the rule correctly to the income they were given","Reaches for a mitigation that cannot repair a wrong input: weights change counts, not recorded incomes","Treats every old pattern as historical: nothing here changed over time",""],"lo":["LO5"]},{"id":"check-mitigation-q1","slide":"check-mitigation","type":"single","prompt":"Reweighting moved the FNR gap from 12.9 to 12.6 points. Group thresholds moved it to 10.0, at the same accuracy. The gap comes mostly from missing and mis-recorded income. What do you recommend to Bashayer?","options":[{"key":"A","text":"Group thresholds as the permanent fix, since accuracy did not fall"},{"key":"B","text":"Fix income recording first; thresholds only as an approved interim measure"},{"key":"C","text":"Reweighting, because pre-processing is always preferable"},{"key":"D","text":"Neither, since the gap is not closed completely"}],"correct":[1],"explanation":"The cause is in the income feature, so the lasting fix is at the source; the threshold change helps meanwhile but needs approval because it uses gender and nationality.","misconceptions":["Reads an unchanged accuracy as a free fix: the rule uses protected attributes and the gap remains","","Ignores what the evidence showed: the weights cannot repair a wrong feature","Treats an unfinished fix as no fix: a narrowed gap with monitoring is better than the baseline"],"lo":["LO5"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day3.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

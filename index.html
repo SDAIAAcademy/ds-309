@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="page" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsible Data Science: Privacy, Fairness and Documentation · SDAIA Academy</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<meta name="description" content="Measure and reduce re-identification risk, release counts under a privacy budget, test synthetic data for leakage, audit a screening model for subgroup errors, and document a release so that someone else can rerun it">
+<link rel="icon" href="_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="index.md">
+<link rel="describedby" href="llms.txt">
+<link rel="stylesheet" href="_engine/academy.css">
+</head>
+<body>
+<header>
+<div class="wrap">
+<div class="top"><div class="logo" id="logo"></div><nav><a href="slides/day1.html">Slides</a><a href="practice.html">Practice</a><a href="index.md" type="text/markdown">Markdown</a></nav></div>
+<div class="kicker">Data Science Track · SDAIA Academy · DS-309</div>
+<h1>Responsible Data Science: Privacy, Fairness and Documentation<span class="sub ar" lang="ar" dir="rtl">علم البيانات المسؤول: الخصوصية والإنصاف والتوثيق</span></h1>
+<p>Measure and reduce re-identification risk, release counts under a privacy budget, test synthetic data for leakage, audit a screening model for subgroup errors, and document a release so that someone else can rerun it</p>
+<div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>26 hours</span><span>Level 300</span><span>Data Science · Associate badge</span></div>
+</div>
+</header>
+<main class="wrap">
+<h2>About the course</h2>
+<p>Participants take the synthetic applicant data and eligibility-screening model of Yusr Housing Support Fund, a fictional public fund, through the checks a release needs: they measure re-identification risk and de-identify the table, publish differentially private counts under a budget, test a synthetic extract for leakage, audit subgroup errors against the bias types in SDAIA's AI Bias Reference Guide, and write the datasheet, model card and impact assessment a reviewer needs. Calibration and explanation are DS-305.</p>
+<p><b>Who it is for:</b> Practitioners. Data scientists and analysts who have completed the level 200 set or can show equivalent work: an analysis they framed, carried out and explained to a stakeholder.</p>
+<p><b>Format:</b> Intensive: 4 teaching days of four sessions and a capstone day, with guided pre-work and a tracked follow-up task</p>
+<h2>The case study</h2>
+<div class="note info"><b>Yusr Housing Support Fund.</b> Yusr Housing Support Fund is a fictional public fund that screens applications for housing support with an eligibility screening model, Ahliya. A researcher asks for an extract, the fund wants to publish district counts and a synthetic extract, and internal audit wants the model audited: participants take 60,000 synthetic applicant records, a linkable public register and 12,000 scored and reviewed applications through every check a release needs. All data is synthetic, generated with a fixed seed, and planted with the problems the labs find.</div>
+<h2>The course</h2>
+<div class="day">
+<div class="day-head c-teal"><div><div class="t">Day 1 · 4 sessions · 4 labs</div><h3>Find the personal data</h3></div><a class="btn" href="slides/day1.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Personal data in an analysis</b><br>Which applicant fields identify a person directly, which do it in combination, and which are sensitive<ul><li>Tell direct identifiers, quasi-identifiers and sensitive attributes apart in a real table</li><li>Find identifiers hiding in free-text fields</li><li>Decide keep, drop or transform for each field against a stated purpose</li></ul></td><td><a href="labs/D1_1_tag_each_applicant.ipynb">Lab 1.1 · Tag the applicant fields (AI-off)</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D1_1_tag_each_applicant.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Classification and permitted use</b><br>The national classification levels, the secondary use rules, and five release controls by guarantee and cost<ul><li>Assign a national classification level to an extract from its impact</li><li>State when an extract may leave the fund under the secondary use rules</li><li>Match five release controls to their guarantee and their cost</li></ul></td><td><a href="labs/D1_2_assign_classification_levels.ipynb">Lab 1.2 · Classify three extracts</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D1_2_assign_classification_levels.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Linkage attacks</b><br>How a release with no names is joined to an outside file, and what a link discloses<ul><li>Explain how a linkage attack joins a release to an outside file</li><li>Run a linkage on quasi-identifiers and measure its success</li><li>Name what a successful link discloses</li></ul></td><td><a href="labs/D1_3_re_identify_applicants.ipynb">Lab 1.3 · Link the release to the register</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D1_3_re_identify_applicants.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Measuring disclosure risk</b><br>Equivalence classes, uniqueness and k, and why k alone misses what a group reveals<ul><li>Compute equivalence classes, uniqueness and k for a release</li><li>Compare candidate releases by record-level risk</li><li>Explain why k alone misses attribute disclosure</li></ul></td><td><a href="labs/D1_4_compute_unique_quasi.ipynb">Lab 1.4 · Uniqueness and k for three releases</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D1_4_compute_unique_quasi.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-cyan"><div><div class="t">Day 2 · 4 sessions · 4 labs</div><h3>Release with less risk</h3></div><a class="btn" href="slides/day2.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Generalisation and suppression</b><br>Generalise and suppress until every record hides among five, and measure what the analysis loses<ul><li>Generalise quasi-identifiers along a hierarchy</li><li>Suppress the records that stay below k</li><li>Measure the utility cost on key statistics</li></ul></td><td><a href="labs/D2_1_reach_k_least.ipynb">Lab 2.1 · Reach k of five</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D2_1_reach_k_least.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Differential privacy for counts</b><br>The promise of differential privacy, calibrated noise on counts, and the error a budget costs<ul><li>State what the differential privacy promise covers and what it does not</li><li>Add calibrated noise to counts with a library</li><li>Measure the error that a budget costs</li></ul></td><td><a href="labs/D2_2_release_district_counts.ipynb">Lab 2.2 · District counts at three budgets</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D2_2_release_district_counts.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Budgets and composition</b><br>Sequential and parallel composition, bounded means, and one budget spread over several queries<ul><li>Add up privacy loss under sequential and parallel composition</li><li>Release a bounded mean with a library</li><li>Allocate one budget across queries by need</li></ul></td><td><a href="labs/D2_3_split_one_budget.ipynb">Lab 2.3 · Split one budget over four queries</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D2_3_split_one_budget.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Synthetic data and leakage</b><br>A synthetic extract generated column by column, its utility, and the tests that show it copies people<ul><li>Generate a synthetic extract by sequential modelling</li><li>Measure its utility against the real table</li><li>Test it for record copying and membership inference</li></ul></td><td><a href="labs/D2_4_generate_synthetic_extract.ipynb">Lab 2.4 · Test a synthetic extract</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D2_4_generate_synthetic_extract.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-coral"><div><div class="t">Day 3 · 4 sessions · 4 labs</div><h3>Audit for fairness</h3></div><a class="btn" href="slides/day3.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Disaggregating errors</b><br>Error rates by group and by intersection, with intervals that say how much a small group can tell<ul><li>Compute false negative and false positive rates by group with intervals</li><li>Slice by an intersection of two attributes</li><li>Report a small group without overclaiming</li></ul></td><td><a href="labs/D3_1_compute_error_rates.ipynb">Lab 3.1 · Error rates with intervals</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D3_1_compute_error_rates.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Criteria that conflict</b><br>Demographic parity, equal opportunity and predictive parity, why they conflict, and how to choose<ul><li>Compute demographic parity, equal opportunity and predictive parity gaps</li><li>Show why they cannot all hold when base rates differ</li><li>Choose a criterion from the harm of each kind of error</li></ul></td><td><a href="labs/D3_2_show_two_fairness.ipynb">Lab 3.2 · Two criteria in conflict</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D3_2_show_two_fairness.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Bias across the lifecycle</b><br>Where in the lifecycle a bias enters, its name in the national guide, and the check that tells two apart<ul><li>Place a finding in a stage of the AI system lifecycle</li><li>Name its bias type from the national bias guide</li><li>Run the check that separates two neighbouring types</li></ul></td><td><a href="labs/D3_3_map_five_findings.ipynb">Lab 3.3 · Five findings, five types</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D3_3_map_five_findings.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Mitigation and its cost</b><br>Reweighting before training, group thresholds after it, and what each costs in accuracy and disparity<ul><li>Apply reweighting before training</li><li>Apply group thresholds after training</li><li>Compare accuracy and disparity, and recommend</li></ul></td><td><a href="labs/D3_4_apply_reweighting_threshold.ipynb">Lab 3.4 · Reweighting and a threshold change</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D3_4_apply_reweighting_threshold.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-purple"><div><div class="t">Day 4 · 4 sessions · 4 labs</div><h3>Document and assess</h3></div><a class="btn" href="slides/day4.html">Open the slides</a></div>
+<div class="scroll"><table>
+<tr><th>Session</th><th>Topic</th><th>Lab</th></tr>
+<tr><td>1</td><td><b>Datasheets</b><br>What a datasheet of a de-identified release must answer, filled from the release log<ul><li>List what a datasheet of a de-identified release must answer</li><li>Fill each answer from a log, not from memory</li><li>Test a datasheet for completeness</li></ul></td><td><a href="labs/D4_1_write_datasheet_de.ipynb">Lab 4.1 · The datasheet of the release</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D4_1_write_datasheet_de.ipynb">Open in Colab</a></td></tr>
+<tr><td>2</td><td><b>Model cards</b><br>A model card with intended use, disaggregated results and the fairness criterion it was held to<ul><li>Write the intended and out-of-scope uses of a model</li><li>Report disaggregated results with intervals</li><li>State the fairness criterion and what it costs</li></ul></td><td><a href="labs/D4_2_write_model_card.ipynb">Lab 4.2 · The model card of Ahliya</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D4_2_write_model_card.ipynb">Open in Colab</a></td></tr>
+<tr><td>3</td><td><b>Impact assessment</b><br>Risks scored on the national framework: likelihood, impact, level, treatment, residual risk and a reviewer<ul><li>Score a risk's likelihood and impact on the national framework's scales</li><li>Choose a treatment and score the residual risk</li><li>Name a human reviewer for every high risk</li></ul></td><td><a href="labs/D4_3_score_four_risks.ipynb">Lab 4.3 · Score four risks</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D4_3_score_four_risks.ipynb">Open in Colab</a></td></tr>
+<tr><td>4</td><td><b>Review by someone else</b><br>A colleague's result rerun from their notebook and data, and the documentation gaps that changed it<ul><li>Rerun a colleague's result from their notebook and data</li><li>Find the undocumented choices that change a number</li><li>Record documentation gaps that a reviewer can act on</li></ul></td><td><a href="labs/D4_4_rerun_one_result.ipynb">Lab 4.4 · Rerun a peer's result</a> <span class="muted">(25 min)</span><br><a href="https://colab.research.google.com/github/SDAIAAcademy/ds-309/blob/main/labs/D4_4_rerun_one_result.ipynb">Open in Colab</a></td></tr>
+</table></div>
+</div>
+<div class="day">
+<div class="day-head c-amber"><div><div class="t">Capstone</div><h3>Capstone: the release pack</h3></div><a class="btn" href="slides/capstone.html">Open the slides</a></div>
+<div class="scroll"><table><tr><td>Ten-minute reviews of the Sabeel Scholarship Fund release pack, with one disparity recomputed live</td></tr></table></div>
+</div>
+<h2>Capstone</h2>
+<div class="two">
+<div><p>A release pack for a second synthetic case (a scholarship allocation model): treated extract, fairness audit, datasheet, model card and impact assessment, in a public repository whose README reports measured risk, utility and disparities, defended in a ten-minute review</p><p><b>What you submit:</b> A link to a public GitHub repository holding the release pack for the Sabeel Scholarship Fund case: the treated extract with its release log, the fairness audit with disaggregated error rates and intervals, the datasheet, the model card and the impact assessment, with a README that reports the measured risk, utility and disparities and how to rerun them. The commit history is part of the evidence. Then a ten-minute review in which the assessor picks a slice and the participant recomputes one disparity live.</p><p><b>Format:</b> 10 min talk and demo</p></div>
+<div><h3>Rubric</h3><div class="bar c-teal"><span>Privacy<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-cyan"><span>Fairness audit<i style="--w:100%"></i></span><b>25%</b></div><div class="bar c-coral"><span>Documentation<i style="--w:80%"></i></span><b>20%</b></div><div class="bar c-purple"><span>Impact assessment<i style="--w:80%"></i></span><b>20%</b></div><div class="bar c-amber"><span>Reproducibility<i style="--w:40%"></i></span><b>10%</b></div></div>
+</div>
+<h2>Outcomes</h2>
+<p>By the end of the course, participants can:</p>
+<div class="day"><div class="scroll"><table>
+<tr><th></th><th>Outcomes</th><th>Level</th><th>Evidence</th></tr>
+<tr><td><b>LO1</b></td><td>Distinguish pseudonymisation, de-identification, aggregation, synthetic data and differential privacy by the guarantee and cost of each, given five described data releases</td><td>Awareness</td><td>a decision table naming the fitting control and the residual risk for each</td></tr>
+<tr><td><b>LO2</b></td><td>Measure re-identification risk from quasi-identifiers and reduce it while tracking analytic utility, given 60,000 synthetic applicant records and a linkable external file</td><td>Applied</td><td>unique records, linkage success and three key statistics before and after treatment</td></tr>
+<tr><td><b>LO3</b></td><td>Compute differentially private counts and means and state the accuracy cost of a privacy budget, given three candidate budgets</td><td>Applied</td><td>error-against-budget curves and a recommended setting</td></tr>
+<tr><td><b>LO4</b></td><td>Test a synthetic extract for analytic utility and membership-inference leakage, given a generator trained on the applicant table</td><td>Applied</td><td>a utility and leakage report with a release recommendation</td></tr>
+<tr><td><b>LO5</b></td><td>Audit a screening model for subgroup disparities, choose fairness criteria that fit the decision and evaluate two mitigations, given a scored test set with protected and intersectional attributes</td><td>Performance</td><td>an audit report with disaggregated error rates, intervals and a recommendation</td></tr>
+<tr><td><b>LO6</b></td><td>Build the datasheet, model card and impact assessment a reviewer needs to judge and rerun a release, given the participant's capstone release</td><td>Performance</td><td>a pack that a peer reruns and challenges, with a likelihood and impact score for each risk</td></tr>
+</table></div></div>
+<h2>Tools</h2>
+<div class="grid">
+<div class="card c-teal"><h3>De-identification and disclosure risk</h3><p>ARX · sdcMicro</p></div>
+<div class="card c-cyan"><h3>Differential privacy library</h3><p>OpenDP · diffprivlib</p></div>
+<div class="card c-coral"><h3>Synthetic tabular data</h3><p>Synthetic Data Vault · synthpop</p></div>
+<div class="card c-purple"><h3>Fairness metrics and mitigation</h3><p>Fairlearn · AIF360 · Aequitas</p></div>
+<div class="card c-green"><h3>Notebooks with pinned environments</h3><p>Jupyter or marimo with uv · R with Quarto and renv</p></div>
+</div>
+<h2>Before you start</h2>
+<h3>Prerequisites</h3>
+<ul><li>DS-204 Machine Learning for Tabular Data: Baselines and Validation</li><li>DS-207 Responsible Data Practice and Conduct in Analytical Work</li><li>Trains and evaluates a classifier in Python</li><li>Computes error rates and confidence intervals for proportions</li><li>Setup: a laptop CPU with uv, or Google Colab. No lab calls or downloads a model. See labs/README.md.</li></ul>
+<div class="note tip">The labs are notebooks. Open each one in Google Colab from the table above, or clone the repository and run them locally.</div>
+<h2>Sources</h2>
+<h3>National references</h3>
+<ul><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/PersonalDataProtectionLaw.pdf">Personal Data Protection Law (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/ImplementingRegulationPersonalDataProtectionLaw.pdf">Implementing Regulation of the Personal Data Protection Law (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/Documents/PersonalDataDestructionAnonymizationAndEncryptionGuideline.pdf">Personal Data Destruction, Anonymization and Pseudonymisation Guideline, version 1.0 (SDAIA, August 2024)</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/DataClassificationPolicy.pdf">Data Classification Policy (National Data Management Office, SDAIA)</a></li><li><a href="https://sdaia.gov.sa/Documents/GeneralRulesForSecondaryUseOfData_EN.pdf">General Rules for Secondary Use of Data (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/en/SDAIA/about/Documents/ai-principles.pdf">AI Ethics Principles, with Annexure A (AI ethics tools) and Annexure B (tools by lifecycle stage) (SDAIA)</a></li><li><a href="https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/EN-AI-BIAS.pdf">AI Bias Reference Guide, first edition (SDAIA, May 2026)</a></li><li><a href="https://sdaia.gov.sa/ar/MediaCenter/KnowledgeCenter/ResearchLibrary/ExecutiveSummaryAr.pdf">National AI Risk Management Framework, full text in Arabic (SDAIA, April 2026)</a></li><li><a href="https://sdaia.gov.sa/en/MediaCenter/KnowledgeCenter/ResearchLibrary/ExecutiveSummaryEn.pdf">National AI Risk Management Framework, English executive summary (SDAIA, April 2026)</a></li></ul>
+<h3>Methods</h3>
+<ul><li><a href="https://dataprivacylab.org/projects/identifiability/paper1.pdf">Sweeney, Simple Demographics Often Identify People Uniquely (Carnegie Mellon University, 2000)</a></li><li><a href="https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf">Dwork and Roth, The Algorithmic Foundations of Differential Privacy</a></li><li><a href="https://www.jstatsoft.org/article/view/v074i11">Nowok, Raab and Dibben, synthpop: Bespoke Creation of Synthetic Data in R (Journal of Statistical Software, 2016)</a></li><li><a href="https://arxiv.org/abs/1609.05807">Kleinberg, Mullainathan and Raghavan, Inherent Trade-Offs in the Fair Determination of Risk Scores</a></li><li><a href="https://link.springer.com/article/10.1007/s10115-011-0463-8">Kamiran and Calders, Data preprocessing techniques for classification without discrimination (Knowledge and Information Systems, 2012)</a></li><li><a href="https://arxiv.org/abs/1610.02413">Hardt, Price and Srebro, Equality of Opportunity in Supervised Learning</a></li><li><a href="https://arxiv.org/abs/1803.09010">Gebru and others, Datasheets for Datasets</a></li><li><a href="https://arxiv.org/abs/1810.03993">Mitchell and others, Model Cards for Model Reporting</a></li></ul>
+<h3>Tools</h3>
+<ul><li><a href="https://docs.opendp.org/">OpenDP library documentation</a></li><li><a href="https://fairlearn.org/">Fairlearn documentation</a></li><li><a href="https://arx.deidentifier.org/">ARX data anonymization tool</a></li><li><a href="https://cran.r-project.org/package=sdcMicro">sdcMicro on CRAN</a></li><li><a href="https://cran.r-project.org/package=synthpop">synthpop on CRAN</a></li><li><a href="https://docs.sdv.dev/sdv">Synthetic Data Vault documentation</a></li><li><a href="https://github.com/Trusted-AI/AIF360">AI Fairness 360</a></li><li><a href="https://github.com/dssg/aequitas">Aequitas</a></li><li><a href="https://docs.astral.sh/uv/">uv documentation</a></li></ul>
+<h2>Files and links</h2>
+<div class="files">
+<a href="practice.html"><b>practice.html</b><span>Practice questions with feedback</span></a>
+<a href="index.md"><b>index.md</b><span>This page as Markdown, for an AI assistant</span></a>
+<a href="llms.txt"><b>llms.txt</b><span>The course for AI assistants (llms.txt)</span></a>
+<a href="https://github.com/SDAIAAcademy/ds-309"><b>SDAIAAcademy/ds-309</b><span>The course repository</span></a>
+</div>
+</main>
+<footer><div class="wrap">SDAIA Academy · Data Science Track · Responsible Data Science: Privacy, Fairness and Documentation<br><span class="muted">Course version 2027.1.0 · engine 1.0.0 · built 2026-11-15 · commit 8cfd447</span></div></footer>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:16:16Z","version":"2027.1.0","commit":"8cfd447"},"course":{"id":"ds-309","code":"DS-309","title":"Responsible Data Science: Privacy, Fairness and Documentation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-309/","repo":"SDAIAAcademy/ds-309","home":"index.html"},"ai":{"context":{"course":"context/course.md","courseJs":"context/course.js","day":null,"llms":"llms.txt"},"tasks":[],"tools":[]},"features":{},"strings":{}}</script>
+<script src="_engine/academy.js"></script>
+</body>
+</html>

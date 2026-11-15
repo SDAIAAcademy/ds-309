@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 4 · Document and assess · Responsible Data Science: Privacy, Fairness and Documentation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day4.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Responsible Data Science: Privacy, Fairness and Documentation" data-track="data-science" data-day="Day 4">
+<!-- ======================= OPENING ======================= -->
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation</div>
+  <h1>Document and assess</h1>
+  <p class="lead mt">Day 4: Datasheets, model cards, impact assessment and review by a peer</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-309</span></div>
+  <aside class="notes"><p>Day 4 turns the week's numbers into documents that someone else can check: a datasheet for the release, a model card for Ahliya, an impact assessment, and a review of a peer's result. Every lab starts from a supplied log or result, so nobody depends on yesterday's notebook. Start with the review checkpoint on Day 3.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="2">
+  <div class="kicker">Today</div>
+  <h2>Document and assess</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Datasheets</b><small>What a datasheet of a de-identified release must answer, filled from the release log</small></div></div><div class="item"><div><b>Session 2 · Model cards</b><small>A model card with intended use, disaggregated results and the fairness criterion it was held to</small></div></div><div class="item"><div><b>Session 3 · Impact assessment</b><small>Risks scored on the national framework: likelihood, impact, level, treatment, residual risk and a reviewer</small></div></div><div class="item"><div><b>Session 4 · Review by someone else</b><small>A colleague's result rerun from their notebook and data, and the documentation gaps that changed it</small></div></div></div>
+</section>
+
+<section class="slide" id="review-day3" data-lo="LO5" data-n="3">
+  <div class="kicker">Review of Day 3</div>
+  <h2>Gender alone shows no gap. Is Ahliya fair?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5" data-id="review-day3-q1">
+    <p class="lead">Anmar reports that eligible women and men are missed at 22.7% and 22.8%. He proposes to close the audit.</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Not shown: the intersection of gender and nationality must be checked too</div>
+      <div class="opt" data-why="Reads equal margins as equal treatment: a gap inside an intersection can cancel out in both margins" data-k="B">Yes: equal false negative rates by gender meet equal opportunity</div>
+      <div class="opt" data-why="Moves to a criterion the course did not choose: for support by need, the harm is the missed eligible applicant" data-k="C">No: the selection rates by gender must also be equal</div>
+      <div class="opt" data-why="Treats every slice as required: cells below the minimum of 30 eligible are reported as too few, not audited" data-k="D">Not until every region by gender by nationality cell is estimated</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Non-Saudi women are missed at 29.8%, which the gender margin hides.</div>
+  </div>
+  <aside class="notes"><p>Answer A. D is the overcorrection: 23 of the 52 three-way cells are below 30 eligible applicants, so they are reported as too few to estimate. Today the intersection reappears in the model card's results table.</p></aside>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="4">
+  <div class="kicker">Session 1</div>
+  <h1>Datasheets</h1>
+  <ul class="bullets outcomes"><li>List what a datasheet of a de-identified release must answer</li><li>Fill each answer from a log, not from memory</li><li>Test a datasheet for completeness</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="why-document" data-lo="LO6" data-label="Why" data-n="5" data-session="1">
+  <div class="kicker">What a recipient cannot see</div>
+  <h2>A file without its documentation invites the wrong use</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Waad receives 59,707 rows: she cannot see the <b>293 suppressed</b> records</li>
+      <li>She cannot see that income is <b>as recorded</b>, overstated for the self-employed</li>
+      <li>She cannot see that the officer decision is <b>historical</b>, not a reviewed outcome</li>
+    </ul>
+    <div class="card c-teal"><h4>The datasheet answers</h4><p class="small mb0">Why the data exist, what is in them, how they were made and treated, what risk remains, and what they must not be used for.</p></div>
+  </div>
+  <aside class="notes"><p>Gebru and colleagues, "Datasheets for Datasets" (2021), propose the questions; we use their sections plus two that a de-identified release needs. Ask: which of the three hidden facts would change Waad's conclusions most? The suppression falls on non-Saudi applicants in small regions, so a regional analysis of nationality is biased by the treatment itself.</p></aside>
+</section>
+
+<section class="slide" id="datasheet-sections" data-lo="LO6" data-label="Sections" data-n="6" data-session="1">
+  <div class="kicker">The sections</div>
+  <h2>Seven sections, two of them for de-identified data</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>Motivation</h4><p class="small mb0">Who asked, for what purpose, who approved.</p></div>
+    <div class="card c-teal flat"><h4>Composition</h4><p class="small mb0">Records, fields released and removed.</p></div>
+    <div class="card c-teal flat"><h4>Collection</h4><p class="small mb0">The source and what its fields really record.</p></div>
+    <div class="card c-coral flat"><h4>De-identification</h4><p class="small mb0">Risk before, treatment, risk after, utility.</p></div>
+    <div class="card c-coral flat"><h4>Residual risk</h4><p class="small mb0">What the treatment does not cover.</p></div>
+    <div class="card c-cyan flat"><h4>Uses · Maintenance</h4><p class="small mb0">Two sections: allowed and forbidden uses; contact and code.</p></div>
+  </div>
+  <aside class="notes"><p>Composition, Collection, Uses and Maintenance follow Gebru and colleagues; De-identification and Residual risk are this course's additions, tied to the national anonymisation guideline, which treats pseudonymised data as personal data. Lab 4.1 checks that each section is present and not empty.</p></aside>
+</section>
+
+<section class="slide" id="from-the-log" data-lo="LO6" data-label="From the log" data-n="7" data-session="1">
+  <div class="kicker">Where the numbers come from</div>
+  <h2>Fill the datasheet from the release log, never from memory</h2>
+  <table class="t small">
+    <tr><th>Release log entry</th><th class="num">Value</th></tr>
+    <tr><td>Unique on birth date, gender and postcode, before</td><td class="num">59,458</td></tr>
+    <tr><td>Linkage success, before</td><td class="num">99.2%</td></tr>
+    <tr><td>Suppressed (rule: at most 1%)</td><td class="num">293</td></tr>
+    <tr><td>k after treatment · links claimed</td><td class="num">5 · 0</td></tr>
+    <tr><td>Largest change: mean income, Northern Borders</td><td class="num">-1.01%</td></tr>
+  </table>
+  <aside class="notes"><p>These are the values in data/release_log.json, written when the Day 2 release was made. A notebook rerun later may give different numbers if anything changed; the log records the run that was approved and released. Lab 4.1's check finds every number in the De-identification section and looks it up in the log.</p></aside>
+</section>
+
+<section class="slide" id="k-needs-context" data-lo="LO6" data-label="k = 5" data-n="8" data-session="1">
+  <div class="kicker">One number is not a guarantee</div>
+  <h2>"k = 5" means little without what it was measured on</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The <b>quasi-identifiers</b>: birth band, gender, nationality, region</li>
+      <li>The <b>suppression</b>: 293 records, and who they were</li>
+      <li>What k does <b>not</b> cover: a class that shares one income or one disability value</li>
+    </ul>
+    <div class="card c-coral"><h4>Residual risks in the log</h4><p class="small mb0">Attribute disclosure in classes with one value; outside files holding other fields; suppression falling on non-Saudi applicants in small regions.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> A datasheet that says "anonymised" and stops there. The extract is still personal data and stays Restricted.</div>
+  <aside class="notes"><p>The Data Classification Policy puts personal data under Restricted; the extract was Restricted B before treatment, and treatment lowers the risk, not the class. The guideline's own examples of de-identification techniques (generalisation, aggregation, masking) are what Day 2 applied.</p></aside>
+</section>
+
+<section class="slide" id="cannot-rerun" data-lo="LO6" data-label="Cannot rerun" data-n="9" data-session="1">
+  <div class="kicker">The honest last section</div>
+  <h2>Name what a reader still cannot rerun, and why</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>The treatment</h4><p class="small mb0">The source stays inside the fund. Acceptable: the code and seed 309 are named.</p></div>
+    <div class="card c-cyan flat"><h4>The linkage test</h4><p class="small mb0">Needs the register and the truth key, which the fund keeps for audit.</p></div>
+    <div class="card c-purple flat"><h4>The study codes</h4><p class="small mb0">Only the data protection officer holds the mapping, by design.</p></div>
+  </div>
+  <aside class="notes"><p>A reviewer accepts a limit that is stated with its reason; a limit discovered later reads as concealment. This list is task 5 of Lab 4.1. The stretch adds the distribution terms from the sharing agreement: research use only, no linkage, destruction after 24 months.</p></aside>
+</section>
+
+<section class="slide" id="check-datasheet" data-lo="LO6" data-n="10" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>What must the residual risk section say?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-datasheet-q1">
+    <p class="lead">Malak's draft says: "k = 5 was reached, so the extract is anonymous and no risk remains." Yahya sends it back.</p>
+    <div class="opts">
+      <div class="opt" data-why="Moves the problem to a number: a larger k narrows linkage risk but still says nothing about classes that share one value" data-k="A">That k should be raised to 10 before release</div>
+      <div class="opt" data-why="Confuses documentation with access control: the agreement limits use, it does not remove the risk the datasheet must state" data-k="B">That the sharing agreement makes residual risk irrelevant</div>
+      <div class="opt" data-why="Reports the before-treatment figure as if it remained: no register record matched one record after treatment" data-k="C">That 99.2% of applicants can still be linked</div>
+      <div class="opt" data-ok data-k="D">The risks k does not cover, and that the extract is still personal data</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> k limits singling out on the chosen quasi-identifiers only; attribute disclosure and other files remain, and the data stay Restricted.</div>
+  </div>
+  <aside class="notes"><p>Answer D. C catches participants who copy the before-treatment number into the after section; Lab 4.1's traceability check would accept it, because it is in the log, which is why a human still reads the datasheet.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-1" data-auto="lab" data-lab="4.1" data-label="Lab 4.1" data-n="11" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.1 · 25 min</div><h2>The datasheet of the release</h2><p class="lead small">Write the datasheet for the de-identified release.</p><a class="nb" href="../labs/D4_1_write_datasheet_de.ipynb">D4_1_write_datasheet_de.ipynb</a></div><ul class="checklist"><li>Read the release log <span class="min">4 min</span></li><li>Fill the composition and collection sections <span class="min">7 min</span></li><li>Fill the de-identification and residual risk sections <span class="min">7 min</span></li><li>Run the completeness check <span class="min">5 min</span></li><li>Name what a reader still cannot rerun <span class="min">2 min</span></li><li class="stretch">✱ Stretch: Add the distribution terms for the researcher: licence, retention and destruction</li></ul></div>
+  <aside class="notes"><p>Expected: all seven sections present, every De-identification number found in the log, "the datasheet is complete and traceable". Show the check failing: type 290 suppressed records and rerun. Common error: formatting 0.992 as 99.2% and the check rejecting it; the helper accepts both a fraction and its percentage, so look for a rounding to 99%.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="12">
+  <div class="kicker">Session 2</div>
+  <h1>Model cards</h1>
+  <ul class="bullets outcomes"><li>Write the intended and out-of-scope uses of a model</li><li>Report disaggregated results with intervals</li><li>State the fairness criterion and what it costs</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="card-sections" data-lo="LO6" data-label="Model card" data-n="13" data-session="2">
+  <div class="kicker">Mitchell and colleagues, 2019</div>
+  <h2>A model card tells a reviewer what the model is for and where it fails</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Model details</b> and <b>intended use</b></li>
+      <li><b>Metrics</b>: which, against what outcome</li>
+      <li><b>Quantitative analyses</b>: results by group, with intervals</li>
+      <li><b>Fairness</b>: the criterion, the mitigation, its cost</li>
+      <li><b>Out-of-scope uses</b> and <b>caveats</b></li>
+    </ul>
+    <div class="card c-teal"><h4>Ahliya today</h4><p class="small mb0">No card: only a validation report the audit could not reproduce.</p></div>
+  </div>
+  <aside class="notes"><p>Mitchell and colleagues, "Model Cards for Model Reporting" (2019). We keep their sections and add a Fairness section that records the Day 3 decision. The AI Ethics Principles ask for transparency and explainability at the Deploy and Monitor stage; a card is the document that carries it.</p></aside>
+</section>
+
+<section class="slide" id="which-accuracy" data-lo="LO6" data-label="Which accuracy" data-n="14" data-session="2">
+  <div class="kicker">Metrics against the right outcome</div>
+  <h2>Report accuracy against what really happened, not against officers</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">88.1%</div><div class="lbl">validation report: agreement with officers in Riyadh and Makkah</div></div>
+    <div class="stat center"><div class="big">84.8%</div><div class="lbl">the card: against the reviewed outcome of 12,000 applications</div></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Copying the vendor's number into the card. It measured agreement with biased labels, in two regions.</div>
+  <aside class="notes"><p>From Lab 4.2: accuracy 84.8% on all 12,000 reviewed applications at threshold 0.5. Day 3's finding F4 was this evaluation bias. The card names the validation report's figure and says why it is not used, so a reader who has seen 88.1% elsewhere is not confused.</p></aside>
+</section>
+
+<section class="slide" id="results-table" data-lo="LO6" data-label="Results" data-n="15" data-session="2">
+  <div class="kicker">Quantitative analyses</div>
+  <h2>The results table includes the intersection, with counts and intervals</h2>
+  <table class="t small">
+    <tr><th>Group</th><th class="num">Eligible</th><th class="num">FNR</th><th class="num">95% interval</th></tr>
+    <tr><td>Women · Men</td><td class="num">2,413 · 3,928</td><td class="num">22.7% · 22.8%</td><td class="num">overlap</td></tr>
+    <tr class="hl"><td>Women, non-Saudi</td><td class="num">295</td><td class="num">29.8%</td><td class="num">24.9 to 35.3</td></tr>
+    <tr><td>Qassim</td><td class="num">282</td><td class="num">31.6%</td><td class="num">26.4 to 37.2</td></tr>
+    <tr><td>Men, non-Saudi</td><td class="num">216</td><td class="num">26.9%</td><td class="num">21.4 to 33.1</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 4.2's results_table, which repeats Lab 3.1 on the card's terms. Every row here has at least 30 eligible applicants; below that, the rate is left empty and the note says "too few to estimate", which is why the card stops at two attributes. A card that shows only gender would look fair; the checkpoint turns on that.</p></aside>
+</section>
+
+<section class="slide" id="card-fairness" data-lo="LO6" data-label="Fairness" data-n="16" data-session="2">
+  <div class="kicker">The fairness section</div>
+  <h2>State the criterion, the gap, the mitigation, and what it costs</h2>
+  <div class="prompt" data-tool="Model card, Fairness">Held to equal opportunity: equal false negative rates, because the harmful error is declining an eligible applicant. Largest group gap 12.9 points; group thresholds reduce it to 10.0 at the same accuracy, using gender and nationality, which needs approval. The lasting fix is verified income.</div>
+  <aside class="notes"><p>The paragraph is generated by Lab 4.2 from the Lab 3.4 reference comparison, so its numbers cannot drift from the audit. It contains the four things a reviewer needs: criterion and reason, size of the problem, the measure and its result, and its cost.</p></aside>
+</section>
+
+<section class="slide" id="out-of-scope" data-lo="LO6" data-label="Out of scope" data-n="17" data-session="2">
+  <div class="kicker">Limits</div>
+  <h2>Out-of-scope uses are the ones someone will try</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Declining an application <b>without an officer's review</b></li>
+      <li>Scoring applications for <b>another programme</b></li>
+      <li>Ranking applicants against each other for a <b>fixed budget</b></li>
+    </ul>
+    <div class="card c-coral"><h4>Caveats</h4><p class="small mb0">Trained on historical decisions. Measurement bias in self-employed income, historical bias on family homes, labelling bias in one office, a feedback loop through auto-declines.</p></div>
+  </div>
+  <aside class="notes"><p>Each caveat names a bias type from the national AI Bias Reference Guide, found on Day 3. The first out-of-scope use is the one in production today: 37.4% of applications were auto-declined below 0.2, finding F5. Ask the room which use a new manager would most likely try.</p></aside>
+</section>
+
+<section class="slide" id="check-card" data-lo="LO6" data-n="18" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>A card that passes every section check</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-card-q1">
+    <p class="lead">Anmar's card has all seven sections. Its results table shows gender and region, each with intervals. Wiam rejects it.</p>
+    <div class="opts">
+      <div class="opt" data-why="Asks for a figure the card already handles: the vendor's number is named and explained, not required" data-k="A">The card omits the validation report's 88.1%</div>
+      <div class="opt" data-why="Asks for more rows than the data support: small cells are reported as too few, not filled" data-k="B">It does not estimate every region by gender cell</div>
+      <div class="opt" data-ok data-k="C">It hides the largest gap, which is in gender by nationality</div>
+      <div class="opt" data-why="Reads the absence of a fix as a defect of the card: the card records the mitigation, it does not have to close the gap" data-k="D">The gap is not closed, so the card cannot be filed</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Non-Saudi women are missed at 29.8%; margins by gender and region alone do not show it.</div>
+  </div>
+  <aside class="notes"><p>Answer C. Lab 4.2's check fails a card with no intersectional rows for this reason. D is worth a minute: documentation reports the state honestly, including a gap that remains.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-2" data-auto="lab" data-lab="4.2" data-label="Lab 4.2" data-n="19" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.2 · 25 min</div><h2>The model card of Ahliya</h2><p class="lead small">Write a model card with disaggregated results and intended use.</p><a class="nb" href="../labs/D4_2_write_model_card.ipynb">D4_2_write_model_card.ipynb</a></div><ul class="checklist"><li>Model details and intended use <span class="min">5 min</span></li><li>The disaggregated results table <span class="min">8 min</span></li><li>Fairness criterion, mitigation and cost <span class="min">5 min</span></li><li>Limits and out-of-scope uses <span class="min">4 min</span></li><li>Run the card check <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Write a one-paragraph summary of the card for applicants</li></ul></div>
+  <aside class="notes"><p>Expected: results by gender, nationality, gender by nationality and region; accuracy 84.8%; "the card passes". Common error: a group label containing a pipe breaks the Markdown table; the helper U.md_table replaces it. Participants who kept their own Lab 3.4 table can load it in place of the reference.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="20">
+  <div class="kicker">Session 3</div>
+  <h1>Impact assessment</h1>
+  <ul class="bullets outcomes"><li>Score a risk's likelihood and impact on the national framework's scales</li><li>Choose a treatment and score the residual risk</li><li>Name a human reviewer for every high risk</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="risk-cycle" data-lo="LO6" data-label="The cycle" data-n="21" data-session="3">
+  <div class="kicker">National AI Risk Management Framework</div>
+  <h2>Identify, assess, treat, monitor: and assess again after treatment</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Identify</b>the risk, who is affected, the evidence</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Assess</b>likelihood × impact, a level and a band</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-amber frag" data-frag="c"><b>3 · Treat</b>avoid, mitigate, transfer or accept</div>
+    <div class="arrow frag" data-frag="d">→</div><div class="step c-coral frag" data-frag="d"><b>4 · Monitor</b>the residual risk, its owner, its reviewer</div>
+  </div>
+  <aside class="notes"><p>Press once per step. The framework (April 2026) sets the cycle and the scales. Our four risks come from the week: re-identification (Days 1 and 2), wrongful declines (Day 3), the dashboard budget (Day 2), and the synthetic file (Day 2). Identification is done for you in Lab 4.3, so the lab time goes to scoring.</p></aside>
+</section>
+
+<section class="slide" id="risk-scales" data-lo="LO6" data-label="Scales" data-n="22" data-session="3">
+  <div class="kicker">The scales</div>
+  <h2>Two scores from 1 to 4, and their product is the level</h2>
+  <table class="t small">
+    <tr><th class="num">Score</th><th>Likelihood</th><th>Impact</th></tr>
+    <tr><td class="num">1</td><td>Rare</td><td>Low: limited, contained quickly</td></tr>
+    <tr><td class="num">2</td><td>Unlikely</td><td>Medium: tangible, contained in reasonable time</td></tr>
+    <tr><td class="num">3</td><td>Likely</td><td>High: substantial, needs an organisational response</td></tr>
+    <tr><td class="num">4</td><td>Almost certain</td><td>Catastrophic: severe, wide, possibly irreversible</td></tr>
+  </table>
+  <p class="small mt">Bands: 1 to 2 low · 3 to 6 medium · 8 to 12 high · 16 catastrophic.</p>
+  <aside class="notes"><p>Short forms of the framework's descriptions. Note that a level of 5, 7, 10, 11 or 13 to 15 cannot occur: products of 1 to 4 skip them. Likelihood is argued from exposure, the controls in place, how easily the harm happens, and precedents; impact from severity, breadth and reversibility.</p></aside>
+</section>
+
+<section class="slide" id="argue-from-evidence" data-lo="LO6" data-label="Evidence" data-n="23" data-session="3">
+  <div class="kicker">A score needs a reason</div>
+  <h2>Argue every score from a measured number</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>R2 · wrongful declines</h4><p class="small mb0">Likelihood 4: it is happening now, 30% of eligible non-Saudi women declined. Impact 3: support delayed or lost. <b>Level 12, high.</b></p></div>
+    <div class="card c-teal"><h4>R4 · the synthetic file</h4><p class="small mb0">Likelihood 2: only a regeneration with another setting copies rows. Impact 3: leaf one copied 92.8%. <b>Level 6, medium.</b></p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Scores by feeling, then adjusted until the table looks balanced. The register check in Lab 4.3 rejects a reason with no number in it.</div>
+  <aside class="notes"><p>The evidence lines are in data/risks.json and come from the week's reference runs. Ask a table to defend R2's likelihood at 3, then ask the room why measured harm is "almost certain". The answer is the checkpoint's.</p></aside>
+</section>
+
+<section class="slide" id="treat-residual" data-lo="LO6" data-label="Residual" data-n="24" data-session="3">
+  <div class="kicker">Treat and score again</div>
+  <h2>A treatment usually lowers the likelihood, not the impact</h2>
+  <table class="t small">
+    <tr><th>Risk</th><th class="num">Level</th><th>Treatment</th><th class="num">Residual</th></tr>
+    <tr><td>R1 re-identification</td><td class="num">9 high</td><td>k of five, agreement, destruction</td><td class="num">3</td></tr>
+    <tr class="hl"><td>R2 wrongful declines</td><td class="num">12 high</td><td>officer review, verified income</td><td class="num">6</td></tr>
+    <tr><td>R3 dashboard budget</td><td class="num">6</td><td>yearly ledger, margins shown</td><td class="num">4</td></tr>
+    <tr><td>R4 synthetic file</td><td class="num">6</td><td>leakage tests as a release gate</td><td class="num">3</td></tr>
+  </table>
+  <aside class="notes"><p>From the Lab 4.3 reference run. R2 falls only to medium (6): review makes a wrong score less likely to become a wrong decision, but a wrongly declined applicant is harmed exactly as before. Lowering the impact to make the residual look low is the most common error in real registers.</p></aside>
+</section>
+
+<section class="slide" id="human-reviewer" data-lo="LO6" data-label="Reviewer" data-n="25" data-session="3">
+  <div class="kicker">Who signs</div>
+  <h2>Every risk has an owner; every high risk also has a human reviewer</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Owner</b>: runs the treatment and reports on it</li>
+      <li><b>Reviewer</b>: independent of the owner, signs the residual risk</li>
+      <li>At Yusr: R1 and R2 go to <b>Wiam Al-Mutairi</b>, internal audit</li>
+    </ul>
+    <div class="card c-purple"><h4>Accepting a high risk</h4><p class="small mb0">Not a data scientist's decision. The register check rejects "accept" on a high band.</p></div>
+  </div>
+  <aside class="notes"><p>The course entry requires a human reviewer for high risks; the framework's escalation supports it. Owners in the reference: Yahya Al-Qahtani for R1 and R3, Bashayer Al-Otaibi for R2, Malak Al-Harbi for R4. The stretch adds R5, the feedback loop.</p></aside>
+</section>
+
+<section class="slide" id="check-likelihood" data-lo="LO6" data-n="26" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>How likely is a harm that is already happening?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-likelihood-q1">
+    <p class="lead">Malak scores R2's likelihood as 2, "unlikely", because officers can overturn Ahliya. The audit measured 1,444 of 6,341 eligible applicants declined by the screen.</p>
+    <div class="opts">
+      <div class="opt" data-why="Counts a control that is not in place: 37.4% of applications are auto-declined and never seen by an officer" data-k="A">2 is right, since officers review every decision</div>
+      <div class="opt" data-ok data-k="B">4: the harm is measured now, without an effective control</div>
+      <div class="opt" data-why="Lowers the likelihood because the impact is high: the two scores are argued separately" data-k="C">3, so that the level does not reach the catastrophic band</div>
+      <div class="opt" data-why="Scores on fairness instead of harm: likelihood asks how probable the harm is, not whether groups differ" data-k="D">1, because the gender gap is only 0.1 points</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Likelihood is argued from exposure and the controls in place; the harm is already measured and auto-declines bypass review.</div>
+  </div>
+  <aside class="notes"><p>Answer B. Even at 4, R2 reaches 12, not 16: the band is high, so C's worry is misplaced. D mixes the gender margin with the risk: the harm is the missed eligible applicant, whoever they are.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-3" data-auto="lab" data-lab="4.3" data-label="Lab 4.3" data-n="27" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.3 · 25 min</div><h2>Score four risks</h2><p class="lead small">Score four risks on the national framework's likelihood and impact matrix and propose treatments.</p><a class="nb" href="../labs/D4_3_score_four_risks.ipynb">D4_3_score_four_risks.ipynb</a></div><ul class="checklist"><li>Read the four risks and their evidence <span class="min">4 min</span></li><li>Score likelihood and impact <span class="min">7 min</span></li><li>Treat and score again <span class="min">7 min</span></li><li>Name owners and reviewers <span class="min">3 min</span></li><li>Run the register check <span class="min">4 min</span></li><li class="stretch">✱ Stretch: Add a fifth risk from your own audit and score it</li></ul></div>
+  <aside class="notes"><p>Expected levels 9, 12, 6, 6; residuals 3, 6, 4, 3; reviewers on R1 and R2; "the register passes". Disagreement on a score is fine if it is argued from the evidence; let two tables compare R3. Common error: a residual above the initial level after choosing "transfer", which the check catches.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="28">
+  <div class="kicker">Session 4</div>
+  <h1>Review by someone else</h1>
+  <ul class="bullets outcomes"><li>Rerun a colleague's result from their notebook and data</li><li>Find the undocumented choices that change a number</li><li>Record documentation gaps that a reviewer can act on</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="rerun-evidence" data-lo="LO6" data-label="Rerun" data-n="29" data-session="4">
+  <div class="kicker">Reproducibility as evidence</div>
+  <h2>A result counts when someone else can rerun it and get the same number</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The <b>code</b> and the <b>data</b>, as used</li>
+      <li>A <b>pinned environment</b>: uv.lock in this course</li>
+      <li>Every <b>seed</b>, every threshold, every filter</li>
+      <li>A <b>log</b> of the run that was reported</li>
+    </ul>
+    <div class="card c-teal"><h4>The capstone</h4><p class="small mb0">The assessor picks a slice and you recompute one disparity live, from your repository.</p></div>
+  </div>
+  <aside class="notes"><p>Reproducibility is the 10% criterion of the capstone rubric, but it underpins the other 90%: an audit nobody can rerun is an opinion. This course pins its environment with uv.lock and seeds every random step with 309.</p></aside>
+</section>
+
+<section class="slide" id="peer-claim" data-lo="LO6" data-label="The claim" data-n="30" data-session="4">
+  <div class="kicker">Lab 4.4, the peer's result</div>
+  <h2>"Ahliya misses eligible men more often than eligible women"</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">15.7% · 18.6%</div><div class="lbl">claimed FNR, women · men; gap -2.9 points</div></div>
+    <div class="card c-amber"><h4>The README says</h4><p class="small mb0">"I used Ahliya's threshold and the scored test set. The interval is a bootstrap."</p></div>
+  </div>
+  <p class="small mt">The code reproduces the claim exactly. Day 3 found 22.7% and 22.8%.</p>
+  <aside class="notes"><p>A participant of an earlier cohort, kept as handed in (data/peer). Running it gives the claimed numbers, which is where many reviews stop. Ask the room: the code runs and the numbers match; what is left to check? Then read the script together for two minutes.</p></aside>
+</section>
+
+<section class="slide" id="choices-move" data-lo="LO6" data-label="Choices" data-n="31" data-session="4">
+  <div class="kicker">What the README does not say</div>
+  <h2>Two undocumented choices; one of them flips the sign</h2>
+  <table class="t small">
+    <tr><th>Threshold</th><th>Missing income</th><th class="num">Rows</th><th class="num">Gap, women minus men</th></tr>
+    <tr><td>0.45 (peer)</td><td>dropped (peer)</td><td class="num">11,367</td><td class="num">-2.9 pts</td></tr>
+    <tr><td>0.45</td><td>kept</td><td class="num">12,000</td><td class="num">+0.6 pts</td></tr>
+    <tr><td>0.5</td><td>dropped</td><td class="num">11,367</td><td class="num">-3.7 pts</td></tr>
+    <tr class="hl"><td>0.5 (deployed)</td><td>kept</td><td class="num">12,000</td><td class="num">-0.2 pts</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 4.4's variants. The filter drops 633 rows, 65% of them women against 34% overall, and many are eligible applicants Ahliya misses. The README's "Ahliya's threshold" is wrong: the code uses 0.45. A third gap: the bootstrap has no seed, so the interval changes on each run.</p></aside>
+</section>
+
+<section class="slide" id="useful-gap" data-lo="LO6" data-label="Record" data-n="32" data-session="4">
+  <div class="kicker">Recording a gap</div>
+  <h2>A useful gap says where, by how much, and what to write</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-coral flat"><h4>Where</h4><p class="small mb0">load(), the notna() filter.</p></div>
+    <div class="card c-amber flat"><h4>Effect</h4><p class="small mb0">Gap -2.9 with the filter, +0.6 without it.</p></div>
+    <div class="card c-teal flat"><h4>Fix</h4><p class="small mb0">Keep the rows, or state the filter and who it removes.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> "Results not reproducible." True, and of no use to the author.</div>
+  <aside class="notes"><p>Lab 4.4 records four gaps in these columns: the filter, the threshold, the seed, and the missing versions. The check requires at least three, with a number in the ones that move the result. The tone is a colleague's, not an examiner's: the author fixes what the review names.</p></aside>
+</section>
+
+<section class="slide" id="corrected" data-lo="LO6" data-label="Corrected" data-n="33" data-session="4">
+  <div class="kicker">The corrected result</div>
+  <h2>On all rows at 0.5, no gender gap: the claim does not hold</h2>
+  <div class="prompt" data-tool="Review, corrected result">On all 12,000 reviewed applications at Ahliya's threshold of 0.5, the false negative rate is 0.227 for women and 0.228 for men (gap -0.002, 95% bootstrap interval -0.020 to +0.018, seed 309).</div>
+  <aside class="notes"><p>Printed by Lab 4.4. The interval includes zero. The audit's real gap, non-Saudi women, is invisible at this margin in both versions. The capstone review asks for the same: a stated result, the choices it rests on, and a seed.</p></aside>
+</section>
+
+<section class="slide" id="check-review" data-lo="LO6" data-n="34" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which gap explains the different number?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6" data-id="check-review-q1">
+    <p class="lead">A peer reports an FNR gap of -2.9 points; your rerun on all rows at 0.5 gives -0.2. The bootstrap is unseeded, the threshold is 0.45, and 633 rows with missing income are dropped.</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">The dropped rows: removing them alone takes the gap from +0.6 to -2.9</div>
+      <div class="opt" data-why="Blames the visible randomness: an unseeded bootstrap moves the interval, not the point estimate" data-k="B">The unseeded bootstrap, because each run differs</div>
+      <div class="opt" data-why="Picks the documented mismatch: at all rows, 0.45 against 0.5 moves the gap by under one point" data-k="C">The threshold of 0.45, because it differs from the documented 0.5</div>
+      <div class="opt" data-why="Assumes environments explain differences: the same code on the same data reproduced the claim exactly" data-k="D">A different pandas version on the peer's machine</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> At the peer's threshold, keeping the rows gives +0.6; dropping them gives -2.9, because they are mostly women Ahliya misses.</div>
+  </div>
+  <aside class="notes"><p>Answer A. C is the gap participants find first, since it contradicts the README; it matters for documentation but barely moves this number. Measuring each choice separately is what the variants table is for.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-4-4" data-auto="lab" data-lab="4.4" data-label="Lab 4.4" data-n="35" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 4.4 · 25 min</div><h2>Rerun a peer's result</h2><p class="lead small">Rerun one result from a peer's day 2 or day 3 notebook and record the documentation gaps.</p><a class="nb" href="../labs/D4_4_rerun_one_result.ipynb">D4_4_rerun_one_result.ipynb</a></div><ul class="checklist"><li>Run the peer's code as given <span class="min">5 min</span></li><li>Compare with the claimed number <span class="min">4 min</span></li><li>Find the choices that move it <span class="min">9 min</span></li><li>Record the gaps <span class="min">5 min</span></li><li>State the corrected result <span class="min">2 min</span></li><li class="stretch">✱ Stretch: Swap notebooks with a neighbour and rerun one of their Day 2 or Day 3 results</li></ul></div>
+  <aside class="notes"><p>Expected: the peer's code gives 0.157, 0.186, -0.029; variants as on the Choices slide; corrected -0.002 with interval -0.020 to +0.018. The two unseeded interval runs printed in task 1 differ: point at them. For the stretch, pairs swap a Day 2 or Day 3 notebook with only its README.</p></aside>
+</section>
+
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up" data-n="36" data-session="4">
+  <div class="kicker">Day 4 · Three things to keep</div>
+  <h2>Write from the log, score from the evidence, rerun before you believe</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>From the log</h4><p class="small mb0">Datasheet and card numbers trace to the approved run, with their limits stated.</p></div>
+    <div class="card c-coral"><h4>From the evidence</h4><p class="small mb0">Likelihood and impact argued from measured numbers; a reviewer for every high risk.</p></div>
+    <div class="card c-purple"><h4>Rerun</h4><p class="small mb0">A filter nobody documented flipped a peer's conclusion.</p></div>
+  </div>
+  <aside class="notes"><p>The four artifacts of today (datasheet, model card, risk register, review gaps) are the shape of the capstone pack. Ask each participant which of their own Day 2 or Day 3 results they would least like a peer to rerun, and why.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Next" data-n="37" data-session="4">
+  <div class="kicker">Next · Capstone</div>
+  <h2>The release pack for the Sabeel Scholarship Fund</h2>
+  <ul class="bullets">
+    <li>A treated extract with its release log</li>
+    <li>A fairness audit with intervals, a datasheet, a model card and an impact assessment</li>
+    <li>A public repository whose README says how to rerun every number</li>
+    <li>Ten minutes: the assessor picks a slice and you recompute one disparity live</li>
+  </ul>
+  <aside class="notes"><p>The case brief and data are in labs/capstone. Reuse the week's notebooks: the methods carry over, the numbers do not. Commit as you go; the history is part of the evidence.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:16:16Z","version":"2027.1.0","commit":"8cfd447"},"course":{"id":"ds-309","code":"DS-309","title":"Responsible Data Science: Privacy, Fairness and Documentation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-309/","repo":"SDAIAAcademy/ds-309","home":"../index.html"},"deck":{"id":"day4","kind":"day","day":4,"label":"Day 4","title":"Document and assess","prev":"day3.html","next":"capstone.html","md":"day4.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Datasheets","slide":"s1","outcomes":["List what a datasheet of a de-identified release must answer","Fill each answer from a log, not from memory","Test a datasheet for completeness"],"minutes":50,"lab":{"id":"4.1","title":"The datasheet of the release","minutes":25,"href":"../labs/D4_1_write_datasheet_de.ipynb"}},{"n":2,"label":"Session 2","title":"Model cards","slide":"s2","outcomes":["Write the intended and out-of-scope uses of a model","Report disaggregated results with intervals","State the fairness criterion and what it costs"],"minutes":50,"lab":{"id":"4.2","title":"The model card of Ahliya","minutes":25,"href":"../labs/D4_2_write_model_card.ipynb"}},{"n":3,"label":"Session 3","title":"Impact assessment","slide":"s3","outcomes":["Score a risk's likelihood and impact on the national framework's scales","Choose a treatment and score the residual risk","Name a human reviewer for every high risk"],"minutes":50,"lab":{"id":"4.3","title":"Score four risks","minutes":25,"href":"../labs/D4_3_score_four_risks.ipynb"}},{"n":4,"label":"Session 4","title":"Review by someone else","slide":"s4","outcomes":["Rerun a colleague's result from their notebook and data","Find the undocumented choices that change a number","Record documentation gaps that a reviewer can act on"],"minutes":50,"lab":{"id":"4.4","title":"Rerun a peer's result","minutes":25,"href":"../labs/D4_4_rerun_one_result.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Document and assess","kind":"title","session":0,"hash":"3b1a4058","md":"#### [day4#title] Document and assess\n\n*SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation*\n\nDay 4: Datasheets, model cards, impact assessment and review by a peer\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-309","notes":"Day 4 turns the week's numbers into documents that someone else can check: a datasheet for the release, a model card for Ahliya, an impact assessment, and a review of a peer's result. Every lab starts from a supplied log or result, so nobody depends on yesterday's notebook. Start with the review checkpoint on Day 3.","minutes":null,"lo":[]},{"id":"agenda","n":2,"title":"Document and assess","kind":"content","session":0,"hash":"07d95e3b","md":"#### [day4#agenda] Document and assess\n\n*Today*\n\n- **Session 1 · Datasheets**: What a datasheet of a de-identified release must answer, filled from the release log\n- **Session 2 · Model cards**: A model card with intended use, disaggregated results and the fairness criterion it was held to\n- **Session 3 · Impact assessment**: Risks scored on the national framework: likelihood, impact, level, treatment, residual risk and a reviewer\n- **Session 4 · Review by someone else**: A colleague's result rerun from their notebook and data, and the documentation gaps that changed it","notes":"","minutes":null,"lo":[]},{"id":"review-day3","n":3,"title":"Gender alone shows no gap. Is Ahliya fair?","kind":"quiz","session":0,"hash":"c1b9d76a","md":"#### [day4#review-day3] Gender alone shows no gap. Is Ahliya fair?\n\n*Review of Day 3*\n\n**Question:** Anmar reports that eligible women and men are missed at 22.7% and 22.8%. He proposes to close the audit.\n\n- A. Not shown: the intersection of gender and nationality must be checked too\n- B. Yes: equal false negative rates by gender meet equal opportunity\n- C. No: the selection rates by gender must also be equal\n- D. Not until every region by gender by nationality cell is estimated","notes":"Answer A. D is the overcorrection: 23 of the 52 three-way cells are below 30 eligible applicants, so they are reported as too few to estimate. Today the intersection reappears in the model card's results table.","minutes":null,"lo":["LO5"]},{"id":"s1","n":4,"title":"Datasheets","kind":"section","session":1,"hash":"d4680b4c","md":"#### [day4#s1] Datasheets\n\n*Session 1*\n\n- List what a datasheet of a de-identified release must answer\n- Fill each answer from a log, not from memory\n- Test a datasheet for completeness","notes":"","minutes":null,"lo":["LO6"]},{"id":"why-document","n":5,"title":"A file without its documentation invites the wrong use","kind":"content","session":1,"hash":"79b5a2dc","md":"#### [day4#why-document] A file without its documentation invites the wrong use\n\n*What a recipient cannot see*\n\n- Waad receives 59,707 rows: she cannot see the **293 suppressed** records\n- She cannot see that income is **as recorded**, overstated for the self-employed\n- She cannot see that the officer decision is **historical**, not a reviewed outcome\n\n- **The datasheet answers.** Why the data exist, what is in them, how they were made and treated, what risk remains, and what they must not be used for.","notes":"Gebru and colleagues, \"Datasheets for Datasets\" (2021), propose the questions; we use their sections plus two that a de-identified release needs. Ask: which of the three hidden facts would change Waad's conclusions most? The suppression falls on non-Saudi applicants in small regions, so a regional analysis of nationality is biased by the treatment itself.","minutes":null,"lo":["LO6"]},{"id":"datasheet-sections","n":6,"title":"Seven sections, two of them for de-identified data","kind":"content","session":1,"hash":"a2c34d83","md":"#### [day4#datasheet-sections] Seven sections, two of them for de-identified data\n\n*The sections*\n\n- **Motivation.** Who asked, for what purpose, who approved.\n- **Composition.** Records, fields released and removed.\n- **Collection.** The source and what its fields really record.\n- **De-identification.** Risk before, treatment, risk after, utility.\n- **Residual risk.** What the treatment does not cover.\n- **Uses · Maintenance.** Two sections: allowed and forbidden uses; contact and code.","notes":"Composition, Collection, Uses and Maintenance follow Gebru and colleagues; De-identification and Residual risk are this course's additions, tied to the national anonymisation guideline, which treats pseudonymised data as personal data. Lab 4.1 checks that each section is present and not empty.","minutes":null,"lo":["LO6"]},{"id":"from-the-log","n":7,"title":"Fill the datasheet from the release log, never from memory","kind":"content","session":1,"hash":"427c0a9b","md":"#### [day4#from-the-log] Fill the datasheet from the release log, never from memory\n\n*Where the numbers come from*\n\n| Release log entry | Value |\n| --- | --- |\n| Unique on birth date, gender and postcode, before | 59,458 |\n| Linkage success, before | 99.2% |\n| Suppressed (rule: at most 1%) | 293 |\n| k after treatment · links claimed | 5 · 0 |\n| Largest change: mean income, Northern Borders | -1.01% |","notes":"These are the values in data/release_log.json, written when the Day 2 release was made. A notebook rerun later may give different numbers if anything changed; the log records the run that was approved and released. Lab 4.1's check finds every number in the De-identification section and looks it up in the log.","minutes":null,"lo":["LO6"]},{"id":"k-needs-context","n":8,"title":"\"k = 5\" means little without what it was measured on","kind":"content","session":1,"hash":"bff7efb3","md":"#### [day4#k-needs-context] \"k = 5\" means little without what it was measured on\n\n*One number is not a guarantee*\n\n- The **quasi-identifiers**: birth band, gender, nationality, region\n- The **suppression**: 293 records, and who they were\n- What k does **not** cover: a class that shares one income or one disability value\n\n- **Residual risks in the log.** Attribute disclosure in classes with one value; outside files holding other fields; suppression falling on non-Saudi applicants in small regions.\n\n> **What goes wrong.** A datasheet that says \"anonymised\" and stops there. The extract is still personal data and stays Restricted.","notes":"The Data Classification Policy puts personal data under Restricted; the extract was Restricted B before treatment, and treatment lowers the risk, not the class. The guideline's own examples of de-identification techniques (generalisation, aggregation, masking) are what Day 2 applied.","minutes":null,"lo":["LO6"]},{"id":"cannot-rerun","n":9,"title":"Name what a reader still cannot rerun, and why","kind":"content","session":1,"hash":"d18a126f","md":"#### [day4#cannot-rerun] Name what a reader still cannot rerun, and why\n\n*The honest last section*\n\n- **The treatment.** The source stays inside the fund. Acceptable: the code and seed 309 are named.\n- **The linkage test.** Needs the register and the truth key, which the fund keeps for audit.\n- **The study codes.** Only the data protection officer holds the mapping, by design.","notes":"A reviewer accepts a limit that is stated with its reason; a limit discovered later reads as concealment. This list is task 5 of Lab 4.1. The stretch adds the distribution terms from the sharing agreement: research use only, no linkage, destruction after 24 months.","minutes":null,"lo":["LO6"]},{"id":"check-datasheet","n":10,"title":"What must the residual risk section say?","kind":"quiz","session":1,"hash":"56ae3eb9","md":"#### [day4#check-datasheet] What must the residual risk section say?\n\n*Checkpoint*\n\n**Question:** Malak's draft says: \"k = 5 was reached, so the extract is anonymous and no risk remains.\" Yahya sends it back.\n\n- A. That k should be raised to 10 before release\n- B. That the sharing agreement makes residual risk irrelevant\n- C. That 99.2% of applicants can still be linked\n- D. The risks k does not cover, and that the extract is still personal data","notes":"Answer D. C catches participants who copy the before-treatment number into the after section; Lab 4.1's traceability check would accept it, because it is in the log, which is why a human still reads the datasheet.","minutes":null,"lo":["LO6"]},{"id":"lab-4-1","n":11,"title":"The datasheet of the release","kind":"lab","session":1,"hash":"7bd2c37d","md":"#### [day4#lab-4-1] The datasheet of the release\n\nLab 4.1 · 25 min\n\nWrite the datasheet for the de-identified release.\n\n[D4_1_write_datasheet_de.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D4_1_write_datasheet_de.ipynb)\n\n- [ ] Read the release log (4 min)\n- [ ] Fill the composition and collection sections (7 min)\n- [ ] Fill the de-identification and residual risk sections (7 min)\n- [ ] Run the completeness check (5 min)\n- [ ] Name what a reader still cannot rerun (2 min)\n- [ ] ✱ Stretch: Add the distribution terms for the researcher: licence, retention and destruction","notes":"Expected: all seven sections present, every De-identification number found in the log, \"the datasheet is complete and traceable\". Show the check failing: type 290 suppressed records and rerun. Common error: formatting 0.992 as 99.2% and the check rejecting it; the helper accepts both a fraction and its percentage, so look for a rounding to 99%.","minutes":null,"lo":[]},{"id":"s2","n":12,"title":"Model cards","kind":"section","session":2,"hash":"0e9ac882","md":"#### [day4#s2] Model cards\n\n*Session 2*\n\n- Write the intended and out-of-scope uses of a model\n- Report disaggregated results with intervals\n- State the fairness criterion and what it costs","notes":"","minutes":null,"lo":["LO6"]},{"id":"card-sections","n":13,"title":"A model card tells a reviewer what the model is for and where it fails","kind":"content","session":2,"hash":"b73f7a15","md":"#### [day4#card-sections] A model card tells a reviewer what the model is for and where it fails\n\n*Mitchell and colleagues, 2019*\n\n- **Model details** and **intended use**\n- **Metrics**: which, against what outcome\n- **Quantitative analyses**: results by group, with intervals\n- **Fairness**: the criterion, the mitigation, its cost\n- **Out-of-scope uses** and **caveats**\n\n- **Ahliya today.** No card: only a validation report the audit could not reproduce.","notes":"Mitchell and colleagues, \"Model Cards for Model Reporting\" (2019). We keep their sections and add a Fairness section that records the Day 3 decision. The AI Ethics Principles ask for transparency and explainability at the Deploy and Monitor stage; a card is the document that carries it.","minutes":null,"lo":["LO6"]},{"id":"which-accuracy","n":14,"title":"Report accuracy against what really happened, not against officers","kind":"content","session":2,"hash":"f22418ec","md":"#### [day4#which-accuracy] Report accuracy against what really happened, not against officers\n\n*Metrics against the right outcome*\n\n- **88.1%** validation report: agreement with officers in Riyadh and Makkah\n- **84.8%** the card: against the reviewed outcome of 12,000 applications\n\n> **What goes wrong.** Copying the vendor's number into the card. It measured agreement with biased labels, in two regions.","notes":"From Lab 4.2: accuracy 84.8% on all 12,000 reviewed applications at threshold 0.5. Day 3's finding F4 was this evaluation bias. The card names the validation report's figure and says why it is not used, so a reader who has seen 88.1% elsewhere is not confused.","minutes":null,"lo":["LO6"]},{"id":"results-table","n":15,"title":"The results table includes the intersection, with counts and intervals","kind":"content","session":2,"hash":"8791514b","md":"#### [day4#results-table] The results table includes the intersection, with counts and intervals\n\n*Quantitative analyses*\n\n| Group | Eligible | FNR | 95% interval |\n| --- | --- | --- | --- |\n| Women · Men | 2,413 · 3,928 | 22.7% · 22.8% | overlap |\n| Women, non-Saudi | 295 | 29.8% | 24.9 to 35.3 |\n| Qassim | 282 | 31.6% | 26.4 to 37.2 |\n| Men, non-Saudi | 216 | 26.9% | 21.4 to 33.1 |","notes":"From Lab 4.2's results_table, which repeats Lab 3.1 on the card's terms. Every row here has at least 30 eligible applicants; below that, the rate is left empty and the note says \"too few to estimate\", which is why the card stops at two attributes. A card that shows only gender would look fair; the checkpoint turns on that.","minutes":null,"lo":["LO6"]},{"id":"card-fairness","n":16,"title":"State the criterion, the gap, the mitigation, and what it costs","kind":"content","session":2,"hash":"2932a5bf","md":"#### [day4#card-fairness] State the criterion, the gap, the mitigation, and what it costs\n\n*The fairness section*\n\nPrompt for Model card, Fairness:\n\n```text\nHeld to equal opportunity: equal false negative rates, because the harmful error is declining an eligible applicant. Largest group gap 12.9 points; group thresholds reduce it to 10.0 at the same accuracy, using gender and nationality, which needs approval. The lasting fix is verified income.\n```","notes":"The paragraph is generated by Lab 4.2 from the Lab 3.4 reference comparison, so its numbers cannot drift from the audit. It contains the four things a reviewer needs: criterion and reason, size of the problem, the measure and its result, and its cost.","minutes":null,"lo":["LO6"]},{"id":"out-of-scope","n":17,"title":"Out-of-scope uses are the ones someone will try","kind":"content","session":2,"hash":"d66fc741","md":"#### [day4#out-of-scope] Out-of-scope uses are the ones someone will try\n\n*Limits*\n\n- Declining an application **without an officer's review**\n- Scoring applications for **another programme**\n- Ranking applicants against each other for a **fixed budget**\n\n- **Caveats.** Trained on historical decisions. Measurement bias in self-employed income, historical bias on family homes, labelling bias in one office, a feedback loop through auto-declines.","notes":"Each caveat names a bias type from the national AI Bias Reference Guide, found on Day 3. The first out-of-scope use is the one in production today: 37.4% of applications were auto-declined below 0.2, finding F5. Ask the room which use a new manager would most likely try.","minutes":null,"lo":["LO6"]},{"id":"check-card","n":18,"title":"A card that passes every section check","kind":"quiz","session":2,"hash":"828c63ec","md":"#### [day4#check-card] A card that passes every section check\n\n*Checkpoint*\n\n**Question:** Anmar's card has all seven sections. Its results table shows gender and region, each with intervals. Wiam rejects it.\n\n- A. The card omits the validation report's 88.1%\n- B. It does not estimate every region by gender cell\n- C. It hides the largest gap, which is in gender by nationality\n- D. The gap is not closed, so the card cannot be filed","notes":"Answer C. Lab 4.2's check fails a card with no intersectional rows for this reason. D is worth a minute: documentation reports the state honestly, including a gap that remains.","minutes":null,"lo":["LO6"]},{"id":"lab-4-2","n":19,"title":"The model card of Ahliya","kind":"lab","session":2,"hash":"33bd612f","md":"#### [day4#lab-4-2] The model card of Ahliya\n\nLab 4.2 · 25 min\n\nWrite a model card with disaggregated results and intended use.\n\n[D4_2_write_model_card.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D4_2_write_model_card.ipynb)\n\n- [ ] Model details and intended use (5 min)\n- [ ] The disaggregated results table (8 min)\n- [ ] Fairness criterion, mitigation and cost (5 min)\n- [ ] Limits and out-of-scope uses (4 min)\n- [ ] Run the card check (3 min)\n- [ ] ✱ Stretch: Write a one-paragraph summary of the card for applicants","notes":"Expected: results by gender, nationality, gender by nationality and region; accuracy 84.8%; \"the card passes\". Common error: a group label containing a pipe breaks the Markdown table; the helper U.md_table replaces it. Participants who kept their own Lab 3.4 table can load it in place of the reference.","minutes":null,"lo":[]},{"id":"s3","n":20,"title":"Impact assessment","kind":"section","session":3,"hash":"45054b50","md":"#### [day4#s3] Impact assessment\n\n*Session 3*\n\n- Score a risk's likelihood and impact on the national framework's scales\n- Choose a treatment and score the residual risk\n- Name a human reviewer for every high risk","notes":"","minutes":null,"lo":["LO6"]},{"id":"risk-cycle","n":21,"title":"Identify, assess, treat, monitor: and assess again after treatment","kind":"content","session":3,"hash":"17bfe9bd","md":"#### [day4#risk-cycle] Identify, assess, treat, monitor: and assess again after treatment\n\n*National AI Risk Management Framework*\n\n1. **1 · Identify** the risk, who is affected, the evidence\n2. **2 · Assess** likelihood × impact, a level and a band\n3. **3 · Treat** avoid, mitigate, transfer or accept\n4. **4 · Monitor** the residual risk, its owner, its reviewer","notes":"Press once per step. The framework (April 2026) sets the cycle and the scales. Our four risks come from the week: re-identification (Days 1 and 2), wrongful declines (Day 3), the dashboard budget (Day 2), and the synthetic file (Day 2). Identification is done for you in Lab 4.3, so the lab time goes to scoring.","minutes":null,"lo":["LO6"]},{"id":"risk-scales","n":22,"title":"Two scores from 1 to 4, and their product is the level","kind":"content","session":3,"hash":"cfab3096","md":"#### [day4#risk-scales] Two scores from 1 to 4, and their product is the level\n\n*The scales*\n\n| Score | Likelihood | Impact |\n| --- | --- | --- |\n| 1 | Rare | Low: limited, contained quickly |\n| 2 | Unlikely | Medium: tangible, contained in reasonable time |\n| 3 | Likely | High: substantial, needs an organisational response |\n| 4 | Almost certain | Catastrophic: severe, wide, possibly irreversible |\n\nBands: 1 to 2 low · 3 to 6 medium · 8 to 12 high · 16 catastrophic.","notes":"Short forms of the framework's descriptions. Note that a level of 5, 7, 10, 11 or 13 to 15 cannot occur: products of 1 to 4 skip them. Likelihood is argued from exposure, the controls in place, how easily the harm happens, and precedents; impact from severity, breadth and reversibility.","minutes":null,"lo":["LO6"]},{"id":"argue-from-evidence","n":23,"title":"Argue every score from a measured number","kind":"content","session":3,"hash":"e3b19405","md":"#### [day4#argue-from-evidence] Argue every score from a measured number\n\n*A score needs a reason*\n\n- **R2 · wrongful declines.** Likelihood 4: it is happening now, 30% of eligible non-Saudi women declined. Impact 3: support delayed or lost. **Level 12, high.**\n- **R4 · the synthetic file.** Likelihood 2: only a regeneration with another setting copies rows. Impact 3: leaf one copied 92.8%. **Level 6, medium.**\n\n> **What goes wrong.** Scores by feeling, then adjusted until the table looks balanced. The register check in Lab 4.3 rejects a reason with no number in it.","notes":"The evidence lines are in data/risks.json and come from the week's reference runs. Ask a table to defend R2's likelihood at 3, then ask the room why measured harm is \"almost certain\". The answer is the checkpoint's.","minutes":null,"lo":["LO6"]},{"id":"treat-residual","n":24,"title":"A treatment usually lowers the likelihood, not the impact","kind":"content","session":3,"hash":"a4c536a2","md":"#### [day4#treat-residual] A treatment usually lowers the likelihood, not the impact\n\n*Treat and score again*\n\n| Risk | Level | Treatment | Residual |\n| --- | --- | --- | --- |\n| R1 re-identification | 9 high | k of five, agreement, destruction | 3 |\n| R2 wrongful declines | 12 high | officer review, verified income | 6 |\n| R3 dashboard budget | 6 | yearly ledger, margins shown | 4 |\n| R4 synthetic file | 6 | leakage tests as a release gate | 3 |","notes":"From the Lab 4.3 reference run. R2 falls only to medium (6): review makes a wrong score less likely to become a wrong decision, but a wrongly declined applicant is harmed exactly as before. Lowering the impact to make the residual look low is the most common error in real registers.","minutes":null,"lo":["LO6"]},{"id":"human-reviewer","n":25,"title":"Every risk has an owner; every high risk also has a human reviewer","kind":"content","session":3,"hash":"a87c091e","md":"#### [day4#human-reviewer] Every risk has an owner; every high risk also has a human reviewer\n\n*Who signs*\n\n- **Owner**: runs the treatment and reports on it\n- **Reviewer**: independent of the owner, signs the residual risk\n- At Yusr: R1 and R2 go to **Wiam Al-Mutairi**, internal audit\n\n- **Accepting a high risk.** Not a data scientist's decision. The register check rejects \"accept\" on a high band.","notes":"The course entry requires a human reviewer for high risks; the framework's escalation supports it. Owners in the reference: Yahya Al-Qahtani for R1 and R3, Bashayer Al-Otaibi for R2, Malak Al-Harbi for R4. The stretch adds R5, the feedback loop.","minutes":null,"lo":["LO6"]},{"id":"check-likelihood","n":26,"title":"How likely is a harm that is already happening?","kind":"quiz","session":3,"hash":"952fbd7f","md":"#### [day4#check-likelihood] How likely is a harm that is already happening?\n\n*Checkpoint*\n\n**Question:** Malak scores R2's likelihood as 2, \"unlikely\", because officers can overturn Ahliya. The audit measured 1,444 of 6,341 eligible applicants declined by the screen.\n\n- A. 2 is right, since officers review every decision\n- B. 4: the harm is measured now, without an effective control\n- C. 3, so that the level does not reach the catastrophic band\n- D. 1, because the gender gap is only 0.1 points","notes":"Answer B. Even at 4, R2 reaches 12, not 16: the band is high, so C's worry is misplaced. D mixes the gender margin with the risk: the harm is the missed eligible applicant, whoever they are.","minutes":null,"lo":["LO6"]},{"id":"lab-4-3","n":27,"title":"Score four risks","kind":"lab","session":3,"hash":"569d350f","md":"#### [day4#lab-4-3] Score four risks\n\nLab 4.3 · 25 min\n\nScore four risks on the national framework's likelihood and impact matrix and propose treatments.\n\n[D4_3_score_four_risks.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D4_3_score_four_risks.ipynb)\n\n- [ ] Read the four risks and their evidence (4 min)\n- [ ] Score likelihood and impact (7 min)\n- [ ] Treat and score again (7 min)\n- [ ] Name owners and reviewers (3 min)\n- [ ] Run the register check (4 min)\n- [ ] ✱ Stretch: Add a fifth risk from your own audit and score it","notes":"Expected levels 9, 12, 6, 6; residuals 3, 6, 4, 3; reviewers on R1 and R2; \"the register passes\". Disagreement on a score is fine if it is argued from the evidence; let two tables compare R3. Common error: a residual above the initial level after choosing \"transfer\", which the check catches.","minutes":null,"lo":[]},{"id":"s4","n":28,"title":"Review by someone else","kind":"section","session":4,"hash":"381cdbc4","md":"#### [day4#s4] Review by someone else\n\n*Session 4*\n\n- Rerun a colleague's result from their notebook and data\n- Find the undocumented choices that change a number\n- Record documentation gaps that a reviewer can act on","notes":"","minutes":null,"lo":["LO6"]},{"id":"rerun-evidence","n":29,"title":"A result counts when someone else can rerun it and get the same number","kind":"content","session":4,"hash":"09d367f9","md":"#### [day4#rerun-evidence] A result counts when someone else can rerun it and get the same number\n\n*Reproducibility as evidence*\n\n- The **code** and the **data**, as used\n- A **pinned environment**: uv.lock in this course\n- Every **seed**, every threshold, every filter\n- A **log** of the run that was reported\n\n- **The capstone.** The assessor picks a slice and you recompute one disparity live, from your repository.","notes":"Reproducibility is the 10% criterion of the capstone rubric, but it underpins the other 90%: an audit nobody can rerun is an opinion. This course pins its environment with uv.lock and seeds every random step with 309.","minutes":null,"lo":["LO6"]},{"id":"peer-claim","n":30,"title":"\"Ahliya misses eligible men more often than eligible women\"","kind":"content","session":4,"hash":"45e144e6","md":"#### [day4#peer-claim] \"Ahliya misses eligible men more often than eligible women\"\n\n*Lab 4.4, the peer's result*\n\n**15.7% · 18.6%** claimed FNR, women · men; gap -2.9 points\n\n- **The README says.** \"I used Ahliya's threshold and the scored test set. The interval is a bootstrap.\"\n\nThe code reproduces the claim exactly. Day 3 found 22.7% and 22.8%.","notes":"A participant of an earlier cohort, kept as handed in (data/peer). Running it gives the claimed numbers, which is where many reviews stop. Ask the room: the code runs and the numbers match; what is left to check? Then read the script together for two minutes.","minutes":null,"lo":["LO6"]},{"id":"choices-move","n":31,"title":"Two undocumented choices; one of them flips the sign","kind":"content","session":4,"hash":"d1462477","md":"#### [day4#choices-move] Two undocumented choices; one of them flips the sign\n\n*What the README does not say*\n\n| Threshold | Missing income | Rows | Gap, women minus men |\n| --- | --- | --- | --- |\n| 0.45 (peer) | dropped (peer) | 11,367 | -2.9 pts |\n| 0.45 | kept | 12,000 | +0.6 pts |\n| 0.5 | dropped | 11,367 | -3.7 pts |\n| 0.5 (deployed) | kept | 12,000 | -0.2 pts |","notes":"From Lab 4.4's variants. The filter drops 633 rows, 65% of them women against 34% overall, and many are eligible applicants Ahliya misses. The README's \"Ahliya's threshold\" is wrong: the code uses 0.45. A third gap: the bootstrap has no seed, so the interval changes on each run.","minutes":null,"lo":["LO6"]},{"id":"useful-gap","n":32,"title":"A useful gap says where, by how much, and what to write","kind":"content","session":4,"hash":"7449c48b","md":"#### [day4#useful-gap] A useful gap says where, by how much, and what to write\n\n*Recording a gap*\n\n- **Where.** load(), the notna() filter.\n- **Effect.** Gap -2.9 with the filter, +0.6 without it.\n- **Fix.** Keep the rows, or state the filter and who it removes.\n\n> **What goes wrong.** \"Results not reproducible.\" True, and of no use to the author.","notes":"Lab 4.4 records four gaps in these columns: the filter, the threshold, the seed, and the missing versions. The check requires at least three, with a number in the ones that move the result. The tone is a colleague's, not an examiner's: the author fixes what the review names.","minutes":null,"lo":["LO6"]},{"id":"corrected","n":33,"title":"On all rows at 0.5, no gender gap: the claim does not hold","kind":"content","session":4,"hash":"804ceec6","md":"#### [day4#corrected] On all rows at 0.5, no gender gap: the claim does not hold\n\n*The corrected result*\n\nPrompt for Review, corrected result:\n\n```text\nOn all 12,000 reviewed applications at Ahliya's threshold of 0.5, the false negative rate is 0.227 for women and 0.228 for men (gap -0.002, 95% bootstrap interval -0.020 to +0.018, seed 309).\n```","notes":"Printed by Lab 4.4. The interval includes zero. The audit's real gap, non-Saudi women, is invisible at this margin in both versions. The capstone review asks for the same: a stated result, the choices it rests on, and a seed.","minutes":null,"lo":["LO6"]},{"id":"check-review","n":34,"title":"Which gap explains the different number?","kind":"quiz","session":4,"hash":"857f79a8","md":"#### [day4#check-review] Which gap explains the different number?\n\n*Checkpoint*\n\n**Question:** A peer reports an FNR gap of -2.9 points; your rerun on all rows at 0.5 gives -0.2. The bootstrap is unseeded, the threshold is 0.45, and 633 rows with missing income are dropped.\n\n- A. The dropped rows: removing them alone takes the gap from +0.6 to -2.9\n- B. The unseeded bootstrap, because each run differs\n- C. The threshold of 0.45, because it differs from the documented 0.5\n- D. A different pandas version on the peer's machine","notes":"Answer A. C is the gap participants find first, since it contradicts the README; it matters for documentation but barely moves this number. Measuring each choice separately is what the variants table is for.","minutes":null,"lo":["LO6"]},{"id":"lab-4-4","n":35,"title":"Rerun a peer's result","kind":"lab","session":4,"hash":"0b927482","md":"#### [day4#lab-4-4] Rerun a peer's result\n\nLab 4.4 · 25 min\n\nRerun one result from a peer's day 2 or day 3 notebook and record the documentation gaps.\n\n[D4_4_rerun_one_result.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D4_4_rerun_one_result.ipynb)\n\n- [ ] Run the peer's code as given (5 min)\n- [ ] Compare with the claimed number (4 min)\n- [ ] Find the choices that move it (9 min)\n- [ ] Record the gaps (5 min)\n- [ ] State the corrected result (2 min)\n- [ ] ✱ Stretch: Swap notebooks with a neighbour and rerun one of their Day 2 or Day 3 results","notes":"Expected: the peer's code gives 0.157, 0.186, -0.029; variants as on the Choices slide; corrected -0.002 with interval -0.020 to +0.018. The two unseeded interval runs printed in task 1 differ: point at them. For the stretch, pairs swap a Day 2 or Day 3 notebook with only its README.","minutes":null,"lo":[]},{"id":"wrap-up","n":36,"title":"Write from the log, score from the evidence, rerun before you believe","kind":"content","session":4,"hash":"23b355e5","md":"#### [day4#wrap-up] Write from the log, score from the evidence, rerun before you believe\n\n*Day 4 · Three things to keep*\n\n- **From the log.** Datasheet and card numbers trace to the approved run, with their limits stated.\n- **From the evidence.** Likelihood and impact argued from measured numbers; a reviewer for every high risk.\n- **Rerun.** A filter nobody documented flipped a peer's conclusion.","notes":"The four artifacts of today (datasheet, model card, risk register, review gaps) are the shape of the capstone pack. Ask each participant which of their own Day 2 or Day 3 results they would least like a peer to rerun, and why.","minutes":null,"lo":[]},{"id":"next","n":37,"title":"The release pack for the Sabeel Scholarship Fund","kind":"content","session":4,"hash":"8569a902","md":"#### [day4#next] The release pack for the Sabeel Scholarship Fund\n\n*Next · Capstone*\n\n- A treated extract with its release log\n- A fairness audit with intervals, a datasheet, a model card and an impact assessment\n- A public repository whose README says how to rerun every number\n- Ten minutes: the assessor picks a slice and you recompute one disparity live","notes":"The case brief and data are in labs/capstone. Reuse the week's notebooks: the methods carry over, the numbers do not. Commit as you go; the history is part of the evidence.","minutes":null,"lo":[]}],"activities":[{"id":"review-day3-q1","slide":"review-day3","type":"single","prompt":"Anmar reports that eligible women and men are missed at 22.7% and 22.8%. He proposes to close the audit.","options":[{"key":"A","text":"Not shown: the intersection of gender and nationality must be checked too"},{"key":"B","text":"Yes: equal false negative rates by gender meet equal opportunity"},{"key":"C","text":"No: the selection rates by gender must also be equal"},{"key":"D","text":"Not until every region by gender by nationality cell is estimated"}],"correct":[0],"explanation":"Non-Saudi women are missed at 29.8%, which the gender margin hides.","misconceptions":["","Reads equal margins as equal treatment: a gap inside an intersection can cancel out in both margins","Moves to a criterion the course did not choose: for support by need, the harm is the missed eligible applicant","Treats every slice as required: cells below the minimum of 30 eligible are reported as too few, not audited"],"lo":["LO5"]},{"id":"check-datasheet-q1","slide":"check-datasheet","type":"single","prompt":"Malak's draft says: \"k = 5 was reached, so the extract is anonymous and no risk remains.\" Yahya sends it back.","options":[{"key":"A","text":"That k should be raised to 10 before release"},{"key":"B","text":"That the sharing agreement makes residual risk irrelevant"},{"key":"C","text":"That 99.2% of applicants can still be linked"},{"key":"D","text":"The risks k does not cover, and that the extract is still personal data"}],"correct":[3],"explanation":"k limits singling out on the chosen quasi-identifiers only; attribute disclosure and other files remain, and the data stay Restricted.","misconceptions":["Moves the problem to a number: a larger k narrows linkage risk but still says nothing about classes that share one value","Confuses documentation with access control: the agreement limits use, it does not remove the risk the datasheet must state","Reports the before-treatment figure as if it remained: no register record matched one record after treatment",""],"lo":["LO6"]},{"id":"check-card-q1","slide":"check-card","type":"single","prompt":"Anmar's card has all seven sections. Its results table shows gender and region, each with intervals. Wiam rejects it.","options":[{"key":"A","text":"The card omits the validation report's 88.1%"},{"key":"B","text":"It does not estimate every region by gender cell"},{"key":"C","text":"It hides the largest gap, which is in gender by nationality"},{"key":"D","text":"The gap is not closed, so the card cannot be filed"}],"correct":[2],"explanation":"Non-Saudi women are missed at 29.8%; margins by gender and region alone do not show it.","misconceptions":["Asks for a figure the card already handles: the vendor's number is named and explained, not required","Asks for more rows than the data support: small cells are reported as too few, not filled","","Reads the absence of a fix as a defect of the card: the card records the mitigation, it does not have to close the gap"],"lo":["LO6"]},{"id":"check-likelihood-q1","slide":"check-likelihood","type":"single","prompt":"Malak scores R2's likelihood as 2, \"unlikely\", because officers can overturn Ahliya. The audit measured 1,444 of 6,341 eligible applicants declined by the screen.","options":[{"key":"A","text":"2 is right, since officers review every decision"},{"key":"B","text":"4: the harm is measured now, without an effective control"},{"key":"C","text":"3, so that the level does not reach the catastrophic band"},{"key":"D","text":"1, because the gender gap is only 0.1 points"}],"correct":[1],"explanation":"Likelihood is argued from exposure and the controls in place; the harm is already measured and auto-declines bypass review.","misconceptions":["Counts a control that is not in place: 37.4% of applications are auto-declined and never seen by an officer","","Lowers the likelihood because the impact is high: the two scores are argued separately","Scores on fairness instead of harm: likelihood asks how probable the harm is, not whether groups differ"],"lo":["LO6"]},{"id":"check-review-q1","slide":"check-review","type":"single","prompt":"A peer reports an FNR gap of -2.9 points; your rerun on all rows at 0.5 gives -0.2. The bootstrap is unseeded, the threshold is 0.45, and 633 rows with missing income are dropped.","options":[{"key":"A","text":"The dropped rows: removing them alone takes the gap from +0.6 to -2.9"},{"key":"B","text":"The unseeded bootstrap, because each run differs"},{"key":"C","text":"The threshold of 0.45, because it differs from the documented 0.5"},{"key":"D","text":"A different pandas version on the peer's machine"}],"correct":[0],"explanation":"At the peer's threshold, keeping the rows gives +0.6; dropping them gives -2.9, because they are mostly women Ahliya misses.","misconceptions":["","Blames the visible randomness: an unseeded bootstrap moves the interval, not the point estimate","Picks the documented mismatch: at all rows, 0.45 against 0.5 moves the gap by under one point","Assumes environments explain differences: the same code on the same data reproduced the claim exactly"],"lo":["LO6"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day4.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

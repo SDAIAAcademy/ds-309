@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-ax="deck" data-track="data-science">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 1 · Find the personal data · Responsible Data Science: Privacy, Fairness and Documentation</title>
+<meta name="generator" content="SDAIA Academy engine 1.0.0">
+<link rel="icon" href="../_engine/icon.svg">
+<link rel="alternate" type="text/markdown" href="day1.md">
+<link rel="describedby" href="../llms.txt">
+<link rel="stylesheet" href="../_engine/academy.css">
+</head>
+<body>
+<div class="deck" data-course="Responsible Data Science: Privacy, Fairness and Documentation" data-track="data-science" data-day="Day 1">
+<!-- ======================= OPENING ======================= -->
+<section class="slide title" id="title" data-auto="title" data-label="Welcome" data-n="1">
+  <div class="kicker">SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation</div>
+  <h1>Find the personal data</h1>
+  <p class="lead mt">Day 1: Identifiers, classification, linkage and disclosure risk</p>
+  <div class="meta"><span class="track">Data Science Track</span><span>4 teaching days + capstone day</span><span>4 sessions · 4 labs</span><span>DS-309</span></div>
+  <aside class="notes"><p>Welcome the room. Ask two questions by show of hands: who has shared a row-level extract with someone outside their team, and who has been asked whether a model treats groups fairly. This is a 300-level course: participants train classifiers and compute intervals already (DS-204), and they know the PDPL principles, classification and small-cell rules from DS-207. Day 1 recaps those in a slide each and spends its time on linkage and measured risk.</p></aside>
+</section>
+
+<section class="slide" id="four-days-one-release" data-label="The course" data-n="2">
+  <div class="kicker">The course at a glance</div>
+  <h2>Four days take one release through every check it needs</h2>
+  <div class="cols cols-4 gap-s">
+    <div class="card c-teal"><h4>Day 1 · Find</h4><p class="small mb0">Identifiers, classification, linkage attacks, measured disclosure risk.</p></div>
+    <div class="card c-cyan"><h4>Day 2 · Reduce</h4><p class="small mb0">Generalisation, differential privacy, budgets, synthetic data and its leakage.</p></div>
+    <div class="card c-coral"><h4>Day 3 · Audit</h4><p class="small mb0">Errors by group, criteria that conflict, bias types, two mitigations.</p></div>
+    <div class="card c-purple"><h4>Day 4 · Document</h4><p class="small mb0">Datasheet, model card, impact assessment, a rerun by a peer.</p></div>
+  </div>
+  <div class="callout tip mt"><b>Day 5 · Capstone.</b> A release pack for a second case, a scholarship allocation model, in a public repository, reviewed for ten minutes with one disparity recomputed live.</div>
+  <aside class="notes"><p>One sentence per day; do not teach yet. The capstone rubric is privacy 25, fairness audit 25, documentation 20, impact assessment 20, reproducibility 10. Each day builds one part of that pack on the Yusr case first, so the capstone is a second pass on new data, not new learning.</p></aside>
+</section>
+
+<section class="slide" id="how-this-course-works" data-label="How we work" data-n="3">
+  <div class="kicker">How this course works</div>
+  <h2>Every claim about risk or fairness ends in a measured number</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-navy"><h4>Measure, then decide</h4><p class="small mb0">Unique records, linkage success, error against budget, error rates with intervals. A control without a measurement is a hope.</p></div>
+    <div class="card c-teal"><h4>Reference states</h4><p class="small mb0">Every lab starts from supplied files. Nothing depends on an earlier lab, and every exercise has a safety net.</p></div>
+    <div class="card c-coral"><h4>Synthetic data only</h4><p class="small mb0">60,000 invented applicants. Identifiers carry the marker <code>SYN</code>. No lab calls or downloads a model.</p></div>
+  </div>
+  <div class="callout warn small mt"><b>AI policy.</b> AI off for the supervised check and for Lab 1.1. In the other labs an assistant may explain a method or an error, but it does not produce the audit. In the capstone anything goes, and you defend it live.</div>
+  <aside class="notes"><p>Say the AI policy aloud and why: the supervised check asks participants to tag fields, read a k and pick a fairness criterion without help, and Lab 1.1 is the same skill. The policy comes from the catalog entry. If someone asks which assistant: any chat assistant, used as a tutor.</p></aside>
+</section>
+
+<section class="slide" id="yusr-case" data-label="Case study" data-n="4">
+  <div class="kicker">One case all week</div>
+  <h2>Yusr Housing Support Fund and its screening model, Ahliya</h2>
+  <p class="lead">A fictional public fund that screens applications for housing support. Its model, <b>Ahliya</b> (<span class="ar">أهلية</span>), scores each application before an officer decides.</p>
+  <div class="cols cols-3 gap-s mt-s">
+    <div class="card c-teal flat"><h4>A researcher's request</h4><p class="small mb0">Waad Al-Shehri, a university researcher, asks for row-level data on household size, income and approval.</p></div>
+    <div class="card c-cyan flat"><h4>Two publications</h4><p class="small mb0">District counts for a public dashboard, and a synthetic extract for a hackathon.</p></div>
+    <div class="card c-coral flat"><h4>An audit</h4><p class="small mb0">Internal audit asks whether Ahliya misses eligible applicants more often in some groups.</p></div>
+  </div>
+  <aside class="notes"><p>The people: Bashayer Al-Otaibi, director of eligibility and support, owns the decisions; Yahya Al-Qahtani is the data protection officer; Anmar Al-Ghamdi built Ahliya; Wiam Al-Mutairi in internal audit reviews every high risk; participants play Malak Al-Harbi, the fund's data scientist. All data is generated by labs/prepare_data.py with seed 309. Problems are planted in it; do not reveal them yet.</p></aside>
+</section>
+
+<section class="slide" id="setup-check" data-label="Setup" data-n="5">
+  <div class="kicker">Lab environment</div>
+  <h2>Open the labs in Colab, or run them locally with uv</h2>
+  <div class="cols cols-2">
+    <ol class="bullets">
+      <li><b>Colab:</b> open a notebook from the course page. Its first cell clones the repository and installs two libraries.</li>
+      <li><b>Locally:</b> the commands on the right. A laptop processor is enough; the slowest lab runs in about a minute.</li>
+      <li>Exercises raise an error until you fill them in. The cell after each one supplies a reference result, so the rest of the notebook still runs.</li>
+    </ol>
+    <pre class="code s" data-file="terminal (local option)"><code class="language-bash">git <span class="hljs-built_in">clone</span> https://github.com/SDAIAAcademy/ds-309
+<span class="hljs-built_in">cd</span> ds-309/labs
+uv <span class="hljs-built_in">sync</span>
+uv run jupyter lab</code></pre>
+  </div>
+  <aside class="notes"><p>Have everyone open Lab 1.1 now and run its first two cells. Common failures: a corporate proxy that blocks github.com (use Colab), and on Windows a deep folder path that breaks the virtual environment (set UV_PROJECT_ENVIRONMENT to a short folder before uv sync). The data files are committed, so nothing is downloaded beyond the libraries.</p></aside>
+</section>
+
+<section class="slide" id="agenda" data-auto="agenda" data-label="Agenda" data-n="6">
+  <div class="kicker">Today</div>
+  <h2>Find the personal data</h2>
+  <div class="agenda"><div class="item"><div><b>Session 1 · Personal data in an analysis</b><small>Which applicant fields identify a person directly, which do it in combination, and which are sensitive</small></div></div><div class="item"><div><b>Session 2 · Classification and permitted use</b><small>The national classification levels, the secondary use rules, and five release controls by guarantee and cost</small></div></div><div class="item"><div><b>Session 3 · Linkage attacks</b><small>How a release with no names is joined to an outside file, and what a link discloses</small></div></div><div class="item"><div><b>Session 4 · Measuring disclosure risk</b><small>Equivalence classes, uniqueness and k, and why k alone misses what a group reveals</small></div></div></div>
+</section>
+
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1" data-n="7">
+  <div class="kicker">Session 1</div>
+  <h1>Personal data in an analysis</h1>
+  <ul class="bullets outcomes"><li>Tell direct identifiers, quasi-identifiers and sensitive attributes apart in a real table</li><li>Find identifiers hiding in free-text fields</li><li>Decide keep, drop or transform for each field against a stated purpose</li></ul>
+  <div class="sess-no">01</div>
+</section>
+
+<section class="slide" id="pdpl-recap" data-lo="LO1" data-label="Recap" data-n="8" data-session="1">
+  <div class="kicker">Recap from DS-207</div>
+  <h2>The law asks for a purpose first, then only the data that purpose needs</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>Purpose</h4><p class="small mb0">Data collected to decide support is used for that, or for a compatible purpose under the rules.</p></div>
+    <div class="card c-cyan flat"><h4>Minimisation</h4><p class="small mb0">Each field that leaves has a reason tied to the purpose. "Might be useful" is not one.</p></div>
+    <div class="card c-coral flat"><h4>Secondary use</h4><p class="small mb0">Research use has its own rules: legitimate purpose, minimum necessary, an approved request.</p></div>
+  </div>
+  <div class="callout note mt"><b>This course goes further.</b> DS-207 decided whether a request is lawful. Here you measure how identifying the data still is after you cut it, and you reduce that risk with numbers to show for it.</div>
+  <aside class="notes"><p>Two minutes only. If the room has not taken DS-207, name the three ideas and move on: the Personal Data Protection Law and its Implementing Regulation are the reference, and the General Rules for Secondary Use of Data cover research use. Sources: PDPL and Implementing Regulation (SDAIA); General Rules for Secondary Use of Data (SDAIA).</p></aside>
+</section>
+
+<section class="slide" id="three-kinds-of-field" data-lo="LO1" data-label="Three kinds" data-n="9" data-session="1">
+  <div class="kicker">Not every field identifies the same way</div>
+  <h2>Direct identifiers, quasi-identifiers and sensitive attributes</h2>
+  <table class="t small">
+    <tr><th>Kind</th><th>What it does</th><th>In the Yusr table</th></tr>
+    <tr><td><b>Direct identifier</b></td><td>Points at one person by itself</td><td>national identifier, name, mobile, e-mail, the fund's applicant number</td></tr>
+    <tr><td><b>Quasi-identifier</b></td><td>Points at one person in combination, and someone outside could know it</td><td>birth date, gender, postcode, district, nationality, household size</td></tr>
+    <tr><td><b>Sensitive attribute</b></td><td>What an attacker wants to learn</td><td>income, social security, disability in the household, the fund's decision</td></tr>
+    <tr><td><b>Free text</b></td><td>Can hold any of the above</td><td>the officers' case notes</td></tr>
+  </table>
+  <aside class="notes"><p>Ask: is the applicant number a direct identifier? Most say no because it is not a name. It is: inside the fund it opens the whole file, and outside it is a key to it. The four tags are the ones of Lab 1.1. Sensitive here is used in the disclosure-control sense (what harms the person if learnt); the PDPL's own list of sensitive data is narrower, so do not equate the two.</p></aside>
+</section>
+
+<section class="slide" id="quasi-test" data-lo="LO1" data-label="Quasi test" data-n="10" data-session="1">
+  <div class="kicker">How to tell a quasi-identifier</div>
+  <h2>Ask who outside the fund could already know the value</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A <b>neighbour</b> knows the postcode and roughly the household size</li>
+      <li>An <b>employer</b> knows the sector and the birth date</li>
+      <li>A <b>public list</b> may hold name, birth date, gender and postcode together</li>
+      <li>If an outsider can know it, an outsider can <b>join on it</b></li>
+    </ul>
+    <div class="card c-coral"><h4>Three ordinary fields</h4><p class="small mb0">In 1990 United States census data, 87% of people were likely unique on five-digit ZIP code, gender and date of birth.</p></div>
+  </div>
+  <aside class="notes"><p>The Sweeney figure is the classic one: 216 million of 248 million people. Do not over-read it for Saudi postcodes; Lab 1.4 measures the same thing on the Yusr table, and the result there is even starker. Sources: Sweeney, Simple Demographics Often Identify People Uniquely (2000).</p></aside>
+</section>
+
+<section class="slide" id="notes-hold-identifiers" data-lo="LO1" data-label="Free text" data-n="11" data-session="1">
+  <div class="kicker">The field everyone forgets</div>
+  <h2>Case notes hold identifiers that no column was meant to</h2>
+  <div class="cols cols-2">
+    <div class="stack">
+      <div class="prompt s" data-tool="case_note">Called back on 05-SYN-418203 about the lease.</div>
+      <div class="prompt s" data-tool="case_note">Spoke to Hind at the branch; brother handles the file.</div>
+      <div class="prompt s" data-tool="case_note">Duplicate file found under SYN5520147.</div>
+    </div>
+    <div class="stat center"><div class="big">2,470</div><div class="lbl">of 60,000 notes hold a mobile, a national identifier or a first name (Lab 1.1)</div></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> A pipeline drops the identifier columns and keeps the note "for context". The extract now carries names and numbers in free text.</div>
+  <aside class="notes"><p>The three examples are the three planted patterns. In Lab 1.1 participants find all 2,470 with two regular expressions and the set of first names in the table. Point out that the safe default for free text is to drop it from an extract; redaction tools such as Presidio exist, but a recall below 100% still leaks.</p></aside>
+</section>
+
+<section class="slide" id="minimise-field-by-field" data-lo="LO1" data-label="Minimise" data-n="12" data-session="1">
+  <div class="kicker">Minimisation in practice</div>
+  <h2>Decide each field against the question: keep, drop or transform</h2>
+  <table class="t small">
+    <tr><th>Field</th><th>Decision</th><th>Reason, for the question "household size, income and approval by region"</th></tr>
+    <tr><td>birth date</td><td>transform</td><td>an age band answers the question</td></tr>
+    <tr><td>postcode, district</td><td>drop</td><td>region is the unit of the question</td></tr>
+    <tr><td>income</td><td>transform</td><td>bands of 1,000 riyals</td></tr>
+    <tr><td>applicant number</td><td>transform</td><td>a study code; the key stays with the data protection officer</td></tr>
+    <tr class="hl"><td>case note</td><td>drop</td><td>free text holds identifiers</td></tr>
+  </table>
+  <p class="small mt-s">In the reference solution 8 of 23 fields leave, kept or transformed.</p>
+  <aside class="notes"><p>The decision is per field and every one carries a reason, because the reason is what the data protection officer, Yahya, signs. Participants will disagree about nationality or employment: that is fine if the reason ties to the question. The Lab 1.1 check only enforces that no direct identifier and no free text leaves as it is.</p></aside>
+</section>
+
+<section class="slide" id="pseudonym-still-personal" data-lo="LO1" data-label="Pseudonyms" data-n="13" data-session="1">
+  <div class="kicker">A code is not anonymity</div>
+  <h2>A pseudonymised extract is still personal data</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Pseudonymisation</b> replaces identifiers with codes; the key is kept apart</li>
+      <li>Whoever holds the key can reverse it; the quasi-identifiers stay</li>
+      <li>SDAIA's anonymisation guideline treats pseudonymised data as personal data and its protection as weaker than anonymisation</li>
+      <li><b>Anonymised</b> data must be irreversible, with the re-identification risk assessed</li>
+    </ul>
+    <div class="card c-purple"><h4>A hash is a code too</h4><p class="small mb0">Anyone with a list of national identifiers recomputes the same hashes and finds the rows (Lab 1.1 stretch).</p></div>
+  </div>
+  <aside class="notes"><p>The guideline names generalisation, aggregation, encryption and masking as example techniques, and asks for an assessment of re-identification potential when data is anonymised. Days 1 and 2 are that assessment, done with numbers. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline, version 1.0 (SDAIA, 2024).</p></aside>
+</section>
+
+<section class="slide" id="check-hashed-id" data-lo="LO1" data-n="14" data-session="1">
+  <div class="kicker">Checkpoint</div>
+  <h2>Is the hashed extract still personal data?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-hashed-id-q1">
+    <p class="lead">Malak replaces each national identifier with its SHA-256 hash and removes names. Birth date, gender and postcode stay. Waad says the extract is now anonymous. What do you answer?</p>
+    <div class="opts">
+      <div class="opt" data-why="Treats a one-way function as a missing key: anyone with the list of identifiers recomputes the same hashes" data-k="A">Yes: a hash cannot be reversed, so nobody can find the person</div>
+      <div class="opt" data-ok data-k="B">No: the hash is a pseudonym and the quasi-identifiers still single people out</div>
+      <div class="opt" data-why="Confuses who holds the data with what the data is: the extract identifies people wherever it sits" data-k="C">Yes, as long as it stays on the university's servers</div>
+      <div class="opt" data-why="Thinks names are the only identifier: birth date, gender and postcode do the identifying here" data-k="D">No, but only because names were in the original table</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Hashing is pseudonymisation: recomputable by anyone with the identifiers, and it leaves birth date, gender and postcode, which together are unique for almost every applicant.</div>
+  </div>
+  <aside class="notes"><p>Answer B. If many pick A, run the stretch cell of Lab 1.1 on the screen: five identifiers, five hashes, rows found. If many pick C, return to the slide on pseudonyms: the level of protection follows the data, not the server.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-1" data-auto="lab" data-lab="1.1" data-label="Lab 1.1" data-n="15" data-session="1">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.1 · 25 min</div><h2>Tag the applicant fields (AI-off)</h2><p class="lead small">Tag each applicant field by identifiability and decide what to drop (AI-off).</p><a class="nb" href="../labs/D1_1_tag_each_applicant.ipynb">D1_1_tag_each_applicant.ipynb</a></div><ul class="checklist"><li>Load the table and list its fields <span class="min">3 min</span></li><li>Tag each field by identifiability <span class="min">8 min</span></li><li>Find identifiers in the case notes <span class="min">6 min</span></li><li>Keep, drop or transform, with a reason <span class="min">6 min</span></li><li>Count what the purpose still needs <span class="min">2 min</span></li><li class="stretch">✱ Stretch: Hash the national identifier and decide whether the hash is still personal data</li></ul></div>
+  <aside class="notes"><p>AI off for this lab: ask for assistants to be closed. Walk the room during task 2 and challenge one tag per table. Expected results: 5 direct identifiers, 2,470 notes with an identifier (817 mobiles, 829 national identifiers, 824 names), and in the reference decisions 8 of 23 fields leave. The safety nets let a participant who is stuck on task 2 continue to task 3.</p></aside>
+</section>
+
+<!-- ======================= SESSION 2 ======================= -->
+<section class="slide section" id="s2" data-auto="section" data-session="2" data-n="16">
+  <div class="kicker">Session 2</div>
+  <h1>Classification and permitted use</h1>
+  <ul class="bullets outcomes"><li>Assign a national classification level to an extract from its impact</li><li>State when an extract may leave the fund under the secondary use rules</li><li>Match five release controls to their guarantee and their cost</li></ul>
+  <div class="sess-no">02</div>
+</section>
+
+<section class="slide" id="four-levels" data-lo="LO1" data-label="Four levels" data-n="17" data-session="2">
+  <div class="kicker">The national classification</div>
+  <h2>The level follows the impact of an unauthorised disclosure</h2>
+  <table class="t small">
+    <tr><th>Level</th><th>Impact</th><th>Typical content</th></tr>
+    <tr><td><b>Top Secret</b></td><td>high</td><td>exceptionally serious, irreparable harm to national interests</td></tr>
+    <tr><td><b>Secret</b></td><td>medium</td><td>serious harm to national interests or major losses</td></tr>
+    <tr class="hl"><td><b>Restricted</b></td><td>low</td><td>limited harm; the policy's examples include personally identifiable information such as names and identification numbers</td></tr>
+    <tr><td><b>Public</b></td><td>none</td><td>none of the impacts above</td></tr>
+  </table>
+  <p class="small mt-s">Restricted splits by scale: <b>A</b> a whole sector, <b>B</b> several entities or a group of individuals, <b>C</b> one entity or one individual.</p>
+  <aside class="notes"><p>Recap of DS-207 Session 1.3 in one slide. The point for this course: the level is set by impact, so removing names does not lower it while people can still be singled out. Sources: Data Classification Policy (National Data Management Office, SDAIA).</p></aside>
+</section>
+
+<section class="slide" id="three-extracts" data-lo="LO1" data-label="Three extracts" data-n="18" data-session="2">
+  <div class="kicker">On the fund's analysis server</div>
+  <h2>Three extracts, three levels, three answers to "may it leave?"</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-coral"><h4>E1 · Applicant table</h4><p class="small mb0">60,000 rows, 23 fields, names and identifiers. <b>Restricted B.</b> Stays inside the fund.</p></div>
+    <div class="card c-amber"><h4>E2 · Research extract</h4><p class="small mb0">No names, a study code, birth date and postcode kept. <b>Restricted B.</b> Leaves only under conditions.</p></div>
+    <div class="card c-teal"><h4>E3 · Counts</h4><p class="small mb0">Approved by district and nationality: 118 cells, the smallest is 2. <b>Restricted C</b> until treated.</p></div>
+  </div>
+  <aside class="notes"><p>These are the levels the reference solution of Lab 1.2 assigns. E3 surprises people: an aggregate is not automatically Public. With a cell of 2, the two approved non-Saudi applicants in a small district can be singled out by anyone who knows one of them applied. Day 2 treats it.</p></aside>
+</section>
+
+<section class="slide" id="secondary-use-conditions" data-lo="LO1" data-label="Secondary use" data-n="19" data-session="2">
+  <div class="kicker">When E2 may leave</div>
+  <h2>A research extract leaves under conditions, not because names are gone</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Request</b>through the researcher's university, with its written approval</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Purpose</b>research or public interest, not profit</div>
+    <div class="arrow">→</div>
+    <div class="step c-purple"><b>3 · Minimum</b>only the fields the purpose needs</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>4 · Measured</b>disclosure risk reduced, then shared under an agreement</div>
+  </div>
+  <aside class="notes"><p>Steps 1 to 3 restate the General Rules for Secondary Use of Data in plain words: a legitimate purpose that serves the public interest or research and excludes profit, data confined to the minimum necessary, and for a researcher a request through the institution with written evidence of approval. Step 4 is the fund's own control and the subject of Day 2. Sources: General Rules for Secondary Use of Data (SDAIA).</p></aside>
+</section>
+
+<section class="slide" id="five-controls" data-lo="LO1" data-label="Five controls" data-n="20" data-session="2">
+  <div class="kicker">The controls a release can use</div>
+  <h2>Five controls, each with a different guarantee and a different cost</h2>
+  <table class="t small">
+    <tr><th>Control</th><th>What it guarantees</th><th>What it costs</th></tr>
+    <tr><td><b>Pseudonymisation</b></td><td>nothing outside the key holder; still personal data</td><td>almost nothing</td></tr>
+    <tr><td><b>De-identification</b></td><td>each record hides among at least k on the chosen fields</td><td>detail, and rows suppressed</td></tr>
+    <tr><td><b>Aggregation</b></td><td>no row-level data</td><td>no row-level analysis; small cells still leak</td></tr>
+    <tr><td><b>Synthetic data</b></td><td>no real row, if the generator does not copy</td><td>weaker relationships; must be tested</td></tr>
+    <tr><td><b>Differential privacy</b></td><td>a bound on what any one person changes</td><td>noise, and a budget that runs out</td></tr>
+  </table>
+  <aside class="notes"><p>This table is the backbone of LO1 and of the decision table participants write in task 4 of Lab 1.2. Ask which control gives a guarantee that does not depend on what the attacker knows: only differential privacy. k-anonymity's guarantee holds only for the fields you chose as quasi-identifiers.</p></aside>
+</section>
+
+<section class="slide" id="match-control" data-lo="LO1" data-label="Match" data-n="21" data-session="2">
+  <div class="kicker">Fit the control to the release</div>
+  <h2>The use decides the control, and the control decides the risk left</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Follow one applicant over years inside the fund: <b>pseudonymisation</b></li>
+      <li>Row-level records for an approved study: <b>de-identification</b></li>
+      <li>Once-a-year regional counts: <b>aggregation</b></li>
+      <li>A realistic file for a hackathon: <b>synthetic data</b></li>
+      <li>Monthly district counts on a public dashboard: <b>differential privacy</b></li>
+    </ul>
+    <div class="card c-coral"><h4>Residual risk is part of the answer</h4><p class="small mb0">The monthly dashboard spends its budget twelve times a year. The hackathon file is only as safe as the generator's leakage test.</p></div>
+  </div>
+  <aside class="notes"><p>These are the five releases of Lab 1.2 task 4, so do not dwell: participants will write them. The right column is the part most people skip: every control leaves a risk, and the decision table must name it.</p></aside>
+</section>
+
+<section class="slide" id="check-control" data-lo="LO1" data-n="22" data-session="2">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which control fits the monthly dashboard?</h2>
+  <div class="quiz" data-type="single" data-lo="LO1" data-id="check-control-q1">
+    <p class="lead">Bashayer wants applicants per district on a public dashboard, refreshed every month. Some districts have fewer than ten applicants a month. Which control fits best?</p>
+    <div class="opts">
+      <div class="opt" data-why="Thinks a code protects published numbers: pseudonymisation applies to rows, not to counts" data-k="A">Pseudonymise the applicant numbers before counting</div>
+      <div class="opt" data-why="Assumes suppression is free when repeated: monthly tables with suppressed cells can be differenced against each other" data-k="B">Suppress every count below ten each month</div>
+      <div class="opt" data-why="Uses a row-level control for an aggregate need, and gives up the counts the dashboard is for" data-k="C">Publish a synthetic extract instead of counts</div>
+      <div class="opt" data-ok data-k="D">Add calibrated noise under a stated yearly privacy budget</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Differential privacy bounds what any one applicant changes in every release, and the budget makes the cost of monthly repetition explicit.</div>
+  </div>
+  <aside class="notes"><p>Answer D. B is the tempting one; it is what many dashboards do. Ask what happens when this month's suppressed cell can be recovered from the regional total minus the other districts. Day 2 Sessions 2 and 3 build exactly this release.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-2" data-auto="lab" data-lab="1.2" data-label="Lab 1.2" data-n="23" data-session="2">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.2 · 25 min</div><h2>Classify three extracts</h2><p class="lead small">Assign classification levels to three extracts and decide which may leave the fund.</p><a class="nb" href="../labs/D1_2_assign_classification_levels.ipynb">D1_2_assign_classification_levels.ipynb</a></div><ul class="checklist"><li>Read the three extracts <span class="min">3 min</span></li><li>Score the impact and the level of each <span class="min">7 min</span></li><li>Decide which may leave the fund, and on what conditions <span class="min">7 min</span></li><li>Five releases, five controls: the decision table <span class="min">8 min</span></li><li class="stretch">✱ Stretch: Rewrite the researcher's request so that it asks for the minimum necessary</li></ul></div>
+  <aside class="notes"><p>Expected: E1 and E2 Restricted B, E3 Restricted C with a smallest cell of 2. For task 3 accept any set of at least three conditions that includes the minimum necessary. Task 4 has one right control per release; the residual risk is in the participant's words. The decision table is saved to artifacts/lab12/decision_table.csv: tell them it is the LO1 evidence.</p></aside>
+</section>
+
+<!-- ======================= SESSION 3 ======================= -->
+<section class="slide section" id="s3" data-auto="section" data-session="3" data-n="24">
+  <div class="kicker">Session 3</div>
+  <h1>Linkage attacks</h1>
+  <ul class="bullets outcomes"><li>Explain how a linkage attack joins a release to an outside file</li><li>Run a linkage on quasi-identifiers and measure its success</li><li>Name what a successful link discloses</li></ul>
+  <div class="sess-no">03</div>
+</section>
+
+<section class="slide" id="linkage-attack" data-lo="LO2" data-label="Linkage" data-n="25" data-session="3">
+  <div class="kicker">How a release without names is re-identified</div>
+  <h2>A linkage attack joins the release to a file that has names</h2>
+  <div class="flow">
+    <div class="step c-navy"><b>1 · Release</b>study code, birth date, gender, postcode, income, decision</div>
+    <div class="arrow">→</div>
+    <div class="step c-teal"><b>2 · Outside file</b>name, birth date, gender, postcode</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>3 · Join</b>on the shared fields</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>4 · Unique match</b>a name attached to an income and a decision</div>
+  </div>
+  <div class="callout note mt"><b>In the lab.</b> A synthetic volunteers register published online: 9,000 people, 3,000 of whom applied to the fund.</div>
+  <aside class="notes"><p>The attacker does not need the fund's key, only an outside file that shares quasi-identifiers. Ask the room what such files exist in their world: membership lists, alumni lists, professional registers, social media profiles with a birthday. The register in the lab is invented and its overlap with the applicants is known only through a truth key used for scoring.</p></aside>
+</section>
+
+<section class="slide" id="linkage-result" data-lo="LO2" data-label="It works" data-n="26" data-session="3">
+  <div class="kicker">Lab 1.3, the reference run</div>
+  <h2>Three ordinary fields re-identify 99% of the register's applicants</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="stat center"><div class="big">3,042</div><div class="lbl">register rows with exactly one match</div></div>
+    <div class="stat center"><div class="big">99.2%</div><div class="lbl">of the 3,000 applicants correctly named</div></div>
+    <div class="stat center"><div class="big">97.8%</div><div class="lbl">of claimed links are right</div></div>
+  </div>
+  <div class="callout warn mt"><b>The 66 wrong links harm people too.</b> Someone who never applied is now believed to be on social security, or declined.</div>
+  <aside class="notes"><p>Numbers from the solution run of Lab 1.3: 2,976 correct of 3,042 claimed links, out of 3,000 applicants in the register. Precision matters: a false link attaches someone else's sensitive values to a real name. Ask how the attacker could know which links are wrong: they cannot, which is why precision is measured with a truth key here and never available in practice.</p></aside>
+</section>
+
+<section class="slide" id="what-links-reveal" data-lo="LO2" data-label="Disclosure" data-n="27" data-session="3">
+  <div class="kicker">A link is the door, not the harm</div>
+  <h2>What the 3,042 named records disclose</h2>
+  <div class="bars">
+    <div class="row"><span>Declined by the fund</span><div class="bar c-coral" style="--w:55%"></div><span class="val">1,662</span></div>
+    <div class="row"><span>On social security</span><div class="bar c-amber" style="--w:14%"></div><span class="val">420</span></div>
+    <div class="row"><span>Disability in household</span><div class="bar c-purple" style="--w:9%"></div><span class="val">267</span></div>
+  </div>
+  <p class="small mt">Plus the exact monthly income of every named person.</p>
+  <aside class="notes"><p>Counts from task 4 of Lab 1.3 on the reference run. Distinguish identity disclosure (this row is Hind) from attribute disclosure (Hind is on social security). The second can happen without the first: Session 4 shows a class of five people who all share the same value.</p></aside>
+</section>
+
+<section class="slide" id="coarser-join" data-lo="LO2" data-label="Coarser" data-n="28" data-session="3">
+  <div class="kicker">The lever that matters most</div>
+  <h2>Coarsening one field cuts the links from 99% to 17%</h2>
+  <table class="t small">
+    <tr><th>Join on</th><th class="num">Claimed</th><th class="num">Correct</th><th class="num">Success</th><th class="num">Precision</th></tr>
+    <tr><td>birth date, gender, postcode</td><td class="num">3,042</td><td class="num">2,976</td><td class="num">99.2%</td><td class="num">97.8%</td></tr>
+    <tr class="hl"><td>birth year, gender, postcode</td><td class="num">1,595</td><td class="num">506</td><td class="num">16.9%</td><td class="num">31.7%</td></tr>
+  </table>
+  <div class="callout tip mt"><b>Takeaway.</b> Not zero, and two in three claimed links are now wrong: the attacker can no longer tell which ones to trust. Day 2 finishes the job with a hierarchy and a k.</div>
+  <aside class="notes"><p>From task 5 of Lab 1.3. The birth date carries most of the identifying power because it has about 365 times more values than the year. 16.9% is still far too high for a release; the stretch asks participants to swap postcode for district and see which field does more of the work.</p></aside>
+</section>
+
+<section class="slide" id="background-knowledge" data-lo="LO2" data-label="Who attacks" data-n="29" data-session="3">
+  <div class="kicker">Who the attacker is</div>
+  <h2>Assume the attacker knows someone who applied</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>Prosecutor</h4><p class="small mb0">Knows a specific person is in the release and looks for their row.</p></div>
+    <div class="card c-cyan flat"><h4>Journalist</h4><p class="small mb0">Has an outside file and links whoever links; does not know who applied.</p></div>
+    <div class="card c-coral flat"><h4>Insider</h4><p class="small mb0">A relative or colleague who knows exact values: birth date, household size, sector.</p></div>
+  </div>
+  <aside class="notes"><p>Lab 1.3 played the journalist. The prosecutor is stronger: they already know the person is in the release, so a unique record is a certain hit. Lab 1.4's average risk (one over the class size) is the prosecutor's chance. Plan for the insider when you choose quasi-identifiers: anything a relative knows is a quasi-identifier.</p></aside>
+</section>
+
+<section class="slide" id="check-which-field" data-lo="LO2" data-n="30" data-session="3">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which change stops most of the links?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="check-which-field-q1">
+    <p class="lead">Release A links 99% of the register's applicants on birth date, gender and postcode. Waad needs household size and approval by region. Which single change cuts the links most while keeping her question answerable?</p>
+    <div class="opts">
+      <div class="opt" data-ok data-k="A">Replace the birth date with an age band</div>
+      <div class="opt" data-why="Removes a field that has only two values: gender splits each class in half and barely changes uniqueness" data-k="B">Remove gender</div>
+      <div class="opt" data-why="Thinks the code is what links: the study code was never part of the join" data-k="C">Replace the study code with a new random code</div>
+      <div class="opt" data-why="Protects a sensitive attribute, not an identifier: linkage uses the quasi-identifiers, not the income" data-k="D">Round income to the nearest 1,000 riyals</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The birth date has by far the most values of the three fields; coarsening it collapses the combinations, and the question needs only an age band.</div>
+  </div>
+  <aside class="notes"><p>Answer A. D is tempting because income feels identifying; it is what the attacker learns, not what they join on. If several pick B, ask how many values gender has against how many values a birth date has.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-3" data-auto="lab" data-lab="1.3" data-label="Lab 1.3" data-n="31" data-session="3">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.3 · 25 min</div><h2>Link the release to the register</h2><p class="lead small">Re-identify applicants by linking a release to a synthetic public register.</p><a class="nb" href="../labs/D1_3_re_identify_applicants.ipynb">D1_3_re_identify_applicants.ipynb</a></div><ul class="checklist"><li>Load the release and the register <span class="min">3 min</span></li><li>Join on birth date, gender and postcode <span class="min">7 min</span></li><li>Keep unique matches and score them against the truth key <span class="min">7 min</span></li><li>What the links reveal <span class="min">5 min</span></li><li>Try a coarser join <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Link on the district in place of the postcode and compare the success</li></ul></div>
+  <aside class="notes"><p>Expected on the reference run: 3,042 claimed links, 2,976 correct, success 0.992, precision 0.978; with the birth year 1,595 claimed, 506 correct, success 0.169. Common error: counting links from the release side instead of the register side, or forgetting to require exactly one match. The truth key is in data/reference: remind participants it is for scoring, an attacker never has it.</p></aside>
+</section>
+
+<!-- ======================= SESSION 4 ======================= -->
+<section class="slide section" id="s4" data-auto="section" data-session="4" data-n="32">
+  <div class="kicker">Session 4</div>
+  <h1>Measuring disclosure risk</h1>
+  <ul class="bullets outcomes"><li>Compute equivalence classes, uniqueness and k for a release</li><li>Compare candidate releases by record-level risk</li><li>Explain why k alone misses attribute disclosure</li></ul>
+  <div class="sess-no">04</div>
+</section>
+
+<section class="slide" id="equivalence-class" data-lo="LO2" data-label="Classes" data-n="33" data-session="4">
+  <div class="kicker">Risk without an outside file</div>
+  <h2>An equivalence class is everyone who looks the same on the quasi-identifiers</h2>
+  <div class="cols cols-2">
+    <table class="t small">
+      <tr><th>age band</th><th>gender</th><th>region</th><th>nationality</th><th class="num">class size</th></tr>
+      <tr><td>31-40</td><td>F</td><td>Riyadh</td><td>Saudi</td><td class="num">1,410</td></tr>
+      <tr><td>41-50</td><td>M</td><td>Tabuk</td><td>Saudi</td><td class="num">409</td></tr>
+      <tr class="hl"><td>51-60</td><td>F</td><td>Al-Jouf</td><td>Non-Saudi</td><td class="num">1</td></tr>
+    </table>
+    <ul class="bullets">
+      <li>The <b>class size</b> is how many people a record hides among</li>
+      <li>A class of 1 is a <b>unique</b> record</li>
+      <li>The release's <b>k</b> is its smallest class</li>
+    </ul>
+  </div>
+  <aside class="notes"><p>The highlighted row is one of the seven unique records of release C in Lab 1.4. The two larger class sizes are real too (1,410 and 409 records). A class is defined only by the fields you declared quasi-identifiers: choose them by the outsider test of Session 1.</p></aside>
+</section>
+
+<section class="slide" id="three-releases-risk" data-lo="LO2" data-label="Three releases" data-n="34" data-session="4">
+  <div class="kicker">Lab 1.4, the reference run</div>
+  <h2>The same 60,000 people, three very different risks</h2>
+  <table class="t small">
+    <tr><th>Release</th><th>Quasi-identifiers</th><th class="num">Unique</th><th class="num">Below 5</th><th class="num">Average risk</th></tr>
+    <tr><td>A</td><td>birth date, gender, postcode</td><td class="num">59,458</td><td class="num">100%</td><td class="num">0.996</td></tr>
+    <tr><td>B</td><td>birth year, gender, district, nationality</td><td class="num">2,152</td><td class="num">14.3%</td><td class="num">0.129</td></tr>
+    <tr class="hl"><td>C</td><td>age band, gender, region, nationality</td><td class="num">7</td><td class="num">0.1%</td><td class="num">0.004</td></tr>
+  </table>
+  <p class="small mt-s">All three have k = 1.</p>
+  <aside class="notes"><p>From Lab 1.4. Release A is worse than Sweeney's census finding: 99.1% unique, because a fund's applicants are a small population spread over many postcodes. The punchline is the last line: k alone says all three are equally bad. Read unique, below five and average risk together.</p></aside>
+</section>
+
+<section class="slide" id="k-is-a-floor" data-lo="LO2" data-label="k" data-n="35" data-session="4">
+  <div class="kicker">What k tells you</div>
+  <h2>k is a floor for the most exposed person, not an average</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>k = 5</b>: every record hides among at least five</li>
+      <li>One unique record makes k = 1 for the whole release</li>
+      <li>Report k with the <b>share below the target</b> and the <b>average risk</b></li>
+      <li>The fund's target in this course: <b>k of at least 5</b></li>
+    </ul>
+    <div class="card c-teal"><h4>Average risk</h4><p class="small mb0">The mean of one over the class size: the chance that a prosecutor picks the right record. Release C: 0.004. Its maximum is still 1.</p></div>
+  </div>
+  <aside class="notes"><p>Why five? It is a common choice, not a law. Write the target and its reason in the release log; Day 4's datasheet asks for it. Some organisations use 10 for health data. The threshold matters less than measuring and reporting it honestly.</p></aside>
+</section>
+
+<section class="slide" id="attribute-disclosure" data-lo="LO2" data-label="Uniform classes" data-n="36" data-session="4">
+  <div class="kicker">When k is met and the harm happens anyway</div>
+  <h2>A class of five that all share one value discloses it to anyone who finds the class</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Homogeneity</h4><p class="small mb0">In release B, 661 of 3,241 classes of five or more have a single social security value (Lab 1.4 stretch).</p></div>
+    <div class="card c-purple"><h4>l-diversity</h4><p class="small mb0">Ask every class to hold at least l different values of the sensitive attribute. A partial fix: two values can still be "yes" and "almost yes".</p></div>
+  </div>
+  <aside class="notes"><p>This is the limit of k-anonymity that the topic list asks for. The stronger notion, t-closeness, asks each class's distribution of the sensitive value to be close to the whole table's; mention it by name only. Differential privacy (Day 2) is the answer that does not depend on which fields you thought of.</p></aside>
+</section>
+
+<section class="slide" id="tools-for-risk" data-lo="LO2" data-label="Tools" data-n="37" data-session="4">
+  <div class="kicker">Tools for disclosure risk</div>
+  <h2>Write it in pandas to see the mechanism, then use a tool for the release</h2>
+  <div class="cols cols-2">
+    <pre class="code s" data-file="python"><code class="language-python">sizes = df.groupby(qi)[qi[<span class="hljs-number">0</span>]].transform(<span class="hljs-string">&quot;size&quot;</span>)
+unique   = (sizes == <span class="hljs-number">1</span>).<span class="hljs-built_in">sum</span>()
+k        = sizes.<span class="hljs-built_in">min</span>()
+below_5  = (sizes &lt; <span class="hljs-number">5</span>).mean()
+avg_risk = (<span class="hljs-number">1</span> / sizes).mean()</code></pre>
+    <div class="stack">
+      <div class="card c-teal flat"><h4>ARX</h4><p class="small mb0">A desktop and Java tool: hierarchies, k, l, t, risk models and utility.</p></div>
+      <div class="card c-cyan flat"><h4>sdcMicro</h4><p class="small mb0">An R package for statistical disclosure control with risk and utility measures.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p>Five lines are the whole of Lab 1.4's computation. The tools are interchangeable examples of the capability slot "de-identification and disclosure risk"; both were checked on their official pages this month (ARX site; sdcMicro 5.8.2 on CRAN). Sources: ARX data anonymization tool; sdcMicro on CRAN.</p></aside>
+</section>
+
+<section class="slide" id="check-k" data-lo="LO2" data-n="38" data-session="4">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which release is safer?</h2>
+  <div class="quiz" data-type="single" data-lo="LO2" data-id="check-k-q1">
+    <p class="lead">Release B and release C both have k = 1. B has 2,152 unique records and C has 7. Yahya asks whether they are equally risky. What do you tell him?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads k as the whole story: k is only the smallest class, so it hides how many people are exposed" data-k="A">Yes: both have k = 1, so both expose someone</div>
+      <div class="opt" data-why="Confuses detail kept for the analysis with protection: finer birth and place values split classes and raise the risk" data-k="B">B is safer because its birth year and district are more precise</div>
+      <div class="opt" data-ok data-k="C">C is far safer, but neither meets k of five until the small classes are treated</div>
+      <div class="opt" data-why="Treats seven people as negligible: each of them is certainly re-identified by anyone who knows them" data-k="D">C is safe to release as it is, since seven records is negligible</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> k reports only the worst class. The count of unique records and the average risk show that C exposes 7 people and B exposes 2,152, yet both still fail the target.</div>
+  </div>
+  <aside class="notes"><p>Answer C. D is the dangerous one: say aloud that the seven are real people in the scenario, mostly non-Saudi applicants in small regions, and that a release target applies to everyone.</p></aside>
+</section>
+
+<section class="slide lab top" id="lab-1-4" data-auto="lab" data-lab="1.4" data-label="Lab 1.4" data-n="39" data-session="4">
+  <div class="cols cols-2 mid"><div><div class="lab-tag">Lab 1.4 · 25 min</div><h2>Uniqueness and k for three releases</h2><p class="lead small">Compute unique quasi-identifier combinations and k for three candidate releases.</p><a class="nb" href="../labs/D1_4_compute_unique_quasi.ipynb">D1_4_compute_unique_quasi.ipynb</a></div><ul class="checklist"><li>Build the three candidate releases <span class="min">5 min</span></li><li>Equivalence class sizes <span class="min">6 min</span></li><li>Unique records, k and records below five <span class="min">7 min</span></li><li>Average re-identification risk <span class="min">4 min</span></li><li>Pick the release to treat <span class="min">3 min</span></li><li class="stretch">✱ Stretch: Measure the l-diversity of social security status in release B</li></ul></div>
+  <aside class="notes"><p>Expected: unique 59,458 / 2,152 / 7; below five 100% / 14.3% / 0.1%; k = 1 for all; average risk 0.996 / 0.129 / 0.004. The cell that prints C's unique records shows seven non-Saudi applicants in small regions: point at it, it is the reason Day 3 also worries about small groups. Stretch: 661 of 3,241 classes uniform on social security.</p></aside>
+</section>
+
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up" data-n="40" data-session="4">
+  <div class="kicker">Day 1 · Three things to keep</div>
+  <h2>Find the personal data, then measure how identifying it still is</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>Fields are not equal</h4><p class="small mb0">Direct identifiers, quasi-identifiers, sensitive attributes and free text each need a different decision.</p></div>
+    <div class="card c-cyan"><h4>No names is not anonymous</h4><p class="small mb0">Three ordinary fields linked 99% of the register's applicants to their income and decision.</p></div>
+    <div class="card c-coral"><h4>Report risk with numbers</h4><p class="small mb0">Unique records, k, the share below five and the average risk, together.</p></div>
+  </div>
+  <aside class="notes"><p>Ask each table for the one number from today they would show Yahya. Most will pick 99.2%. Close by noting that every release so far fails the target: Day 2 fixes that and measures what the fix costs.</p></aside>
+</section>
+
+<section class="slide dark" id="next" data-label="Next" data-n="41" data-session="4">
+  <div class="kicker">Tomorrow · Day 2</div>
+  <h2>Release with less risk</h2>
+  <ul class="bullets">
+    <li>Treat release A to k of at least five and measure what the analysis loses</li>
+    <li>Publish district counts with differential privacy, at three budgets</li>
+    <li>Split one budget over four queries, then test a synthetic extract for leakage</li>
+    <li>Before tomorrow: rerun Lab 1.4 if it did not finish; Lab 2.1 starts from the supplied release</li>
+  </ul>
+  <aside class="notes"><p>No preparation is required beyond a working environment. Remind participants that every Day 2 lab starts from supplied files.</p></aside>
+</section>
+</div>
+<script type="application/json" id="academy-data">{"v":1,"engine":"1.0.0","build":{"at":"2026-11-15T16:16:16Z","version":"2027.1.0","commit":"8cfd447"},"course":{"id":"ds-309","code":"DS-309","title":"Responsible Data Science: Privacy, Fairness and Documentation","track":"data-science","lang":"en","dir":"ltr","url":"https://sdaiaacademy.github.io/ds-309/","repo":"SDAIAAcademy/ds-309","home":"../index.html"},"deck":{"id":"day1","kind":"day","day":1,"label":"Day 1","title":"Find the personal data","prev":null,"next":"day2.html","md":"day1.md","alt":{}},"sessions":[{"n":1,"label":"Session 1","title":"Personal data in an analysis","slide":"s1","outcomes":["Tell direct identifiers, quasi-identifiers and sensitive attributes apart in a real table","Find identifiers hiding in free-text fields","Decide keep, drop or transform for each field against a stated purpose"],"minutes":50,"lab":{"id":"1.1","title":"Tag the applicant fields (AI-off)","minutes":25,"href":"../labs/D1_1_tag_each_applicant.ipynb"}},{"n":2,"label":"Session 2","title":"Classification and permitted use","slide":"s2","outcomes":["Assign a national classification level to an extract from its impact","State when an extract may leave the fund under the secondary use rules","Match five release controls to their guarantee and their cost"],"minutes":50,"lab":{"id":"1.2","title":"Classify three extracts","minutes":25,"href":"../labs/D1_2_assign_classification_levels.ipynb"}},{"n":3,"label":"Session 3","title":"Linkage attacks","slide":"s3","outcomes":["Explain how a linkage attack joins a release to an outside file","Run a linkage on quasi-identifiers and measure its success","Name what a successful link discloses"],"minutes":50,"lab":{"id":"1.3","title":"Link the release to the register","minutes":25,"href":"../labs/D1_3_re_identify_applicants.ipynb"}},{"n":4,"label":"Session 4","title":"Measuring disclosure risk","slide":"s4","outcomes":["Compute equivalence classes, uniqueness and k for a release","Compare candidate releases by record-level risk","Explain why k alone misses attribute disclosure"],"minutes":50,"lab":{"id":"1.4","title":"Uniqueness and k for three releases","minutes":25,"href":"../labs/D1_4_compute_unique_quasi.ipynb"}}],"slides":[{"id":"title","n":1,"title":"Find the personal data","kind":"title","session":0,"hash":"0bdde68c","md":"#### [day1#title] Find the personal data\n\n*SDAIA Academy · Responsible Data Science: Privacy, Fairness and Documentation*\n\nDay 1: Identifiers, classification, linkage and disclosure risk\n\nData Science Track · 4 teaching days + capstone day · 4 sessions · 4 labs · DS-309","notes":"Welcome the room. Ask two questions by show of hands: who has shared a row-level extract with someone outside their team, and who has been asked whether a model treats groups fairly. This is a 300-level course: participants train classifiers and compute intervals already (DS-204), and they know the PDPL principles, classification and small-cell rules from DS-207. Day 1 recaps those in a slide each and spends its time on linkage and measured risk.","minutes":null,"lo":[]},{"id":"four-days-one-release","n":2,"title":"Four days take one release through every check it needs","kind":"content","session":0,"hash":"a813eeb5","md":"#### [day1#four-days-one-release] Four days take one release through every check it needs\n\n*The course at a glance*\n\n- **Day 1 · Find.** Identifiers, classification, linkage attacks, measured disclosure risk.\n- **Day 2 · Reduce.** Generalisation, differential privacy, budgets, synthetic data and its leakage.\n- **Day 3 · Audit.** Errors by group, criteria that conflict, bias types, two mitigations.\n- **Day 4 · Document.** Datasheet, model card, impact assessment, a rerun by a peer.\n\n> **Day 5 · Capstone.** A release pack for a second case, a scholarship allocation model, in a public repository, reviewed for ten minutes with one disparity recomputed live.","notes":"One sentence per day; do not teach yet. The capstone rubric is privacy 25, fairness audit 25, documentation 20, impact assessment 20, reproducibility 10. Each day builds one part of that pack on the Yusr case first, so the capstone is a second pass on new data, not new learning.","minutes":null,"lo":[]},{"id":"how-this-course-works","n":3,"title":"Every claim about risk or fairness ends in a measured number","kind":"content","session":0,"hash":"25f3df70","md":"#### [day1#how-this-course-works] Every claim about risk or fairness ends in a measured number\n\n*How this course works*\n\n- **Measure, then decide.** Unique records, linkage success, error against budget, error rates with intervals. A control without a measurement is a hope.\n- **Reference states.** Every lab starts from supplied files. Nothing depends on an earlier lab, and every exercise has a safety net.\n- **Synthetic data only.** 60,000 invented applicants. Identifiers carry the marker `SYN`. No lab calls or downloads a model.\n\n> **AI policy.** AI off for the supervised check and for Lab 1.1. In the other labs an assistant may explain a method or an error, but it does not produce the audit. In the capstone anything goes, and you defend it live.","notes":"Say the AI policy aloud and why: the supervised check asks participants to tag fields, read a k and pick a fairness criterion without help, and Lab 1.1 is the same skill. The policy comes from the catalog entry. If someone asks which assistant: any chat assistant, used as a tutor.","minutes":null,"lo":[]},{"id":"yusr-case","n":4,"title":"Yusr Housing Support Fund and its screening model, Ahliya","kind":"content","session":0,"hash":"1a8156df","md":"#### [day1#yusr-case] Yusr Housing Support Fund and its screening model, Ahliya\n\n*One case all week*\n\nA fictional public fund that screens applications for housing support. Its model, **Ahliya** (أهلية), scores each application before an officer decides.\n\n- **A researcher's request.** Waad Al-Shehri, a university researcher, asks for row-level data on household size, income and approval.\n- **Two publications.** District counts for a public dashboard, and a synthetic extract for a hackathon.\n- **An audit.** Internal audit asks whether Ahliya misses eligible applicants more often in some groups.","notes":"The people: Bashayer Al-Otaibi, director of eligibility and support, owns the decisions; Yahya Al-Qahtani is the data protection officer; Anmar Al-Ghamdi built Ahliya; Wiam Al-Mutairi in internal audit reviews every high risk; participants play Malak Al-Harbi, the fund's data scientist. All data is generated by labs/prepare_data.py with seed 309. Problems are planted in it; do not reveal them yet.","minutes":null,"lo":[]},{"id":"setup-check","n":5,"title":"Open the labs in Colab, or run them locally with uv","kind":"content","session":0,"hash":"a659ffd0","md":"#### [day1#setup-check] Open the labs in Colab, or run them locally with uv\n\n*Lab environment*\n\n1. **Colab:** open a notebook from the course page. Its first cell clones the repository and installs two libraries.\n2. **Locally:** the commands on the right. A laptop processor is enough; the slowest lab runs in about a minute.\n3. Exercises raise an error until you fill them in. The cell after each one supplies a reference result, so the rest of the notebook still runs.\n\n```bash\n# file: terminal (local option)\ngit clone https://github.com/SDAIAAcademy/ds-309\ncd ds-309/labs\nuv sync\nuv run jupyter lab\n```","notes":"Have everyone open Lab 1.1 now and run its first two cells. Common failures: a corporate proxy that blocks github.com (use Colab), and on Windows a deep folder path that breaks the virtual environment (set UV_PROJECT_ENVIRONMENT to a short folder before uv sync). The data files are committed, so nothing is downloaded beyond the libraries.","minutes":null,"lo":[]},{"id":"agenda","n":6,"title":"Find the personal data","kind":"content","session":0,"hash":"e32354bb","md":"#### [day1#agenda] Find the personal data\n\n*Today*\n\n- **Session 1 · Personal data in an analysis**: Which applicant fields identify a person directly, which do it in combination, and which are sensitive\n- **Session 2 · Classification and permitted use**: The national classification levels, the secondary use rules, and five release controls by guarantee and cost\n- **Session 3 · Linkage attacks**: How a release with no names is joined to an outside file, and what a link discloses\n- **Session 4 · Measuring disclosure risk**: Equivalence classes, uniqueness and k, and why k alone misses what a group reveals","notes":"","minutes":null,"lo":[]},{"id":"s1","n":7,"title":"Personal data in an analysis","kind":"section","session":1,"hash":"bfbd0867","md":"#### [day1#s1] Personal data in an analysis\n\n*Session 1*\n\n- Tell direct identifiers, quasi-identifiers and sensitive attributes apart in a real table\n- Find identifiers hiding in free-text fields\n- Decide keep, drop or transform for each field against a stated purpose","notes":"","minutes":null,"lo":["LO1"]},{"id":"pdpl-recap","n":8,"title":"The law asks for a purpose first, then only the data that purpose needs","kind":"content","session":1,"hash":"63c327f9","md":"#### [day1#pdpl-recap] The law asks for a purpose first, then only the data that purpose needs\n\n*Recap from DS-207*\n\n- **Purpose.** Data collected to decide support is used for that, or for a compatible purpose under the rules.\n- **Minimisation.** Each field that leaves has a reason tied to the purpose. \"Might be useful\" is not one.\n- **Secondary use.** Research use has its own rules: legitimate purpose, minimum necessary, an approved request.\n\n> **This course goes further.** DS-207 decided whether a request is lawful. Here you measure how identifying the data still is after you cut it, and you reduce that risk with numbers to show for it.","notes":"Two minutes only. If the room has not taken DS-207, name the three ideas and move on: the Personal Data Protection Law and its Implementing Regulation are the reference, and the General Rules for Secondary Use of Data cover research use. Sources: PDPL and Implementing Regulation (SDAIA); General Rules for Secondary Use of Data (SDAIA).","minutes":null,"lo":["LO1"]},{"id":"three-kinds-of-field","n":9,"title":"Direct identifiers, quasi-identifiers and sensitive attributes","kind":"content","session":1,"hash":"d525ac32","md":"#### [day1#three-kinds-of-field] Direct identifiers, quasi-identifiers and sensitive attributes\n\n*Not every field identifies the same way*\n\n| Kind | What it does | In the Yusr table |\n| --- | --- | --- |\n| **Direct identifier** | Points at one person by itself | national identifier, name, mobile, e-mail, the fund's applicant number |\n| **Quasi-identifier** | Points at one person in combination, and someone outside could know it | birth date, gender, postcode, district, nationality, household size |\n| **Sensitive attribute** | What an attacker wants to learn | income, social security, disability in the household, the fund's decision |\n| **Free text** | Can hold any of the above | the officers' case notes |","notes":"Ask: is the applicant number a direct identifier? Most say no because it is not a name. It is: inside the fund it opens the whole file, and outside it is a key to it. The four tags are the ones of Lab 1.1. Sensitive here is used in the disclosure-control sense (what harms the person if learnt); the PDPL's own list of sensitive data is narrower, so do not equate the two.","minutes":null,"lo":["LO1"]},{"id":"quasi-test","n":10,"title":"Ask who outside the fund could already know the value","kind":"content","session":1,"hash":"df51976b","md":"#### [day1#quasi-test] Ask who outside the fund could already know the value\n\n*How to tell a quasi-identifier*\n\n- A **neighbour** knows the postcode and roughly the household size\n- An **employer** knows the sector and the birth date\n- A **public list** may hold name, birth date, gender and postcode together\n- If an outsider can know it, an outsider can **join on it**\n\n- **Three ordinary fields.** In 1990 United States census data, 87% of people were likely unique on five-digit ZIP code, gender and date of birth.","notes":"The Sweeney figure is the classic one: 216 million of 248 million people. Do not over-read it for Saudi postcodes; Lab 1.4 measures the same thing on the Yusr table, and the result there is even starker. Sources: Sweeney, Simple Demographics Often Identify People Uniquely (2000).","minutes":null,"lo":["LO1"]},{"id":"notes-hold-identifiers","n":11,"title":"Case notes hold identifiers that no column was meant to","kind":"content","session":1,"hash":"2954d0dd","md":"#### [day1#notes-hold-identifiers] Case notes hold identifiers that no column was meant to\n\n*The field everyone forgets*\n\nPrompt for case_note:\n\n```text\nCalled back on 05-SYN-418203 about the lease.\n```\n\nPrompt for case_note:\n\n```text\nSpoke to Hind at the branch; brother handles the file.\n```\n\nPrompt for case_note:\n\n```text\nDuplicate file found under SYN5520147.\n```\n\n**2,470** of 60,000 notes hold a mobile, a national identifier or a first name (Lab 1.1)\n\n> **What goes wrong.** A pipeline drops the identifier columns and keeps the note \"for context\". The extract now carries names and numbers in free text.","notes":"The three examples are the three planted patterns. In Lab 1.1 participants find all 2,470 with two regular expressions and the set of first names in the table. Point out that the safe default for free text is to drop it from an extract; redaction tools such as Presidio exist, but a recall below 100% still leaks.","minutes":null,"lo":["LO1"]},{"id":"minimise-field-by-field","n":12,"title":"Decide each field against the question: keep, drop or transform","kind":"content","session":1,"hash":"043885bf","md":"#### [day1#minimise-field-by-field] Decide each field against the question: keep, drop or transform\n\n*Minimisation in practice*\n\n| Field | Decision | Reason, for the question \"household size, income and approval by region\" |\n| --- | --- | --- |\n| birth date | transform | an age band answers the question |\n| postcode, district | drop | region is the unit of the question |\n| income | transform | bands of 1,000 riyals |\n| applicant number | transform | a study code; the key stays with the data protection officer |\n| case note | drop | free text holds identifiers |\n\nIn the reference solution 8 of 23 fields leave, kept or transformed.","notes":"The decision is per field and every one carries a reason, because the reason is what the data protection officer, Yahya, signs. Participants will disagree about nationality or employment: that is fine if the reason ties to the question. The Lab 1.1 check only enforces that no direct identifier and no free text leaves as it is.","minutes":null,"lo":["LO1"]},{"id":"pseudonym-still-personal","n":13,"title":"A pseudonymised extract is still personal data","kind":"content","session":1,"hash":"693833a7","md":"#### [day1#pseudonym-still-personal] A pseudonymised extract is still personal data\n\n*A code is not anonymity*\n\n- **Pseudonymisation** replaces identifiers with codes; the key is kept apart\n- Whoever holds the key can reverse it; the quasi-identifiers stay\n- SDAIA's anonymisation guideline treats pseudonymised data as personal data and its protection as weaker than anonymisation\n- **Anonymised** data must be irreversible, with the re-identification risk assessed\n\n- **A hash is a code too.** Anyone with a list of national identifiers recomputes the same hashes and finds the rows (Lab 1.1 stretch).","notes":"The guideline names generalisation, aggregation, encryption and masking as example techniques, and asks for an assessment of re-identification potential when data is anonymised. Days 1 and 2 are that assessment, done with numbers. Sources: Personal Data Destruction, Anonymization and Pseudonymisation Guideline, version 1.0 (SDAIA, 2024).","minutes":null,"lo":["LO1"]},{"id":"check-hashed-id","n":14,"title":"Is the hashed extract still personal data?","kind":"quiz","session":1,"hash":"b8727e5e","md":"#### [day1#check-hashed-id] Is the hashed extract still personal data?\n\n*Checkpoint*\n\n**Question:** Malak replaces each national identifier with its SHA-256 hash and removes names. Birth date, gender and postcode stay. Waad says the extract is now anonymous. What do you answer?\n\n- A. Yes: a hash cannot be reversed, so nobody can find the person\n- B. No: the hash is a pseudonym and the quasi-identifiers still single people out\n- C. Yes, as long as it stays on the university's servers\n- D. No, but only because names were in the original table","notes":"Answer B. If many pick A, run the stretch cell of Lab 1.1 on the screen: five identifiers, five hashes, rows found. If many pick C, return to the slide on pseudonyms: the level of protection follows the data, not the server.","minutes":null,"lo":["LO1"]},{"id":"lab-1-1","n":15,"title":"Tag the applicant fields (AI-off)","kind":"lab","session":1,"hash":"5e086bda","md":"#### [day1#lab-1-1] Tag the applicant fields (AI-off)\n\nLab 1.1 · 25 min\n\nTag each applicant field by identifiability and decide what to drop (AI-off).\n\n[D1_1_tag_each_applicant.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D1_1_tag_each_applicant.ipynb)\n\n- [ ] Load the table and list its fields (3 min)\n- [ ] Tag each field by identifiability (8 min)\n- [ ] Find identifiers in the case notes (6 min)\n- [ ] Keep, drop or transform, with a reason (6 min)\n- [ ] Count what the purpose still needs (2 min)\n- [ ] ✱ Stretch: Hash the national identifier and decide whether the hash is still personal data","notes":"AI off for this lab: ask for assistants to be closed. Walk the room during task 2 and challenge one tag per table. Expected results: 5 direct identifiers, 2,470 notes with an identifier (817 mobiles, 829 national identifiers, 824 names), and in the reference decisions 8 of 23 fields leave. The safety nets let a participant who is stuck on task 2 continue to task 3.","minutes":null,"lo":[]},{"id":"s2","n":16,"title":"Classification and permitted use","kind":"section","session":2,"hash":"2347954d","md":"#### [day1#s2] Classification and permitted use\n\n*Session 2*\n\n- Assign a national classification level to an extract from its impact\n- State when an extract may leave the fund under the secondary use rules\n- Match five release controls to their guarantee and their cost","notes":"","minutes":null,"lo":["LO1"]},{"id":"four-levels","n":17,"title":"The level follows the impact of an unauthorised disclosure","kind":"content","session":2,"hash":"562b7641","md":"#### [day1#four-levels] The level follows the impact of an unauthorised disclosure\n\n*The national classification*\n\n| Level | Impact | Typical content |\n| --- | --- | --- |\n| **Top Secret** | high | exceptionally serious, irreparable harm to national interests |\n| **Secret** | medium | serious harm to national interests or major losses |\n| **Restricted** | low | limited harm; the policy's examples include personally identifiable information such as names and identification numbers |\n| **Public** | none | none of the impacts above |\n\nRestricted splits by scale: **A** a whole sector, **B** several entities or a group of individuals, **C** one entity or one individual.","notes":"Recap of DS-207 Session 1.3 in one slide. The point for this course: the level is set by impact, so removing names does not lower it while people can still be singled out. Sources: Data Classification Policy (National Data Management Office, SDAIA).","minutes":null,"lo":["LO1"]},{"id":"three-extracts","n":18,"title":"Three extracts, three levels, three answers to \"may it leave?\"","kind":"content","session":2,"hash":"dcfbe680","md":"#### [day1#three-extracts] Three extracts, three levels, three answers to \"may it leave?\"\n\n*On the fund's analysis server*\n\n- **E1 · Applicant table.** 60,000 rows, 23 fields, names and identifiers. **Restricted B.** Stays inside the fund.\n- **E2 · Research extract.** No names, a study code, birth date and postcode kept. **Restricted B.** Leaves only under conditions.\n- **E3 · Counts.** Approved by district and nationality: 118 cells, the smallest is 2. **Restricted C** until treated.","notes":"These are the levels the reference solution of Lab 1.2 assigns. E3 surprises people: an aggregate is not automatically Public. With a cell of 2, the two approved non-Saudi applicants in a small district can be singled out by anyone who knows one of them applied. Day 2 treats it.","minutes":null,"lo":["LO1"]},{"id":"secondary-use-conditions","n":19,"title":"A research extract leaves under conditions, not because names are gone","kind":"content","session":2,"hash":"e0b18a65","md":"#### [day1#secondary-use-conditions] A research extract leaves under conditions, not because names are gone\n\n*When E2 may leave*\n\n1. **1 · Request** through the researcher's university, with its written approval\n2. **2 · Purpose** research or public interest, not profit\n3. **3 · Minimum** only the fields the purpose needs\n4. **4 · Measured** disclosure risk reduced, then shared under an agreement","notes":"Steps 1 to 3 restate the General Rules for Secondary Use of Data in plain words: a legitimate purpose that serves the public interest or research and excludes profit, data confined to the minimum necessary, and for a researcher a request through the institution with written evidence of approval. Step 4 is the fund's own control and the subject of Day 2. Sources: General Rules for Secondary Use of Data (SDAIA).","minutes":null,"lo":["LO1"]},{"id":"five-controls","n":20,"title":"Five controls, each with a different guarantee and a different cost","kind":"content","session":2,"hash":"31c64460","md":"#### [day1#five-controls] Five controls, each with a different guarantee and a different cost\n\n*The controls a release can use*\n\n| Control | What it guarantees | What it costs |\n| --- | --- | --- |\n| **Pseudonymisation** | nothing outside the key holder; still personal data | almost nothing |\n| **De-identification** | each record hides among at least k on the chosen fields | detail, and rows suppressed |\n| **Aggregation** | no row-level data | no row-level analysis; small cells still leak |\n| **Synthetic data** | no real row, if the generator does not copy | weaker relationships; must be tested |\n| **Differential privacy** | a bound on what any one person changes | noise, and a budget that runs out |","notes":"This table is the backbone of LO1 and of the decision table participants write in task 4 of Lab 1.2. Ask which control gives a guarantee that does not depend on what the attacker knows: only differential privacy. k-anonymity's guarantee holds only for the fields you chose as quasi-identifiers.","minutes":null,"lo":["LO1"]},{"id":"match-control","n":21,"title":"The use decides the control, and the control decides the risk left","kind":"content","session":2,"hash":"2b1f14bb","md":"#### [day1#match-control] The use decides the control, and the control decides the risk left\n\n*Fit the control to the release*\n\n- Follow one applicant over years inside the fund: **pseudonymisation**\n- Row-level records for an approved study: **de-identification**\n- Once-a-year regional counts: **aggregation**\n- A realistic file for a hackathon: **synthetic data**\n- Monthly district counts on a public dashboard: **differential privacy**\n\n- **Residual risk is part of the answer.** The monthly dashboard spends its budget twelve times a year. The hackathon file is only as safe as the generator's leakage test.","notes":"These are the five releases of Lab 1.2 task 4, so do not dwell: participants will write them. The right column is the part most people skip: every control leaves a risk, and the decision table must name it.","minutes":null,"lo":["LO1"]},{"id":"check-control","n":22,"title":"Which control fits the monthly dashboard?","kind":"quiz","session":2,"hash":"c5af3a6c","md":"#### [day1#check-control] Which control fits the monthly dashboard?\n\n*Checkpoint*\n\n**Question:** Bashayer wants applicants per district on a public dashboard, refreshed every month. Some districts have fewer than ten applicants a month. Which control fits best?\n\n- A. Pseudonymise the applicant numbers before counting\n- B. Suppress every count below ten each month\n- C. Publish a synthetic extract instead of counts\n- D. Add calibrated noise under a stated yearly privacy budget","notes":"Answer D. B is the tempting one; it is what many dashboards do. Ask what happens when this month's suppressed cell can be recovered from the regional total minus the other districts. Day 2 Sessions 2 and 3 build exactly this release.","minutes":null,"lo":["LO1"]},{"id":"lab-1-2","n":23,"title":"Classify three extracts","kind":"lab","session":2,"hash":"1ce461ff","md":"#### [day1#lab-1-2] Classify three extracts\n\nLab 1.2 · 25 min\n\nAssign classification levels to three extracts and decide which may leave the fund.\n\n[D1_2_assign_classification_levels.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D1_2_assign_classification_levels.ipynb)\n\n- [ ] Read the three extracts (3 min)\n- [ ] Score the impact and the level of each (7 min)\n- [ ] Decide which may leave the fund, and on what conditions (7 min)\n- [ ] Five releases, five controls: the decision table (8 min)\n- [ ] ✱ Stretch: Rewrite the researcher's request so that it asks for the minimum necessary","notes":"Expected: E1 and E2 Restricted B, E3 Restricted C with a smallest cell of 2. For task 3 accept any set of at least three conditions that includes the minimum necessary. Task 4 has one right control per release; the residual risk is in the participant's words. The decision table is saved to artifacts/lab12/decision_table.csv: tell them it is the LO1 evidence.","minutes":null,"lo":[]},{"id":"s3","n":24,"title":"Linkage attacks","kind":"section","session":3,"hash":"83778551","md":"#### [day1#s3] Linkage attacks\n\n*Session 3*\n\n- Explain how a linkage attack joins a release to an outside file\n- Run a linkage on quasi-identifiers and measure its success\n- Name what a successful link discloses","notes":"","minutes":null,"lo":["LO2"]},{"id":"linkage-attack","n":25,"title":"A linkage attack joins the release to a file that has names","kind":"content","session":3,"hash":"9585af9e","md":"#### [day1#linkage-attack] A linkage attack joins the release to a file that has names\n\n*How a release without names is re-identified*\n\n1. **1 · Release** study code, birth date, gender, postcode, income, decision\n2. **2 · Outside file** name, birth date, gender, postcode\n3. **3 · Join** on the shared fields\n4. **4 · Unique match** a name attached to an income and a decision\n\n> **In the lab.** A synthetic volunteers register published online: 9,000 people, 3,000 of whom applied to the fund.","notes":"The attacker does not need the fund's key, only an outside file that shares quasi-identifiers. Ask the room what such files exist in their world: membership lists, alumni lists, professional registers, social media profiles with a birthday. The register in the lab is invented and its overlap with the applicants is known only through a truth key used for scoring.","minutes":null,"lo":["LO2"]},{"id":"linkage-result","n":26,"title":"Three ordinary fields re-identify 99% of the register's applicants","kind":"content","session":3,"hash":"abac25fe","md":"#### [day1#linkage-result] Three ordinary fields re-identify 99% of the register's applicants\n\n*Lab 1.3, the reference run*\n\n- **3,042** register rows with exactly one match\n- **99.2%** of the 3,000 applicants correctly named\n- **97.8%** of claimed links are right\n\n> **The 66 wrong links harm people too.** Someone who never applied is now believed to be on social security, or declined.","notes":"Numbers from the solution run of Lab 1.3: 2,976 correct of 3,042 claimed links, out of 3,000 applicants in the register. Precision matters: a false link attaches someone else's sensitive values to a real name. Ask how the attacker could know which links are wrong: they cannot, which is why precision is measured with a truth key here and never available in practice.","minutes":null,"lo":["LO2"]},{"id":"what-links-reveal","n":27,"title":"What the 3,042 named records disclose","kind":"content","session":3,"hash":"19dc61c5","md":"#### [day1#what-links-reveal] What the 3,042 named records disclose\n\n*A link is the door, not the harm*\n\n| Item | Value |\n| --- | --- |\n| Declined by the fund | 1,662 |\n| On social security | 420 |\n| Disability in household | 267 |\n\nPlus the exact monthly income of every named person.","notes":"Counts from task 4 of Lab 1.3 on the reference run. Distinguish identity disclosure (this row is Hind) from attribute disclosure (Hind is on social security). The second can happen without the first: Session 4 shows a class of five people who all share the same value.","minutes":null,"lo":["LO2"]},{"id":"coarser-join","n":28,"title":"Coarsening one field cuts the links from 99% to 17%","kind":"content","session":3,"hash":"1e6e5225","md":"#### [day1#coarser-join] Coarsening one field cuts the links from 99% to 17%\n\n*The lever that matters most*\n\n| Join on | Claimed | Correct | Success | Precision |\n| --- | --- | --- | --- | --- |\n| birth date, gender, postcode | 3,042 | 2,976 | 99.2% | 97.8% |\n| birth year, gender, postcode | 1,595 | 506 | 16.9% | 31.7% |\n\n> **Takeaway.** Not zero, and two in three claimed links are now wrong: the attacker can no longer tell which ones to trust. Day 2 finishes the job with a hierarchy and a k.","notes":"From task 5 of Lab 1.3. The birth date carries most of the identifying power because it has about 365 times more values than the year. 16.9% is still far too high for a release; the stretch asks participants to swap postcode for district and see which field does more of the work.","minutes":null,"lo":["LO2"]},{"id":"background-knowledge","n":29,"title":"Assume the attacker knows someone who applied","kind":"content","session":3,"hash":"cdada861","md":"#### [day1#background-knowledge] Assume the attacker knows someone who applied\n\n*Who the attacker is*\n\n- **Prosecutor.** Knows a specific person is in the release and looks for their row.\n- **Journalist.** Has an outside file and links whoever links; does not know who applied.\n- **Insider.** A relative or colleague who knows exact values: birth date, household size, sector.","notes":"Lab 1.3 played the journalist. The prosecutor is stronger: they already know the person is in the release, so a unique record is a certain hit. Lab 1.4's average risk (one over the class size) is the prosecutor's chance. Plan for the insider when you choose quasi-identifiers: anything a relative knows is a quasi-identifier.","minutes":null,"lo":["LO2"]},{"id":"check-which-field","n":30,"title":"Which change stops most of the links?","kind":"quiz","session":3,"hash":"e31e9112","md":"#### [day1#check-which-field] Which change stops most of the links?\n\n*Checkpoint*\n\n**Question:** Release A links 99% of the register's applicants on birth date, gender and postcode. Waad needs household size and approval by region. Which single change cuts the links most while keeping her question answerable?\n\n- A. Replace the birth date with an age band\n- B. Remove gender\n- C. Replace the study code with a new random code\n- D. Round income to the nearest 1,000 riyals","notes":"Answer A. D is tempting because income feels identifying; it is what the attacker learns, not what they join on. If several pick B, ask how many values gender has against how many values a birth date has.","minutes":null,"lo":["LO2"]},{"id":"lab-1-3","n":31,"title":"Link the release to the register","kind":"lab","session":3,"hash":"1c14c9c2","md":"#### [day1#lab-1-3] Link the release to the register\n\nLab 1.3 · 25 min\n\nRe-identify applicants by linking a release to a synthetic public register.\n\n[D1_3_re_identify_applicants.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D1_3_re_identify_applicants.ipynb)\n\n- [ ] Load the release and the register (3 min)\n- [ ] Join on birth date, gender and postcode (7 min)\n- [ ] Keep unique matches and score them against the truth key (7 min)\n- [ ] What the links reveal (5 min)\n- [ ] Try a coarser join (3 min)\n- [ ] ✱ Stretch: Link on the district in place of the postcode and compare the success","notes":"Expected on the reference run: 3,042 claimed links, 2,976 correct, success 0.992, precision 0.978; with the birth year 1,595 claimed, 506 correct, success 0.169. Common error: counting links from the release side instead of the register side, or forgetting to require exactly one match. The truth key is in data/reference: remind participants it is for scoring, an attacker never has it.","minutes":null,"lo":[]},{"id":"s4","n":32,"title":"Measuring disclosure risk","kind":"section","session":4,"hash":"129630ea","md":"#### [day1#s4] Measuring disclosure risk\n\n*Session 4*\n\n- Compute equivalence classes, uniqueness and k for a release\n- Compare candidate releases by record-level risk\n- Explain why k alone misses attribute disclosure","notes":"","minutes":null,"lo":["LO2"]},{"id":"equivalence-class","n":33,"title":"An equivalence class is everyone who looks the same on the quasi-identifiers","kind":"content","session":4,"hash":"1369aba6","md":"#### [day1#equivalence-class] An equivalence class is everyone who looks the same on the quasi-identifiers\n\n*Risk without an outside file*\n\n| age band | gender | region | nationality | class size |\n| --- | --- | --- | --- | --- |\n| 31-40 | F | Riyadh | Saudi | 1,410 |\n| 41-50 | M | Tabuk | Saudi | 409 |\n| 51-60 | F | Al-Jouf | Non-Saudi | 1 |\n\n- The **class size** is how many people a record hides among\n- A class of 1 is a **unique** record\n- The release's **k** is its smallest class","notes":"The highlighted row is one of the seven unique records of release C in Lab 1.4. The two larger class sizes are real too (1,410 and 409 records). A class is defined only by the fields you declared quasi-identifiers: choose them by the outsider test of Session 1.","minutes":null,"lo":["LO2"]},{"id":"three-releases-risk","n":34,"title":"The same 60,000 people, three very different risks","kind":"content","session":4,"hash":"78ecaf4f","md":"#### [day1#three-releases-risk] The same 60,000 people, three very different risks\n\n*Lab 1.4, the reference run*\n\n| Release | Quasi-identifiers | Unique | Below 5 | Average risk |\n| --- | --- | --- | --- | --- |\n| A | birth date, gender, postcode | 59,458 | 100% | 0.996 |\n| B | birth year, gender, district, nationality | 2,152 | 14.3% | 0.129 |\n| C | age band, gender, region, nationality | 7 | 0.1% | 0.004 |\n\nAll three have k = 1.","notes":"From Lab 1.4. Release A is worse than Sweeney's census finding: 99.1% unique, because a fund's applicants are a small population spread over many postcodes. The punchline is the last line: k alone says all three are equally bad. Read unique, below five and average risk together.","minutes":null,"lo":["LO2"]},{"id":"k-is-a-floor","n":35,"title":"k is a floor for the most exposed person, not an average","kind":"content","session":4,"hash":"8adcde9b","md":"#### [day1#k-is-a-floor] k is a floor for the most exposed person, not an average\n\n*What k tells you*\n\n- **k = 5**: every record hides among at least five\n- One unique record makes k = 1 for the whole release\n- Report k with the **share below the target** and the **average risk**\n- The fund's target in this course: **k of at least 5**\n\n- **Average risk.** The mean of one over the class size: the chance that a prosecutor picks the right record. Release C: 0.004. Its maximum is still 1.","notes":"Why five? It is a common choice, not a law. Write the target and its reason in the release log; Day 4's datasheet asks for it. Some organisations use 10 for health data. The threshold matters less than measuring and reporting it honestly.","minutes":null,"lo":["LO2"]},{"id":"attribute-disclosure","n":36,"title":"A class of five that all share one value discloses it to anyone who finds the class","kind":"content","session":4,"hash":"10caeaa6","md":"#### [day1#attribute-disclosure] A class of five that all share one value discloses it to anyone who finds the class\n\n*When k is met and the harm happens anyway*\n\n- **Homogeneity.** In release B, 661 of 3,241 classes of five or more have a single social security value (Lab 1.4 stretch).\n- **l-diversity.** Ask every class to hold at least l different values of the sensitive attribute. A partial fix: two values can still be \"yes\" and \"almost yes\".","notes":"This is the limit of k-anonymity that the topic list asks for. The stronger notion, t-closeness, asks each class's distribution of the sensitive value to be close to the whole table's; mention it by name only. Differential privacy (Day 2) is the answer that does not depend on which fields you thought of.","minutes":null,"lo":["LO2"]},{"id":"tools-for-risk","n":37,"title":"Write it in pandas to see the mechanism, then use a tool for the release","kind":"content","session":4,"hash":"59407fdd","md":"#### [day1#tools-for-risk] Write it in pandas to see the mechanism, then use a tool for the release\n\n*Tools for disclosure risk*\n\n```python\n# file: python\nsizes = df.groupby(qi)[qi[0]].transform(\"size\")\nunique   = (sizes == 1).sum()\nk        = sizes.min()\nbelow_5  = (sizes \u003c 5).mean()\navg_risk = (1 / sizes).mean()\n```\n\n- **ARX.** A desktop and Java tool: hierarchies, k, l, t, risk models and utility.\n- **sdcMicro.** An R package for statistical disclosure control with risk and utility measures.","notes":"Five lines are the whole of Lab 1.4's computation. The tools are interchangeable examples of the capability slot \"de-identification and disclosure risk\"; both were checked on their official pages this month (ARX site; sdcMicro 5.8.2 on CRAN). Sources: ARX data anonymization tool; sdcMicro on CRAN.","minutes":null,"lo":["LO2"]},{"id":"check-k","n":38,"title":"Which release is safer?","kind":"quiz","session":4,"hash":"2f51f538","md":"#### [day1#check-k] Which release is safer?\n\n*Checkpoint*\n\n**Question:** Release B and release C both have k = 1. B has 2,152 unique records and C has 7. Yahya asks whether they are equally risky. What do you tell him?\n\n- A. Yes: both have k = 1, so both expose someone\n- B. B is safer because its birth year and district are more precise\n- C. C is far safer, but neither meets k of five until the small classes are treated\n- D. C is safe to release as it is, since seven records is negligible","notes":"Answer C. D is the dangerous one: say aloud that the seven are real people in the scenario, mostly non-Saudi applicants in small regions, and that a release target applies to everyone.","minutes":null,"lo":["LO2"]},{"id":"lab-1-4","n":39,"title":"Uniqueness and k for three releases","kind":"lab","session":4,"hash":"81157ed9","md":"#### [day1#lab-1-4] Uniqueness and k for three releases\n\nLab 1.4 · 25 min\n\nCompute unique quasi-identifier combinations and k for three candidate releases.\n\n[D1_4_compute_unique_quasi.ipynb](https://sdaiaacademy.github.io/ds-309/labs/D1_4_compute_unique_quasi.ipynb)\n\n- [ ] Build the three candidate releases (5 min)\n- [ ] Equivalence class sizes (6 min)\n- [ ] Unique records, k and records below five (7 min)\n- [ ] Average re-identification risk (4 min)\n- [ ] Pick the release to treat (3 min)\n- [ ] ✱ Stretch: Measure the l-diversity of social security status in release B","notes":"Expected: unique 59,458 / 2,152 / 7; below five 100% / 14.3% / 0.1%; k = 1 for all; average risk 0.996 / 0.129 / 0.004. The cell that prints C's unique records shows seven non-Saudi applicants in small regions: point at it, it is the reason Day 3 also worries about small groups. Stretch: 661 of 3,241 classes uniform on social security.","minutes":null,"lo":[]},{"id":"wrap-up","n":40,"title":"Find the personal data, then measure how identifying it still is","kind":"content","session":4,"hash":"ca74725c","md":"#### [day1#wrap-up] Find the personal data, then measure how identifying it still is\n\n*Day 1 · Three things to keep*\n\n- **Fields are not equal.** Direct identifiers, quasi-identifiers, sensitive attributes and free text each need a different decision.\n- **No names is not anonymous.** Three ordinary fields linked 99% of the register's applicants to their income and decision.\n- **Report risk with numbers.** Unique records, k, the share below five and the average risk, together.","notes":"Ask each table for the one number from today they would show Yahya. Most will pick 99.2%. Close by noting that every release so far fails the target: Day 2 fixes that and measures what the fix costs.","minutes":null,"lo":[]},{"id":"next","n":41,"title":"Release with less risk","kind":"content","session":4,"hash":"d4fb24bf","md":"#### [day1#next] Release with less risk\n\n*Tomorrow · Day 2*\n\n- Treat release A to k of at least five and measure what the analysis loses\n- Publish district counts with differential privacy, at three budgets\n- Split one budget over four queries, then test a synthetic extract for leakage\n- Before tomorrow: rerun Lab 1.4 if it did not finish; Lab 2.1 starts from the supplied release","notes":"No preparation is required beyond a working environment. Remind participants that every Day 2 lab starts from supplied files.","minutes":null,"lo":[]}],"activities":[{"id":"check-hashed-id-q1","slide":"check-hashed-id","type":"single","prompt":"Malak replaces each national identifier with its SHA-256 hash and removes names. Birth date, gender and postcode stay. Waad says the extract is now anonymous. What do you answer?","options":[{"key":"A","text":"Yes: a hash cannot be reversed, so nobody can find the person"},{"key":"B","text":"No: the hash is a pseudonym and the quasi-identifiers still single people out"},{"key":"C","text":"Yes, as long as it stays on the university's servers"},{"key":"D","text":"No, but only because names were in the original table"}],"correct":[1],"explanation":"Hashing is pseudonymisation: recomputable by anyone with the identifiers, and it leaves birth date, gender and postcode, which together are unique for almost every applicant.","misconceptions":["Treats a one-way function as a missing key: anyone with the list of identifiers recomputes the same hashes","","Confuses who holds the data with what the data is: the extract identifies people wherever it sits","Thinks names are the only identifier: birth date, gender and postcode do the identifying here"],"lo":["LO1"]},{"id":"check-control-q1","slide":"check-control","type":"single","prompt":"Bashayer wants applicants per district on a public dashboard, refreshed every month. Some districts have fewer than ten applicants a month. Which control fits best?","options":[{"key":"A","text":"Pseudonymise the applicant numbers before counting"},{"key":"B","text":"Suppress every count below ten each month"},{"key":"C","text":"Publish a synthetic extract instead of counts"},{"key":"D","text":"Add calibrated noise under a stated yearly privacy budget"}],"correct":[3],"explanation":"Differential privacy bounds what any one applicant changes in every release, and the budget makes the cost of monthly repetition explicit.","misconceptions":["Thinks a code protects published numbers: pseudonymisation applies to rows, not to counts","Assumes suppression is free when repeated: monthly tables with suppressed cells can be differenced against each other","Uses a row-level control for an aggregate need, and gives up the counts the dashboard is for",""],"lo":["LO1"]},{"id":"check-which-field-q1","slide":"check-which-field","type":"single","prompt":"Release A links 99% of the register's applicants on birth date, gender and postcode. Waad needs household size and approval by region. Which single change cuts the links most while keeping her question answerable?","options":[{"key":"A","text":"Replace the birth date with an age band"},{"key":"B","text":"Remove gender"},{"key":"C","text":"Replace the study code with a new random code"},{"key":"D","text":"Round income to the nearest 1,000 riyals"}],"correct":[0],"explanation":"The birth date has by far the most values of the three fields; coarsening it collapses the combinations, and the question needs only an age band.","misconceptions":["","Removes a field that has only two values: gender splits each class in half and barely changes uniqueness","Thinks the code is what links: the study code was never part of the join","Protects a sensitive attribute, not an identifier: linkage uses the quasi-identifiers, not the income"],"lo":["LO2"]},{"id":"check-k-q1","slide":"check-k","type":"single","prompt":"Release B and release C both have k = 1. B has 2,152 unique records and C has 7. Yahya asks whether they are equally risky. What do you tell him?","options":[{"key":"A","text":"Yes: both have k = 1, so both expose someone"},{"key":"B","text":"B is safer because its birth year and district are more precise"},{"key":"C","text":"C is far safer, but neither meets k of five until the small classes are treated"},{"key":"D","text":"C is safe to release as it is, since seven records is negligible"}],"correct":[2],"explanation":"k reports only the worst class. The count of unique records and the average risk show that C exposes 7 people and B exposes 2,152, yet both still fail the target.","misconceptions":["Reads k as the whole story: k is only the smallest class, so it hides how many people are exposed","Confuses detail kept for the analysis with protection: finer birth and place values split classes and raise the risk","","Treats seven people as negligible: each of them is certainly re-identified by anyone who knows them"],"lo":["LO2"]}],"ai":{"context":{"course":"../context/course.md","courseJs":"../context/course.js","day":"day1.md","llms":"../llms.txt"},"tasks":[],"tools":[]},"bridge":{"allowedOrigins":[]},"features":{},"strings":{}}</script>
+<script src="../_engine/academy.js"></script>
+</body>
+</html>

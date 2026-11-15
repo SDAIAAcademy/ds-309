@@ -1,0 +1,38 @@
+{
+ "R1": {
+  "likelihood": 3,
+  "impact": 3,
+  "why": "Public lists share birth date, gender and postcode, and the untreated extract linked 99.2% of the register's applicants.",
+  "treatment": "mitigate",
+  "control": "k of five with region and five-year bands, a sharing agreement banning linkage, destruction after 24 months",
+  "residual_likelihood": 1,
+  "residual_impact": 3
+ },
+ "R2": {
+  "likelihood": 4,
+  "impact": 3,
+  "why": "Measured now: 30% of eligible non-Saudi women and 65% of eligible self-employed applicants are declined by the screen.",
+  "treatment": "mitigate",
+  "control": "officer review of every decline, verified net income for the self-employed, group thresholds if approved",
+  "residual_likelihood": 2,
+  "residual_impact": 3
+ },
+ "R3": {
+  "likelihood": 3,
+  "impact": 2,
+  "why": "Monthly refreshes are already requested and small districts carry a 3.1% error at epsilon 0.5.",
+  "treatment": "mitigate",
+  "control": "a yearly budget ledger signed by the data protection officer, and error margins printed on the dashboard",
+  "residual_likelihood": 2,
+  "residual_impact": 2
+ },
+ "R4": {
+  "likelihood": 2,
+  "impact": 3,
+  "why": "Only a regeneration with a different setting copies rows, and the leaf-one setting copied 92.8% of them.",
+  "treatment": "mitigate",
+  "control": "the leakage tests of Lab 2.4 as a release gate for every regeneration",
+  "residual_likelihood": 1,
+  "residual_impact": 3
+ }
+}

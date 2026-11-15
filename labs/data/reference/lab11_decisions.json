@@ -1,0 +1,94 @@
+{
+ "applicant_id": [
+  "transform",
+  "replace with a study code; the key stays with the data protection officer"
+ ],
+ "national_id": [
+  "drop",
+  "not needed for the purpose"
+ ],
+ "full_name": [
+  "drop",
+  "not needed for the purpose"
+ ],
+ "mobile": [
+  "drop",
+  "not needed for the purpose"
+ ],
+ "email": [
+  "drop",
+  "not needed for the purpose"
+ ],
+ "birth_date": [
+  "transform",
+  "age band is enough for the purpose"
+ ],
+ "gender": [
+  "keep",
+  "needed to read approval by group"
+ ],
+ "nationality": [
+  "drop",
+  "not part of the question"
+ ],
+ "marital_status": [
+  "drop",
+  "not part of the question"
+ ],
+ "region": [
+  "keep",
+  "the question is by region"
+ ],
+ "district": [
+  "drop",
+  "region is the unit of the question"
+ ],
+ "postcode": [
+  "drop",
+  "region is the unit of the question"
+ ],
+ "household_size": [
+  "keep",
+  "named in the question"
+ ],
+ "employment": [
+  "drop",
+  "not part of the question"
+ ],
+ "monthly_income_sar": [
+  "transform",
+  "income band of 1,000 riyals"
+ ],
+ "disability_in_household": [
+  "drop",
+  "not part of the question"
+ ],
+ "social_security": [
+  "drop",
+  "not part of the question"
+ ],
+ "tenure": [
+  "drop",
+  "not part of the question"
+ ],
+ "monthly_rent_sar": [
+  "drop",
+  "not part of the question"
+ ],
+ "application_date": [
+  "transform",
+  "year of application only"
+ ],
+ "office": [
+  "drop",
+  "region already says it"
+ ],
+ "officer_decision": [
+  "keep",
+  "the outcome of the question"
+ ],
+ "case_note": [
+  "drop",
+  "free text holds identifiers"
+ ]
+}

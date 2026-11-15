@@ -1,0 +1,7 @@
+{
+  "model": "Tarjih 2.0",
+  "threshold": 0.5,
+  "trained_on": "officer decisions, 2024 to 2026",
+  "accuracy_vs_officers": 0.861,
+  "note": "missing aptitude scores are filled with 0 before scoring"
+}

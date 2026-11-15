@@ -1,0 +1,27 @@
+{
+ "__frame__": {
+  "columns": [
+   "after",
+   "before"
+  ],
+  "index": [
+   "family_home",
+   "other",
+   "renting"
+  ],
+  "data": [
+   [
+    0.492,
+    0.221
+   ],
+   [
+    0.493,
+    0.475
+   ],
+   [
+    0.486,
+    0.49
+   ]
+  ]
+ }
+}

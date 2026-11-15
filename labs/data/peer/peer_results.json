@@ -1,0 +1,9 @@
+{
+  "author": "a participant of an earlier cohort",
+  "claim": "Ahliya misses eligible men more often than eligible women",
+  "fnr_women": 0.157,
+  "fnr_men": 0.186,
+  "gap": -0.029,
+  "interval": "bootstrap, 200 resamples",
+  "data": "data/ahliya_scored_test.csv"
+}
