@@ -163,3 +163,47 @@ try:
     _pd.set_option("display.max_columns", 20)
 except ImportError:
     pass
+
+
+# Ahliya, the eligibility screening model (the same pipeline the generator trained)
+AHLIYA_NUM = ["log_income", "income_missing", "per_capita", "household_size", "age", "monthly_rent_sar"]
+AHLIYA_CAT = ["tenure", "employment", "region", "marital_status", "disability_in_household", "social_security"]
+
+
+AGE_MID = {"21-30": 26, "31-40": 36, "41-50": 46, "51-60": 56, "61+": 66}
+
+
+def age_band(birth_date):
+    import pandas as pd
+    age = 2026 - pd.to_datetime(birth_date).dt.year
+    return pd.cut(age, [0, 30, 40, 50, 60, 120], labels=list(AGE_MID)).astype(str)
+
+
+def ahliya_frame(df, banded: bool = False):
+    """The model's features. With banded=True (or without birth_date) age is the middle of the age band."""
+    import numpy as np
+    x = df.copy()
+    if banded or "birth_date" not in x:
+        band = x["age_band"] if "age_band" in x else age_band(x["birth_date"])
+        x["birth_date"] = None
+        x["_age"] = band.map(AGE_MID)
+    inc = x["monthly_income_sar"]
+    x["income_missing"] = inc.isna().astype(int)
+    fill = inc.fillna(7000)
+    x["log_income"] = np.log1p(fill)
+    x["per_capita"] = fill / x["household_size"]
+    if "_age" in x:
+        x["age"] = x["_age"]
+    else:
+        x["age"] = 2026 - __import__("pandas").to_datetime(x["birth_date"]).dt.year
+    return x[AHLIYA_NUM + AHLIYA_CAT]
+
+
+def ahliya_model():
+    from sklearn.compose import ColumnTransformer
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+    pre = ColumnTransformer([("num", StandardScaler(), AHLIYA_NUM),
+                             ("cat", OneHotEncoder(handle_unknown="ignore"), AHLIYA_CAT)])
+    return make_pipeline(pre, LogisticRegression(max_iter=2000, C=1.0))

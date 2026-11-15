@@ -1,158 +1,427 @@
+<!-- ======================= OPENING ======================= -->
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Day 3 moves from the data to the model's decisions. The reference state changes: 12,000 applications that Ahliya scored and that a full review then settled, so for once we know who was really eligible. Start with the review checkpoint on Day 2.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-auto="agenda"></section>
 
-<!-- Session 1 -->
-
-<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
-
-<section class="slide" id="s1-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="review-day2" data-lo="LO3">
+  <div class="kicker">Review of Day 2</div>
+  <h2>A monthly dashboard at epsilon 0.5: what is spent in a year?</h2>
+  <div class="quiz" data-type="single" data-lo="LO3">
+    <p class="lead">Bashayer approves the district counts at epsilon 0.5 and asks for them every month. Yahya asks what the fund will have spent after a year.</p>
+    <div class="opts">
+      <div class="opt" data-why="Applies parallel composition across months: the months are about the same applicants, so the epsilons add">0.5, because each month is a separate table</div>
+      <div class="opt" data-ok>6, because the same applicants are counted twelve times</div>
+      <div class="opt" data-why="Thinks post-processing covers new releases: each month is a new measurement on the data, not a computation on last month's output">0.5, because later months are post-processing</div>
+      <div class="opt" data-why="Divides instead of adding: splitting a budget into months is a choice, not what happens by default">About 0.04, a twelfth of 0.5</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Sequential composition: twelve releases about the same people spend twelve times 0.5.</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Answer B. If the room is split, return to the Lab 2.3 stretch: one yearly budget spread over twelve releases makes each one far noisier.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
+
+<section class="slide" id="two-errors" data-lo="LO5" data-label="Two errors">
+  <div class="kicker">What an audit counts</div>
+  <h2>For a support decision, the two errors do different harm</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>False negative</h4><p class="small mb0">An eligible applicant declined by Ahliya. The harm the fund exists to prevent. <b>FNR</b> = missed eligible / all eligible.</p></div>
+    <div class="card c-amber"><h4>False positive</h4><p class="small mb0">Support passed to someone not eligible. A cost to the fund, caught later by an officer. <b>FPR</b> = wrongly passed / all not eligible.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <p class="small mt">In the reference data: 12,000 reviewed applications, 6,341 eligible, 5,280 passed by Ahliya at a threshold of 0.5.</p>
+  <aside class="notes"><p>The reviewed outcome is the audit's ground truth: in practice a reviewed sample is expensive, which is why audits run on samples. Ask the room which error Bashayer would rather reduce; most will say false negatives. Keep that answer: it decides Session 2's criterion.</p></aside>
+</section>
+
+<section class="slide" id="recap-intervals" data-lo="LO5" data-label="Intervals">
+  <div class="kicker">Recap from DS-204 and DS-207</div>
+  <h2>Every rate gets an interval, and small groups get wide ones</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>A rate from 2,413 eligible women is precise</li>
+      <li>A rate from 4 eligible applicants is a guess</li>
+      <li>The <b>Wilson interval</b> stays inside 0 to 1 and behaves for small counts</li>
+      <li>Report the count beside every rate</li>
+    </ul>
+    <div class="card c-teal"><h4>Same 50% rate</h4><p class="small mb0">From 200 eligible: 43% to 57%. From 4 eligible: 15% to 85%.</p></div>
+  </div>
+  <aside class="notes"><p>One slide only: the prerequisites taught intervals. The two example intervals are computed with the Wilson formula in yusr.py (U.wilson). The point for today is the small intersections in Lab 3.1, task 4.</p></aside>
+</section>
+
+<section class="slide" id="by-gender" data-lo="LO5" data-label="By gender">
+  <div class="kicker">Lab 3.1, the reference run</div>
+  <h2>By gender alone, Ahliya misses eligible women and men at the same rate</h2>
+  <table class="t small">
+    <tr><th>Group</th><th class="num">Eligible</th><th class="num">FNR</th><th class="num">95% interval</th><th class="num">FPR</th></tr>
+    <tr><td>Women</td><td class="num">2,413</td><td class="num">22.7%</td><td class="num">21.0 to 24.4</td><td class="num">9.6%</td></tr>
+    <tr><td>Men</td><td class="num">3,928</td><td class="num">22.8%</td><td class="num">21.6 to 24.2</td><td class="num">5.6%</td></tr>
+    <tr><td>Non-Saudi</td><td class="num">511</td><td class="num">28.6%</td><td class="num">24.8 to 32.6</td><td class="num">6.5%</td></tr>
+    <tr><td>Saudi</td><td class="num">5,830</td><td class="num">22.3%</td><td class="num">21.2 to 23.4</td><td class="num">6.8%</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 3.1. Gender looks even on FNR; women have a higher FPR, which Session 2 explains through base rates. Nationality shows a gap whose intervals do not overlap. Hold the region table for Session 3: Qassim's FNR is 31.6% (26.4 to 37.2), the highest.</p></aside>
+</section>
+
+<section class="slide" id="intersection" data-lo="LO5" data-label="Intersection">
+  <div class="kicker">Slice by two attributes at once</div>
+  <h2>Non-Saudi women are missed most, and gender alone hides it</h2>
+  <div class="bars">
+    <div class="row"><span>Women, non-Saudi</span><div class="bar c-coral" style="--w:100%"></div><span class="val">29.8%</span></div>
+    <div class="row"><span>Men, non-Saudi</span><div class="bar c-amber" style="--w:90%"></div><span class="val">26.9%</span></div>
+    <div class="row"><span>Men, Saudi</span><div class="bar c-teal" style="--w:76%"></div><span class="val">22.6%</span></div>
+    <div class="row"><span>Women, Saudi</span><div class="bar c-teal" style="--w:73%"></div><span class="val">21.7%</span></div>
+  </div>
+  <p class="small mt">False negative rate. Non-Saudi women: 295 eligible, interval 24.9% to 35.3%.</p>
+  <aside class="notes"><p>From Lab 3.1, task 3. The planted cause, which Session 3 uncovers: income is missing far more often for non-Saudi women, and the model learnt from officers that a missing income usually meant a decline. A gap inside an intersection can be invisible in both margins; here the gender margin shows none at all.</p></aside>
+</section>
+
+<section class="slide" id="small-cells" data-lo="LO5" data-label="Small cells">
+  <div class="kicker">How far to slice</div>
+  <h2>Each extra attribute splits the data until the rates mean nothing</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">23 of 52</div><div class="lbl">region by gender by nationality cells with fewer than 30 eligible applicants</div></div>
+    <div class="card c-coral"><h4>Al-Jouf, non-Saudi women</h4><p class="small mb0">4 eligible, 3 missed: FNR 75%, interval 30% to 95%. Report "too few to estimate (4)", not 75%.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> Fifty-two cells, one of them extreme by chance, and a headline about Al-Jouf. Many comparisons produce false alarms; small cells produce loud ones.</div>
+  <aside class="notes"><p>The minimum of 30 eligible applicants is a reporting rule for this course, not a law; write yours into the audit's method section. This is also what the bias guide calls sample size bias: a sample too small to support the conclusion drawn from it.</p></aside>
+</section>
+
+<section class="slide" id="finding-sentence" data-lo="LO5" data-label="Write it">
+  <div class="kicker">Reporting a finding</div>
+  <h2>One sentence: the group, the rate, the interval, the comparison, the limit</h2>
+  <div class="prompt" data-tool="Audit report, finding 1">Ahliya declines 30% of eligible non-Saudi women (95% interval 25% to 35%) against 22% of all other eligible applicants; gender alone shows no gap, so the margins understate it.</div>
+  <div class="cols cols-3 gap-s mt">
+    <div class="card c-teal flat"><h4>Rate and interval</h4><p class="small mb0">Never a bare percentage.</p></div>
+    <div class="card c-cyan flat"><h4>Against whom</h4><p class="small mb0">The comparison group is named.</p></div>
+    <div class="card c-purple flat"><h4>What is not claimed</h4><p class="small mb0">No cause yet: that is Session 3.</p></div>
+  </div>
+  <aside class="notes"><p>The sentence is printed by Lab 3.1 from the participant's own numbers. The LO5 evidence is an audit report with disaggregated error rates, intervals and a recommendation; these sentences are its findings section.</p></aside>
+</section>
+
+<section class="slide" id="calibration-pointer" data-lo="LO5" data-label="Not today">
+  <div class="kicker">What this audit does not cover</div>
+  <h2>Calibration by group and explanations are DS-305</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Today: errors at the decision threshold, by group</li>
+      <li>Not today: whether a score of 0.7 means the same chance for every group (calibration)</li>
+      <li>Not today: why a particular applicant was scored low (explanation)</li>
+    </ul>
+    <div class="card c-purple"><h4>Next course</h4><p class="small mb0">DS-305 Uncertainty, Interpretability and Model Validation takes both further.</p></div>
+  </div>
+  <aside class="notes"><p>The catalog entry assigns calibration and explanation to DS-305, so answer questions briefly and point there. Predictive parity, which appears in Session 2, is the threshold-level cousin of calibration.</p></aside>
+</section>
+
+<section class="slide" id="check-interval" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>What can the audit say about Hail?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Hail has an FNR of 18.2% from 110 eligible applicants, interval 12.1% to 26.4%. The national FNR is 22.7%. Wiam asks whether Ahliya treats Hail's applicants better.</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads a point estimate without its interval: the interval includes the national rate">Yes: 18.2% is lower than 22.7%, so Hail is treated better</div>
+      <div class="opt" data-why="Treats a wide interval as no information: it still rules out very high or very low rates">Nothing at all, since 110 applicants is too few to compute a rate</div>
+      <div class="opt" data-ok>No difference is shown: the interval includes the national rate</div>
+      <div class="opt" data-why="Confuses a smaller group with a worse outcome: size widens the interval, it does not move the rate">No: small regions are always disadvantaged by the model</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The interval from 12.1% to 26.4% contains 22.7%, so the data do not show that Hail differs.</div>
+  </div>
+  <aside class="notes"><p>Answer C. 110 eligible applicants is above the course's minimum of 30, so a rate is reported, with its interval. B is the overcorrection some participants make after the small-cells slide.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-1" data-auto="lab" data-lab="3.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected: FNR women 0.227, men 0.228; non-Saudi 0.286; Qassim 0.316; intersection non-Saudi women 0.298 (0.249 to 0.353); 52 cells, 23 below 30 eligible. Common error: computing FNR over all applicants instead of the eligible. The stretch shows Fairlearn's MetricFrame giving the same table in four lines.</p></aside>
 </section>
 
-<!-- Session 2 -->
-
+<!-- ======================= SESSION 2 ======================= -->
 <section class="slide section" id="s2" data-auto="section" data-session="2"></section>
 
-<section class="slide" id="s2-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
-  </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+<section class="slide" id="three-criteria" data-lo="LO5" data-label="Three criteria">
+  <div class="kicker">What "fair" can mean</div>
+  <h2>Three criteria, each reasonable, each equalising something different</h2>
+  <table class="t small">
+    <tr><th>Criterion</th><th>Equal across groups</th><th>Plain words</th></tr>
+    <tr><td><b>Demographic parity</b></td><td>selection rate</td><td>pass the same share of each group</td></tr>
+    <tr><td><b>Equal opportunity</b></td><td>false negative rate</td><td>miss eligible people equally often</td></tr>
+    <tr><td><b>Equalised odds</b></td><td>false negative and false positive rates</td><td>both errors equal</td></tr>
+    <tr><td><b>Predictive parity</b></td><td>precision</td><td>a pass is equally reliable for each group</td></tr>
+  </table>
+  <aside class="notes"><p>Equal opportunity is the name Hardt, Price and Srebro gave to equal true positive rates, which is the same as equal false negative rates. Sources: Hardt, Price and Srebro, Equality of Opportunity in Supervised Learning.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="base-rates-differ" data-lo="LO5" data-label="Base rates">
+  <div class="kicker">The fact that forces a choice</div>
+  <h2>Eligibility is more common among women applicants than among men</h2>
+  <div class="cols cols-2">
+    <div class="bars">
+      <div class="row"><span>Women</span><div class="bar c-coral" style="--w:60%"></div><span class="val">59.7%</span></div>
+      <div class="row"><span>Men</span><div class="bar c-teal" style="--w:49%"></div><span class="val">49.3%</span></div>
+    </div>
+    <ul class="bullets">
+      <li>Share eligible after full review (Lab 3.2)</li>
+      <li>Women applicants are more often heads of lower-income households in this data</li>
+      <li>When base rates differ, a model that is not perfect cannot satisfy all criteria at once</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>The impossibility result: with different base rates and an imperfect classifier, calibration-type criteria and error-rate criteria cannot all hold. Do not prove it; Lab 3.2 shows it on the data in eight minutes. Sources: Kleinberg, Mullainathan and Raghavan, Inherent Trade-Offs in the Fair Determination of Risk Scores.</p></aside>
+</section>
+
+<section class="slide" id="at-one-threshold" data-lo="LO5" data-label="One threshold">
+  <div class="kicker">Lab 3.2, the reference run</div>
+  <h2>At one threshold, misses are equal and selection is not</h2>
+  <table class="t small">
+    <tr><th>Threshold 0.5 for all</th><th class="num">Selection</th><th class="num">FNR</th><th class="num">Precision</th></tr>
+    <tr><td>Women</td><td class="num">50.1%</td><td class="num">22.7%</td><td class="num">92.3%</td></tr>
+    <tr><td>Men</td><td class="num">40.9%</td><td class="num">22.8%</td><td class="num">93.0%</td></tr>
+    <tr class="hl"><td>Gap</td><td class="num">+9.1 pts</td><td class="num">-0.2 pts</td><td class="num">-0.8 pts</td></tr>
+  </table>
+  <p class="small mt-s">Equal opportunity holds almost exactly; demographic parity does not.</p>
+  <aside class="notes"><p>Someone will say the 9-point selection gap is discrimination against men. Ask: is it, when 10 points more of the women are eligible? The gap in selection follows the gap in need. That is the argument the next slide makes with numbers.</p></aside>
+</section>
+
+<section class="slide" id="force-parity" data-lo="LO5" data-label="Force parity">
+  <div class="kicker">Force demographic parity</div>
+  <h2>Equal selection makes Ahliya miss eligible women far more often</h2>
+  <table class="t small">
+    <tr><th>Equal selection (thresholds 0.620 and 0.432)</th><th class="num">Selection</th><th class="num">FNR</th><th class="num">Precision</th></tr>
+    <tr><td>Women</td><td class="num">44.0%</td><td class="num">30.9%</td><td class="num">93.8%</td></tr>
+    <tr><td>Men</td><td class="num">44.0%</td><td class="num">18.5%</td><td class="num">91.4%</td></tr>
+    <tr class="hl"><td>Gap</td><td class="num">0</td><td class="num">+12.4 pts</td><td class="num">+2.4 pts</td></tr>
+  </table>
+  <div class="callout warn mt"><b>The trade.</b> One gap closes, another opens. Here the gap that opens is in the harmful error.</div>
+  <aside class="notes"><p>From Lab 3.2, task 2. Women's threshold rises to 0.620 and men's falls to 0.432. Equalising FNR instead (task 3) needs almost no change: thresholds 0.501 and 0.499, with the selection gap staying at 9.0 points.</p></aside>
+</section>
+
+<section class="slide" id="choose-by-harm" data-lo="LO5" data-label="Choose">
+  <div class="kicker">How to choose</div>
+  <h2>Choose the criterion from the decision and the harm of each error</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>SDAIA's AI Ethics Principles ask that fairness metrics be chosen at design time from the kind of decision and the harm and benefit of correct and incorrect predictions</li>
+      <li>Ahliya allocates <b>support by need</b>; the harmful error is the <b>missed eligible applicant</b></li>
+      <li>So: <b>equal opportunity</b>, with the selection gap explained by need</li>
+    </ul>
+    <div class="card c-purple"><h4>When parity fits</h4><p class="small mb0">When need is believed equal and the labels are suspect, or when a fixed opportunity is shared out.</p></div>
+  </div>
+  <aside class="notes"><p>The principles also ask for the allowed threshold of the metric to be defined at the plan-and-design stage, before results are seen. Ahliya had none: that becomes a gap in the model card on Day 4. Sources: AI Ethics Principles (SDAIA), fairness principle, plan and design.</p></aside>
+</section>
+
+<section class="slide" id="check-criterion" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which criterion for a support decision?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Ahliya decides who is passed to an officer for housing support. Eligible applicants are more common among women. Bashayer asks which fairness criterion the fund should commit to.</p>
+    <div class="opts">
+      <div class="opt" data-ok>Equal false negative rates: miss eligible applicants equally in each group</div>
+      <div class="opt" data-why="Ignores the different need: equal selection would decline eligible women to match men's rate">Equal selection rates: pass the same share of women and men</div>
+      <div class="opt" data-why="Thinks all criteria can be met together: with different base rates they conflict">All three criteria at once, to be safe</div>
+      <div class="opt" data-why="Equates removing an input with fair outcomes: outcomes still differ through other features">None: Ahliya does not use gender, so it is fair</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The harmful error in a support decision is the missed eligible applicant, and need differs between groups, so error rates among the eligible are what must be equal.</div>
+  </div>
+  <aside class="notes"><p>Answer A. D deserves a minute: "fairness through unawareness" fails because proxies (marital status, employment, missing income) carry the information.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-2" data-auto="lab" data-lab="3.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected: base rates 0.597 and 0.493; at 0.5 gaps of +9.1 points in selection, -0.2 in FNR, -0.8 in precision; at equal selection the FNR gap becomes +12.4 points; at equal FNR the thresholds are 0.501 and 0.499. The choice in task 4 is open to argument; insist only that it names the harm.</p></aside>
 </section>
 
-<!-- Session 3 -->
-
+<!-- ======================= SESSION 3 ======================= -->
 <section class="slide section" id="s3" data-auto="section" data-session="3"></section>
 
-<section class="slide" id="s3-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="lifecycle" data-lo="LO5" data-label="Lifecycle">
+  <div class="kicker">Where bias enters</div>
+  <h2>The AI Ethics Principles name four stages, and bias can enter at each</h2>
+  <div class="flow">
+    <div class="step c-navy"><b>1 · Plan and Design</b>purpose, target, the fairness metric and its threshold</div>
+    <div class="arrow">→</div>
+    <div class="step c-teal"><b>2 · Prepare Input Data</b>collection, recording, labels</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>3 · Build and Validate</b>features, model choice, evaluation</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>4 · Deploy and Monitor</b>use, feedback, retraining</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>The stage names are those of SDAIA's AI Ethics Principles, whose Annexure B maps ethics tools to the same four stages. Placing a finding in a stage tells you who fixes it: the data owner, the modeller or operations. Sources: AI Ethics Principles (SDAIA), Annexure B.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="bias-guide" data-lo="LO5" data-label="The guide">
+  <div class="kicker">The national vocabulary</div>
+  <h2>SDAIA's AI Bias Reference Guide defines more than a hundred bias types</h2>
+  <table class="t small">
+    <tr><th>Type</th><th>In the guide's terms</th></tr>
+    <tr><td><b>Historical Bias</b></td><td>training data carries past circumstances that no longer hold</td></tr>
+    <tr><td><b>Measurement Bias</b></td><td>values systematically over- or under-recorded</td></tr>
+    <tr><td><b>Labeling Bias</b></td><td>labels shaped by the people who assigned them</td></tr>
+    <tr><td><b>Evaluation Bias</b></td><td>evaluation data or metrics that do not reflect real use</td></tr>
+    <tr><td><b>Feedback Loop Bias</b></td><td>the system's outputs become its future inputs</td></tr>
+  </table>
+  <aside class="notes"><p>Paraphrases of the guide's definitions, first edition, May 2026; each entry also gives the impact, an example and mitigations. DS-207 introduced the guide; today the skill is to tell neighbouring types apart with evidence. Sources: AI Bias Reference Guide (SDAIA).</p></aside>
+</section>
+
+<section class="slide" id="same-gap-two-causes" data-lo="LO5" data-label="Two causes">
+  <div class="kicker">Why the type matters</div>
+  <h2>The same gap can have two causes that need opposite fixes</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>Measurement or labelling?</h4><p class="small mb0">Measurement: a feature is recorded wrongly (fix the recording). Labelling: the outcome used for training is wrong (fix the labels).</p></div>
+    <div class="card c-teal"><h4>Historical or labelling?</h4><p class="small mb0">Historical: labels followed a rule that has since changed (retrain on the current rule). Labelling: labels were wrong when made (relabel or review).</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>These two tests are the core of Lab 3.3, task 3. Ask for an example from participants' own work of a gap they explained without checking which cause it was.</p></aside>
+</section>
+
+<section class="slide" id="evidence-f1-f3" data-lo="LO5" data-label="Evidence 1">
+  <div class="kicker">Lab 3.3, the reference run</div>
+  <h2>Three findings, three checks, three different types</h2>
+  <table class="t small">
+    <tr><th>Finding</th><th>Check</th><th>Result</th><th>Type</th></tr>
+    <tr><td>Self-employed: FNR 65%</td><td>recorded against verified income</td><td>median ratio 1.73; others 1.00</td><td>Measurement</td></tr>
+    <tr><td>Family home: FNR 36% against 17% for renters</td><td>officers' approvals before and after the July 2024 rule change</td><td>22% before, 49% after; renters 49% throughout</td><td>Historical</td></tr>
+    <tr><td>Qassim: highest FNR</td><td>officers' declines of eligible applicants, by office and gender</td><td>women 43% in Qassim, 23% elsewhere; men equal</td><td>Labelling</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 3.3. Self-employed income is recorded as turnover, so they look richer than they are. Family-home applicants were declined under a rule that ended in July 2024, and the model learnt it. In Qassim one office declined eligible women-headed households; men there are treated like everywhere else, which rules out a regional effect.</p></aside>
+</section>
+
+<section class="slide" id="evidence-f4-f5" data-lo="LO5" data-label="Evidence 2">
+  <div class="kicker">Lab 3.3, the reference run</div>
+  <h2>Two findings sit outside the data: in validation and in deployment</h2>
+  <div class="cols cols-2">
+    <div class="card c-purple"><h4>Evaluation Bias · Build and Validate</h4><p class="small mb0">The validation report claimed accuracy 0.881 on officers' decisions in Riyadh and Makkah. Against the reviewed outcome: 0.845 there, 0.850 elsewhere.</p></div>
+    <div class="card c-coral"><h4>Feedback Loop Bias · Deploy and Monitor</h4><p class="small mb0">37.4% of applications are auto-declined and never reviewed, so they never get a label. Retraining cannot see its own misses; 62.8% of self-employed applicants are auto-declined.</p></div>
+  </div>
+  <aside class="notes"><p>The validation report measured agreement with officers, who share the measurement and labelling problems, so it flattered the model. The deployment finding is the one with no error rate today: it makes tomorrow's model worse for exactly the group that is already missed. Remedy: review a random sample of auto-declined applications.</p></aside>
+</section>
+
+<section class="slide" id="check-bias-type" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Measurement or labelling?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Self-employed applicants are missed by Ahliya far more often. An income audit shows their recorded income is 1.73 times the verified income; for employees it is 1.00. Which type fits, and what is the first fix?</p>
+    <div class="opts">
+      <div class="opt" data-why="Blames the outcome when the evidence points at a feature: the officers applied the rule correctly to the income they were given">Labeling Bias: retrain on corrected decisions</div>
+      <div class="opt" data-why="Reaches for a mitigation that cannot repair a wrong input: weights change counts, not recorded incomes">Sampling Bias: reweight the self-employed in training</div>
+      <div class="opt" data-why="Treats every old pattern as historical: nothing here changed over time">Historical Bias: retrain on recent applications only</div>
+      <div class="opt" data-ok>Measurement Bias: record net income for the self-employed</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The feature itself is systematically over-recorded for one group, which is the guide's measurement bias; the fix is at the point of recording.</div>
+  </div>
+  <aside class="notes"><p>Answer D. Session 4 will show that reweighting barely moves this kind of gap, which confirms the diagnosis.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-3" data-auto="lab" data-lab="3.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected mapping: F1 Measurement, F2 Historical, F3 Labeling, F4 Evaluation, F5 Feedback Loop; stages Prepare Input Data for the first three, Build and Validate, Deploy and Monitor. Accept Plan and Design for F2 if the participant argues that choosing past decisions as the target was a design decision. The three distractor types (Sampling, Aggregation, Sample Size) are from the guide too.</p></aside>
 </section>
 
-<!-- Session 4 -->
-
+<!-- ======================= SESSION 4 ======================= -->
 <section class="slide section" id="s4" data-auto="section" data-session="4"></section>
 
-<section class="slide" id="s4-idea" data-lo="LO5">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="three-points" data-lo="LO5" data-label="Where to act">
+  <div class="kicker">Mitigation</div>
+  <h2>You can act before training, during it, or after it</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>Before: pre-processing</h4><p class="small mb0">Change the training data: <b>reweighting</b>, resampling, relabelling, fixing a feature.</p></div>
+    <div class="card c-cyan"><h4>During: in-processing</h4><p class="small mb0">A constraint in the fitting, such as Fairlearn's reductions. Named here, not practised.</p></div>
+    <div class="card c-coral"><h4>After: post-processing</h4><p class="small mb0">Change the decision rule: <b>a threshold per group</b>.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>The lab tries one pre-processing and one post-processing method, as the catalog entry asks. In-processing needs more time than a 25-minute lab allows. All three are in the AI Ethics Principles' list of fairness tools through Fairlearn, AI Fairness 360 and Aequitas. Sources: Fairlearn documentation; AI Ethics Principles, Annexure A.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO5">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="reweighting" data-lo="LO5" data-label="Reweighting">
+  <div class="kicker">Pre-processing</div>
+  <h2>Reweighting makes group and label independent in the training data</h2>
+  <div class="cols cols-2">
+    <pre class="code s" data-file="python"><code class="language-python">pg  = df["group"].value_counts(normalize=True)
+py  = df["y"].value_counts(normalize=True)
+pgy = df.groupby(["group", "y"]).size() / len(df)
+w   = pg[g] * py[y] / pgy[(g, y)]
+model.fit(X, y, logisticregression__sample_weight=w)</code></pre>
+    <ul class="bullets">
+      <li>Rare combinations, such as approved non-Saudi women, weigh more</li>
+      <li>The weights average 1</li>
+      <li>It can only fix what the <b>labels' balance</b> causes</li>
+    </ul>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>Kamiran and Calders' method. The last bullet is the lesson of the lab: Session 3 found the gap comes from income features, so reweighting should not help much. Sources: Kamiran and Calders, Data preprocessing techniques for classification without discrimination (2012).</p></aside>
+</section>
+
+<section class="slide" id="group-thresholds" data-lo="LO5" data-label="Thresholds">
+  <div class="kicker">Post-processing</div>
+  <h2>A threshold per group, tuned on one half and reported on the other</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Target: each group's FNR equal to the overall 22.5%</li>
+      <li>Tuned thresholds: non-Saudi women 0.468, Saudi women 0.511, non-Saudi men 0.470, Saudi men 0.499</li>
+      <li>Reported on reviewed applications not used to tune</li>
+    </ul>
+    <div class="card c-coral"><h4>A legal question, not only a technical one</h4><p class="small mb0">The rule now uses gender and nationality at the moment of decision. The data protection officer and legal counsel decide whether that is allowed and how it is explained.</p></div>
+  </div>
+  <aside class="notes"><p>From Lab 3.4. Tuning and reporting on the same rows would overstate the effect. The AI Ethics Principles ask that sensitive attributes be kept out of model inputs, or that their use be justified: a group threshold is such a use, so it needs that justification in writing.</p></aside>
+</section>
+
+<section class="slide" id="mitigation-results" data-lo="LO5" data-label="Results">
+  <div class="kicker">Lab 3.4, the reference run</div>
+  <h2>Thresholds narrow the gap a little; reweighting barely moves it</h2>
+  <table class="t small">
+    <tr><th>Reported on 6,050 reviewed applications</th><th class="num">Accuracy</th><th class="num">Largest FNR gap</th><th class="num">FNR, non-Saudi women</th></tr>
+    <tr><td>Baseline</td><td class="num">84.5%</td><td class="num">12.9 pts</td><td class="num">34.9%</td></tr>
+    <tr><td>Reweighting</td><td class="num">84.5%</td><td class="num">12.6 pts</td><td class="num">34.9%</td></tr>
+    <tr class="hl"><td>Group thresholds</td><td class="num">84.5%</td><td class="num">10.0 pts</td><td class="num">32.2%</td></tr>
+  </table>
+  <div class="callout note mt"><b>Accuracy did not fall.</b> The cost here is not accuracy: it is a rule that uses protected attributes, and a gap that remains.</div>
+  <aside class="notes"><p>From Lab 3.4. The non-Saudi women's rate stays far from the 22.5% target on the reporting half because their threshold rests on 143 eligible applicants in the tuning half. Honest reporting of a mitigation includes what it did not achieve.</p></aside>
+</section>
+
+<section class="slide" id="recommendation" data-lo="LO5" data-label="Recommend">
+  <div class="kicker">The audit's recommendation</div>
+  <h2>Fix the source, use thresholds only as an interim, and say what remains</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Source</b>verify or impute income properly; net income for the self-employed</div>
+    <div class="arrow">→</div>
+    <div class="step c-cyan"><b>2 · Interim</b>group thresholds, if legally approved, with officer review of declines</div>
+    <div class="arrow">→</div>
+    <div class="step c-coral"><b>3 · Monitor</b>review a sample of auto-declines, so retraining sees its misses</div>
+  </div>
+  <aside class="notes"><p>Each step maps to a Session 3 finding: measurement (1), the intersection gap (2), the feedback loop (3). The recommendation is the last section of the LO5 audit report. On Day 4 it reappears as treatments in the impact assessment.</p></aside>
+</section>
+
+<section class="slide" id="check-mitigation" data-lo="LO5">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which mitigation would you recommend?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Reweighting moved the FNR gap from 12.9 to 12.6 points. Group thresholds moved it to 10.0, at the same accuracy. The gap comes mostly from missing and mis-recorded income. What do you recommend to Bashayer?</p>
+    <div class="opts">
+      <div class="opt" data-why="Reads an unchanged accuracy as a free fix: the rule uses protected attributes and the gap remains">Group thresholds as the permanent fix, since accuracy did not fall</div>
+      <div class="opt" data-ok>Fix income recording first; thresholds only as an approved interim measure</div>
+      <div class="opt" data-why="Ignores what the evidence showed: the weights cannot repair a wrong feature">Reweighting, because pre-processing is always preferable</div>
+      <div class="opt" data-why="Treats an unfinished fix as no fix: a narrowed gap with monitoring is better than the baseline">Neither, since the gap is not closed completely</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> The cause is in the income feature, so the lasting fix is at the source; the threshold change helps meanwhile but needs approval because it uses gender and nationality.</div>
+  </div>
+  <aside class="notes"><p>Answer B. This is also the shape of the capstone's recommendation section: cause, interim measure, cost, approval.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-3-4" data-auto="lab" data-lab="3.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected on the reporting half: baseline accuracy 0.845, gap 0.129; reweighting 0.845 and 0.126; thresholds 0.845 and 0.100. The full run takes about 20 seconds (two fits on 48,000 rows). If the weights cell is slow, the participant probably used apply row by row: show the vectorised version on the reweighting slide.</p></aside>
 </section>
 
-<section class="slide" id="wrap-up">
-  <div class="kicker">Day 3 · wrap-up</div>
-  <h2>Three things to keep</h2>
-  <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up">
+  <div class="kicker">Day 3 · Three things to keep</div>
+  <h2>Disaggregate, choose the criterion by the harm, diagnose before mitigating</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>Disaggregate</h4><p class="small mb0">Gender alone showed no gap; non-Saudi women are missed at 30%. Intervals and counts beside every rate.</p></div>
+    <div class="card c-cyan"><h4>Choose</h4><p class="small mb0">Different base rates make criteria conflict. For support by need: equal false negative rates.</p></div>
+    <div class="card c-coral"><h4>Diagnose</h4><p class="small mb0">Five findings, five types. Reweighting failed where the cause was a feature.</p></div>
   </div>
+  <aside class="notes"><p>Ask each table which finding they would put first in the report to internal audit, and why. Tomorrow turns today's numbers into a model card and an impact assessment that someone else can check.</p></aside>
 </section>
 
 <section class="slide dark" id="next" data-label="Next">
-  <div class="kicker">Next</div>
-  <h2>Day 4: Document and assess</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+  <div class="kicker">Tomorrow · Day 4</div>
+  <h2>Document and assess</h2>
+  <ul class="bullets">
+    <li>The datasheet of the de-identified release, filled from its log</li>
+    <li>The model card of Ahliya with disaggregated results</li>
+    <li>Four risks scored on the national framework's likelihood and impact matrix</li>
+    <li>A peer's result rerun, and the gaps that changed the number</li>
+  </ul>
+  <aside class="notes"><p>Day 4 labs supply reference logs and results, so nothing from today is required. Encourage participants to keep their own Lab 3.1 and 3.4 outputs: they can use them in place of the supplied ones.</p></aside>
 </section>

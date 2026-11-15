@@ -1,0 +1,22 @@
+{
+ "F1": [
+  "Measurement Bias",
+  "Prepare Input Data"
+ ],
+ "F2": [
+  "Historical Bias",
+  "Prepare Input Data"
+ ],
+ "F3": [
+  "Labeling Bias",
+  "Prepare Input Data"
+ ],
+ "F4": [
+  "Evaluation Bias",
+  "Build and Validate"
+ ],
+ "F5": [
+  "Feedback Loop Bias",
+  "Deploy and Monitor"
+ ]
+}

@@ -248,7 +248,7 @@ def main():
                               labels=["21-30", "31-40", "41-50", "51-60", "61+"], right=True).astype(str)
     test_cols = ["applicant_id", "gender", "nationality", "region", "age_band", "marital_status", "employment",
                  "tenure", "household_size", "monthly_income_sar", "disability_in_household", "social_security",
-                 "application_date", "office", "officer_decision", "reviewed_eligible", "score"]
+                 "application_date", "office", "officer_decision", "reviewed_eligible", "score", "monthly_rent_sar"]
     write_csv(test[test_cols], "ahliya_scored_test.csv")
 
     # the modelling lead's validation report: officers' decisions, two urban regions only
@@ -289,6 +289,12 @@ def main():
               "interval": "bootstrap, 200 resamples", "data": "data/ahliya_scored_test.csv"}
     (DATA / "peer").mkdir(exist_ok=True)
     (DATA / "peer" / "peer_results.json").write_text(json.dumps(claims, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    # Day 3.3: an income audit of 600 reviewed applications (verified income against recorded income)
+    audit_rng = np.random.default_rng(SEED + 1)
+    audit = test.iloc[audit_rng.choice(len(test), 600, replace=False)]
+    audit = audit.assign(verified_income_sar=audit["true_income"])
+    write_csv(audit[["applicant_id", "employment", "monthly_income_sar", "verified_income_sar"]], "income_audit.csv")
 
     # facts for the trainer's answer key
     facts = {

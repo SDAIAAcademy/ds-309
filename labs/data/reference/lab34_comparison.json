@@ -1,0 +1,31 @@
+{
+ "__frame__": {
+  "columns": [
+   "accuracy",
+   "fnr_gap",
+   "fnr non-Saudi women"
+  ],
+  "index": [
+   "baseline",
+   "reweighting",
+   "group thresholds"
+  ],
+  "data": [
+   [
+    0.8448,
+    0.1287,
+    0.3487
+   ],
+   [
+    0.845,
+    0.1257,
+    0.3487
+   ],
+   [
+    0.8453,
+    0.0996,
+    0.3224
+   ]
+  ]
+ }
+}

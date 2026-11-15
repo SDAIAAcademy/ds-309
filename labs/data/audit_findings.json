@@ -1,0 +1,22 @@
+{
+  "F1": {
+    "finding": "Ahliya declines more than half of the eligible self-employed applicants.",
+    "evidence": "data/income_audit.csv: recorded income against income verified by an auditor, for 600 reviewed applications."
+  },
+  "F2": {
+    "finding": "Eligible applicants who live in a family home are declined about twice as often as eligible renters.",
+    "evidence": "data/ahliya_train.csv.gz: officers' decisions by tenure, before and after the rule change of July 2024."
+  },
+  "F3": {
+    "finding": "Ahliya's false negative rate is highest in Qassim.",
+    "evidence": "data/ahliya_scored_test.csv: the officers' decisions against the reviewed outcome, by office and gender."
+  },
+  "F4": {
+    "finding": "The model was approved on a reported accuracy that the audit does not reproduce.",
+    "evidence": "data/ahliya_validation_report.json against data/ahliya_scored_test.csv."
+  },
+  "F5": {
+    "finding": "The next version of Ahliya will be retrained on the applications it handled this year.",
+    "evidence": "data/ahliya_deployment_log.csv: which applications received a reviewed label."
+  }
+}

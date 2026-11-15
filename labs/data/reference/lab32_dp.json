@@ -1,0 +1,32 @@
+{
+ "table": {
+  "__frame__": {
+   "columns": [
+    "selection",
+    "fnr",
+    "precision"
+   ],
+   "index": [
+    "F",
+    "M"
+   ],
+   "data": [
+    [
+     0.4401,
+     0.3092,
+     0.9376
+    ],
+    [
+     0.4401,
+     0.1848,
+     0.9141
+    ]
+   ]
+  }
+ },
+ "gaps": {
+  "selection": 0.0,
+  "fnr": 0.1244,
+  "precision": 0.0235
+ }
+}
