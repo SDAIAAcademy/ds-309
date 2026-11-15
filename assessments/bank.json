@@ -3,164 +3,722 @@
   "version": 1,
   "questions": [
     {
-      "id": "q-example-1",
+      "id": "q-privacy-01",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO1, as a short scenario",
+      "prompt": "Yusr replaces each national identifier in a research extract with a salted hash. The data protection officer keeps the salt. The researcher asks whether the extract is still personal data.",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "No: the recipient cannot reverse a salted hash",
+        "Yes: the fund can relink it, so it is still personal data",
+        "No: once direct identifiers are gone the data are anonymous",
+        "Only if the hash had been computed without a salt"
       ],
       "correct": [
         1
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "Pseudonymised data can be linked back with information the fund holds, so the national anonymisation guideline treats it as personal data.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Treats one-way hashing as anonymisation; the fund can still relink, and other fields still single people out",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Ignores both the key the fund keeps and the quasi-identifiers left in the rows",
+        "Thinks the salt changes the legal status; it slows guessing, it does not stop the fund relinking"
       ],
       "lo": [
         "LO1"
       ],
       "day": "day1",
       "session": 1,
+      "slide": "pseudonym-still-personal",
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-02",
+      "type": "single",
+      "prompt": "The board wants to publish approved applications per district each quarter, including districts with fewer than ten applicants. Which control fits, and what does it cost?",
+      "options": [
+        "Differential privacy; small districts get noisier figures",
+        "Pseudonymisation of the counts; nothing is lost",
+        "k-anonymity on the published table; rows can still be linked",
+        "A synthetic copy of the table; the counts stay exact"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Counts are aggregates; differential privacy bounds what one applicant changes, and the price is noise that matters most where counts are small.",
+      "misconceptions": [
+        "",
+        "Applies a record-level control to a table of counts, where there is no identifier to replace",
+        "Applies a microdata control to aggregates, and misstates what it leaves behind",
+        "Expects exact counts from synthetic data, which neither keeps them exact nor bounds the risk"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day1",
+      "session": 2,
+      "slide": "match-control",
       "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-2",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO2 that is true",
+      "id": "q-privacy-03",
+      "type": "single",
+      "prompt": "A university requests an extract of 40,000 applicants with region, five-year age band, household size and support status, treated to k = 5. Under the Data Classification Policy, at what level does it stay?",
       "options": [
-        "True",
-        "False"
+        "Public, because k = 5 makes it anonymous",
+        "Secret, because it concerns social support",
+        "No level, because de-identified data are outside the policy",
+        "Restricted, as personal data about individuals"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The policy lists personal data under Restricted; de-identification lowers the risk but the extract remains personal data.",
+      "misconceptions": [
+        "Thinks a treatment changes the class; it lowers the risk of the data, which are still about people",
+        "Over-classifies: the harm of disclosure does not reach the level the Secret class describes",
+        "Thinks some data escape classification; every data asset gets a level",
+        ""
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day1",
+      "session": 2,
+      "slide": "three-extracts",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-04",
+      "type": "single",
+      "prompt": "A university researcher emails Yusr directly to ask for applicant records for her study. Under the General Rules for Secondary Use of Data, what is missing?",
+      "options": [
+        "Nothing: research is a legitimate purpose, so her email request is enough",
+        "A public release of the records first, so that anyone may use them",
+        "A request via her institution with written approval, for minimum data",
+        "Only encryption of the file when it is sent"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The rules route a researcher's request through her institution with written approval, and limit the data to what the purpose needs.",
+      "misconceptions": [
+        "Takes a legitimate purpose as the only condition; the route and the minimum data matter too",
+        "Confuses secondary use under conditions with open data",
+        "",
+        "Treats a transfer safeguard as the permission to use the data"
+      ],
+      "lo": [
+        "LO1"
+      ],
+      "day": "day1",
+      "session": 2,
+      "slide": "secondary-use-conditions",
+      "level": "analyze",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-05",
+      "type": "single",
+      "prompt": "Release A drops names and national identifiers but keeps birth date, gender and postcode. A public register lists names with the same three fields. A join re-identifies 99.2% of the register's applicants. Why?",
+      "options": [
+        "Together the three fields are unique for almost everyone",
+        "The register also holds the applicants' national identifiers",
+        "The postcode alone points to one applicant",
+        "The test must be wrong, since linkage needs exact names"
       ],
       "correct": [
         0
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "Birth date, gender and postcode in combination single out almost everyone, so a join on them finds one match per person.",
       "misconceptions": [
         "",
-        "REPLACE: the misconception behind this option"
+        "Assumes the attack needs an identifier; it joined on the quasi-identifiers only",
+        "Credits a single field; it is the combination that is unique",
+        "Denies the result; linkage needs shared fields, not names"
       ],
       "lo": [
         "LO2"
       ],
       "day": "day1",
-      "session": 1,
+      "session": 3,
+      "slide": "linkage-attack",
       "level": "understand",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-3",
+      "id": "q-privacy-06",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO3, as a short scenario",
+      "prompt": "In candidate release B, 2,152 records are unique on the quasi-identifiers. What is k for release B, and what does it say?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "k = 2,152: the number of records at risk",
+        "k = 1: at least one record can be singled out on these fields",
+        "k is unknown until a linkage test is run",
+        "k = 1, so every single record in release B is unique"
       ],
       "correct": [
         1
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "k is the size of the smallest equivalence class; a unique record is a class of one.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Confuses k with a count of unique records",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Thinks k needs an outside file; it is computed from the release alone",
+        "Reads k, a minimum, as a statement about every class"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day1",
+      "session": 4,
+      "slide": "equivalence-class",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-07",
+      "type": "single",
+      "prompt": "To reach k = 5, node (a) uses five-year birth bands and region and suppresses 293 records; node (b) uses ten-year bands and region and suppresses 41. The study asks how approval varies with age. What do you choose and report?",
+      "options": [
+        "(b), because fewer suppressed records always means more utility",
+        "(a), without mentioning the suppressed records, since k is met",
+        "Neither: k = 5 needs the age field removed entirely",
+        "(a), reporting the suppressed records and the change by age"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "The research question needs age detail, and a release reports both its suppression and its measured utility change.",
+      "misconceptions": [
+        "Counts only one cost; ten-year bands blur the age effect the study needs",
+        "Hides who was removed, which can bias the analysis",
+        "Contradicted by both nodes, which reach k = 5 with age kept",
+        ""
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day2",
+      "session": 1,
+      "slide": "utility-cost",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-08",
+      "type": "single",
+      "prompt": "After treatment k = 5, but in one class all five records have disability in household = yes. A recipient knows her neighbour is in that class. What has the treatment failed to prevent?",
+      "options": [
+        "Identity disclosure: she can now find her neighbour's exact record",
+        "Nothing, since k = 5 protects every attribute",
+        "Attribute disclosure: she learns the status without the record",
+        "Membership inference, which arises only in synthetic data"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "When a class shares one sensitive value, membership in the class reveals it; k does not prevent this.",
+      "misconceptions": [
+        "Forgets that k = 5 leaves five candidates for one person",
+        "Reads k as a guarantee about attributes, which it does not give",
+        "",
+        "Names a different attack from another release type"
+      ],
+      "lo": [
+        "LO2"
+      ],
+      "day": "day2",
+      "session": 1,
+      "slide": "k-limits",
+      "level": "analyze",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-09",
+      "type": "single",
+      "prompt": "Yusr releases district counts with differential privacy at epsilon 0.5. What does this promise each applicant?",
+      "options": [
+        "Their record is removed from the data before the counts are made",
+        "No count is off by more than 0.5",
+        "No one can learn anything about their district",
+        "The counts are almost as likely with or without their record"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Differential privacy bounds how much any one record can change the probability of the output.",
+      "misconceptions": [
+        "Confuses differential privacy with suppression",
+        "Reads epsilon as a bound on the error",
+        "Expects protection of group facts; the guarantee is about one person's record",
+        ""
       ],
       "lo": [
         "LO3"
       ],
-      "day": "day1",
-      "session": 1,
-      "level": "apply",
-      "pool": "practice",
-      "weight": 1
-    },
-    {
-      "id": "q-example-4",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO4 that is true",
-      "options": [
-        "True",
-        "False"
-      ],
-      "correct": [
-        0
-      ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
-      "misconceptions": [
-        "",
-        "REPLACE: the misconception behind this option"
-      ],
-      "lo": [
-        "LO4"
-      ],
-      "day": "day1",
-      "session": 1,
+      "day": "day2",
+      "session": 2,
+      "slide": "dp-promise",
       "level": "understand",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-5",
+      "id": "q-privacy-10",
       "type": "single",
-      "prompt": "REPLACE: a practice question on LO5, as a short scenario",
+      "prompt": "A count per district is released with the Laplace mechanism. Each applicant is in exactly one district. At epsilon 0.5, what is the noise scale?",
       "options": [
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: the right answer",
-        "REPLACE: a wrong option that a common misconception makes tempting",
-        "REPLACE: a wrong option that a common misconception makes tempting"
+        "0.5: the scale equals epsilon",
+        "2: sensitivity 1 divided by epsilon 0.5",
+        "1: the scale equals the sensitivity",
+        "0.25: sensitivity times epsilon"
       ],
       "correct": [
         1
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "The Laplace scale is sensitivity divided by epsilon; one applicant changes one count by 1.",
       "misconceptions": [
-        "REPLACE: the misconception behind this option",
+        "Uses epsilon as the scale; a smaller epsilon must mean more noise, not less",
         "",
-        "REPLACE: the misconception behind this option",
-        "REPLACE: the misconception behind this option"
+        "Leaves epsilon out of the scale",
+        "Multiplies, which would add less noise for stronger privacy"
       ],
       "lo": [
-        "LO5"
+        "LO3"
       ],
-      "day": "day1",
-      "session": 1,
+      "day": "day2",
+      "session": 2,
+      "slide": "sensitivity",
       "level": "apply",
       "pool": "practice",
       "weight": 1
     },
     {
-      "id": "q-example-6",
-      "type": "tf",
-      "prompt": "REPLACE: a statement on LO6 that is true",
+      "id": "q-privacy-11",
+      "type": "single",
+      "prompt": "Over a year the fund releases four tables about the same applicants at epsilon 0.1, 0.2, 0.2 and 0.5. What is the total privacy loss?",
       "options": [
-        "True",
-        "False"
+        "1.0: releases about the same people add up",
+        "0.5: the largest of the four",
+        "0.25: their average",
+        "0.1: the smallest, because it protects the most"
       ],
       "correct": [
         0
       ],
-      "explanation": "REPLACE: why the right answer is right, in one sentence",
+      "explanation": "Under sequential composition, releases about the same people spend the sum of their epsilons.",
       "misconceptions": [
         "",
-        "REPLACE: the misconception behind this option"
+        "Applies the parallel rule, which holds only for disjoint groups of people",
+        "Averages losses that accumulate",
+        "Thinks the strongest release covers the others"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 3,
+      "slide": "composition",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-12",
+      "type": "single",
+      "prompt": "District counts at epsilon 0.1, 0.5 and 1 give a mean error of 9.98, 1.92 and 0.85, and a relative error in the ten smallest districts of 16%, 3.1% and 1.5%. The dashboard must keep small districts within about 5%. Which budget do you recommend?",
+      "options": [
+        "0.1, because the smallest budget is always the safest choice",
+        "1, because its error is the lowest",
+        "0.5: the smallest budget that meets the need in small districts",
+        "Any of them, since all mean errors are below 10"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Choose the smallest epsilon whose error meets the use, measured where the error matters most.",
+      "misconceptions": [
+        "Ignores fitness for use: 16% error in small districts misleads readers",
+        "Spends more privacy than the stated need requires",
+        "",
+        "Judges by the average, which hides the small districts"
+      ],
+      "lo": [
+        "LO3"
+      ],
+      "day": "day2",
+      "session": 2,
+      "slide": "recommend-budget",
+      "level": "evaluate",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-13",
+      "type": "single",
+      "prompt": "Bashayer says: \"The hackathon file is synthetic, so no applicant can be in it.\" What do you answer?",
+      "options": [
+        "She is right: synthetic rows are invented by definition",
+        "A generator can copy training rows, so leakage is tested first",
+        "She is right if the file has as many rows as the original",
+        "Only a differentially private generator may ever be released at all"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "A flexible generator can memorise its training data, so copying and membership inference are tested before release.",
+      "misconceptions": [
+        "Assumes a generator cannot reproduce its training rows",
+        "",
+        "Links privacy to the number of rows, which says nothing about copying",
+        "Overcorrects: measured leakage tests are another accepted basis for release"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "slide": "synthetic-idea",
+      "level": "understand",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-14",
+      "type": "single",
+      "prompt": "0.10% of synthetic rows match a training record exactly, and 0.05% match a record from a holdout the generator never saw. What does this suggest?",
+      "options": [
+        "The file leaks, because any exact copy is a leak",
+        "The holdout comparison means nothing, since the generator never saw it",
+        "Utility is too low, because so few rows match real ones",
+        "Copies are close to the rate of chance matches seen on the holdout"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Rows the generator never saw are matched almost as often, so most matches are coincidences of common values, not memorisation.",
+      "misconceptions": [
+        "Ignores matches by coincidence, which the holdout measures",
+        "Misses that the unseen holdout is the baseline for chance matches",
+        "Confuses copying with utility, which is measured on analyses",
+        ""
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "slide": "leakage-measures",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-15",
+      "type": "single",
+      "prompt": "A membership-inference test gives AUC 0.819 for a generator with leaves of one row, and 0.511 with leaves of 200 rows. What do you conclude?",
+      "options": [
+        "With leaves of 200, an attacker does little better than chance",
+        "Leaves of one are better, since a higher AUC means more utility",
+        "Neither can be released, since any AUC above 0.5 is leakage",
+        "Nothing, since AUC measures the attack, not the file"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "An AUC near 0.5 means the attacker cannot tell training rows from others; 0.819 means it often can.",
+      "misconceptions": [
+        "",
+        "Reads the attack's AUC as if it were a model's accuracy",
+        "Treats a value within noise of 0.5 as evidence of leakage",
+        "Misses that the attack's success is the measure of the file's leakage"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "slide": "synthetic-results",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-privacy-16",
+      "type": "single",
+      "prompt": "The leaf-200 file copies 0.10% of rows (holdout 0.05%), membership AUC 0.511, and a model trained on it reaches AUC 0.933 against 0.936 on real data. The hackathon will train models. What do you recommend?",
+      "options": [
+        "Release the leaf-one file, which reproduces the real data more closely",
+        "Release this file and stop running the tests, since they passed once",
+        "Release this file with its leakage tests and generator settings documented",
+        "Hold it until its utility matches the real data exactly"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "Utility is close to real and leakage is at chance, so release with the evidence documented.",
+      "misconceptions": [
+        "Prefers fidelity over privacy; that file copied 92.8% of rows",
+        "Forgets that every regeneration needs the same release gate",
+        "",
+        "Asks for perfect utility, which only copying achieves"
+      ],
+      "lo": [
+        "LO4"
+      ],
+      "day": "day2",
+      "session": 4,
+      "slide": "release-recommendation",
+      "level": "evaluate",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-fairness-17",
+      "type": "single",
+      "prompt": "In Al-Jouf, 4 non-Saudi women were eligible and the screen declined 3. How should the audit report this cell?",
+      "options": [
+        "As a false negative rate of 75%, the highest in the audit",
+        "As too few to estimate, with the count of 4",
+        "Merged with Saudi women in Al-Jouf, without saying so",
+        "Not at all: the region is dropped from the report"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "Below the minimum count the rate is not estimated; the count is reported so the reader sees why.",
+      "misconceptions": [
+        "Reports a rate from four people as if it were precise",
+        "",
+        "Changes the slice silently, which hides a choice from the reader",
+        "Removes evidence instead of stating its limit"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 1,
+      "slide": "small-cells",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-fairness-18",
+      "type": "single",
+      "prompt": "Forcing equal selection rates for women and men opened a 12.4-point gap in their false negative rates. For a decision on housing support, which criterion fits?",
+      "options": [
+        "Equal false negative rates: the harm is missing eligible people",
+        "Equal selection rates, which is what fairness means",
+        "Equal precision, since every approved applicant must be eligible",
+        "All three at once, by tuning the threshold carefully"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Equal opportunity fits a support decision: the error that harms is missing an eligible applicant.",
+      "misconceptions": [
+        "",
+        "Treats one criterion as the definition, regardless of the decision",
+        "Puts the fund's cost of wrong approvals before the applicant's harm",
+        "Different base rates make the criteria conflict; no threshold meets all three"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 2,
+      "slide": "choose-by-harm",
+      "level": "analyze",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-fairness-19",
+      "type": "single",
+      "prompt": "Self-employed applicants' recorded income is 1.5 to 2 times their verified income, and the screen declines more than half of the eligible self-employed. Which bias type of the national AI Bias Reference Guide does this match?",
+      "options": [
+        "Historical bias",
+        "Sampling bias",
+        "Feedback loop bias",
+        "Measurement bias"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "A feature that records the quantity wrongly for one group is measurement bias.",
+      "misconceptions": [
+        "The past rule is a different finding; here the field itself is wrong",
+        "The self-employed are in the data; it is their values that are off",
+        "Describes retraining on the model's own outcomes, not a recorded value",
+        ""
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 3,
+      "slide": "bias-guide",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-fairness-20",
+      "type": "single",
+      "prompt": "Group thresholds narrow the false negative gap from 12.9 to 10.0 points at the same accuracy. What must accompany them before deployment?",
+      "options": [
+        "Nothing, since accuracy did not fall",
+        "Reweighting first, since post-processing is not allowed",
+        "Approval to use gender and nationality, and an income fix",
+        "Removing gender and nationality, so the rule cannot be challenged"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "The rule uses protected attributes at decision time, which needs approval, and the cause lies in the income feature.",
+      "misconceptions": [
+        "Treats unchanged accuracy as the only cost",
+        "Invents a rule; reweighting barely helped here because the cause is a feature",
+        "",
+        "Contradicts itself: the thresholds need those attributes"
+      ],
+      "lo": [
+        "LO5"
+      ],
+      "day": "day3",
+      "session": 4,
+      "slide": "group-thresholds",
+      "level": "evaluate",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-documentation-21",
+      "type": "single",
+      "prompt": "Malak fills the datasheet's De-identification section from her notebook's last run, which suppressed 290 records. The release log says 293. What should she write?",
+      "options": [
+        "290, since it is the more recent run",
+        "293, the number in the log of the released run",
+        "291.5, the average, with a note on uncertainty",
+        "No number, since a difference of three does not matter"
+      ],
+      "correct": [
+        1
+      ],
+      "explanation": "The datasheet describes the release that left the fund, which the log recorded.",
+      "misconceptions": [
+        "Documents a run that was not the one approved and released",
+        "",
+        "Invents a number that no run produced",
+        "Drops a fact the reviewer needs to check the release"
       ],
       "lo": [
         "LO6"
       ],
-      "day": "day1",
+      "day": "day4",
       "session": 1,
-      "level": "understand",
+      "slide": "from-the-log",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-documentation-22",
+      "type": "single",
+      "prompt": "The vendor reports 88.1% accuracy against officers' decisions in two regions; against the reviewed outcome of 12,000 applications it is 84.8%. What goes in the model card?",
+      "options": [
+        "88.1%, since it is the figure the model was approved on",
+        "Both, without comment, so readers choose",
+        "Neither, since accuracy says nothing about fairness",
+        "84.8%, and why the vendor's 88.1% is not used"
+      ],
+      "correct": [
+        3
+      ],
+      "explanation": "Accuracy belongs against the reviewed outcome; naming the other figure prevents confusion.",
+      "misconceptions": [
+        "Repeats an evaluation the audit found biased",
+        "Leaves the reader to resolve a difference the author understands",
+        "Drops a metric the reviewer needs alongside the group results",
+        ""
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 2,
+      "slide": "which-accuracy",
+      "level": "apply",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-documentation-23",
+      "type": "single",
+      "prompt": "Risk R2 (wrongful declines) scores likelihood 4 and impact 3. After adding officer review of every decline, Anmar rescores it as likelihood 2 and impact 1. Wiam rejects the new impact. Why?",
+      "options": [
+        "Review lowers the chance of a wrong decision, not the harm when one happens",
+        "A residual cannot be scored until the treatment has run for a year",
+        "A high risk can only be avoided, never mitigated",
+        "Likelihood can never fall after a measured harm"
+      ],
+      "correct": [
+        0
+      ],
+      "explanation": "Treatment here acts on likelihood; an applicant still wrongly declined is harmed as before.",
+      "misconceptions": [
+        "",
+        "Invents a waiting rule; residual risk is scored when the treatment is chosen",
+        "Forgets that mitigate is one of the framework's four treatments",
+        "Denies that a control changes how probable the harm is"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 3,
+      "slide": "treat-residual",
+      "level": "analyze",
+      "pool": "practice",
+      "weight": 1
+    },
+    {
+      "id": "q-documentation-24",
+      "type": "single",
+      "prompt": "A peer's script reproduces their claimed gap exactly. Your review finds it drops 633 rows with missing income, 65% of them women, and the README does not say so. What do you record?",
+      "options": [
+        "Nothing: a result that reproduces is confirmed",
+        "Only that the result is not reproducible",
+        "The filter, its place, its effect on the gap, and the fix",
+        "That missing values should be dropped in every analysis they run"
+      ],
+      "correct": [
+        2
+      ],
+      "explanation": "A useful gap names the choice, its place in the code, its effect on the number and the fix.",
+      "misconceptions": [
+        "Takes reproduction as validity; the undocumented choice changes the answer",
+        "States a verdict the author cannot act on, and it is not even true here",
+        "",
+        "Turns one choice into a rule, when dropping them is what biased this result"
+      ],
+      "lo": [
+        "LO6"
+      ],
+      "day": "day4",
+      "session": 4,
+      "slide": "useful-gap",
+      "level": "analyze",
       "pool": "practice",
       "weight": 1
     }

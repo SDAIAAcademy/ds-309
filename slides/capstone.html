@@ -7,7 +7,7 @@
   <h2>How the presentations run</h2>
   <div class="agenda">
     <div class="item now"><div><b>Expectations and final prep</b><small>the rubric, a last rehearsal, then the first presentations</small></div></div>
-    <div class="item"><div><b>Presentations</b><small>each one timed, with questions after it</small></div></div>
+    <div class="item"><div><b>Presentations</b><small>ten minutes each, with one disparity recomputed live and questions inside the ten minutes</small></div></div>
     <div class="item"><div><b>Review and closing</b><small>peer feedback, the trainer's review, what next</small></div></div>
   </div>
 </section>
@@ -22,19 +22,20 @@
     <div class="row"><span>Impact assessment</span><div class="bar c-purple" style="--w:80%"></div><span class="val">20%</span></div>
     <div class="row"><span>Reproducibility</span><div class="bar c-amber" style="--w:40%"></div><span class="val">10%</span></div>
   </div>
-  <div class="callout tip mt"><b>Show results from at least two measured runs.</b> A claim without a number is a plan, not a result.</div>
-  <aside class="notes">Walk through each criterion with one example of what full marks look like.</aside>
+  <div class="callout tip mt"><b>Every number in the pack is measured and can be rerun.</b> A claim without a number is a plan, not a result.</div>
+  <aside class="notes"><p>Full marks, criterion by criterion. Privacy: a linkage test against the public honours list before and after treatment, k with its quasi-identifiers, the utility change, and counts released under a stated budget with their error. Fairness audit: rates by group and at least one intersection with intervals and counts, a criterion chosen for the harm, findings mapped to the national bias guide, one mitigation measured on rows it was not tuned on. Documentation: datasheet and model card filled from logs, with limits stated. Impact assessment: each risk scored on the national framework's scales from evidence, with residual risk, owner and a reviewer for high risks. Reproducibility: a lock file, seeds, and a README that reruns every number; the live recomputation is scored here.</p></aside>
 </section>
 
 <section class="slide" id="format" data-label="Format">
-  <div class="kicker">Format</div>
-  <h2>10 minutes for each presentation</h2>
+  <div class="kicker">Format of the review</div>
+  <h2>Ten minutes each, questions and the live recomputation included</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>1 · The problem</h4><p class="small mb0">Who, what, why now. One slide.</p></div>
-    <div class="card c-cyan"><h4>2 · What you built</h4><p class="small mb0">Design, decisions, trade-offs. Then the live demo.</p></div>
-    <div class="card c-coral"><h4>3 · What you measured</h4><p class="small mb0">Baseline, improvement, failures found, what comes next.</p></div>
+    <div class="card c-teal"><h4>1 · The release · 3 min</h4><p class="small mb0">Risk before and after, the treatment, the budget, what remains.</p></div>
+    <div class="card c-cyan"><h4>2 · The audit · 3 min</h4><p class="small mb0">The largest gap with its interval, its cause, the mitigation and its cost.</p></div>
+    <div class="card c-coral"><h4>3 · Live · 4 min</h4><p class="small mb0">The assessor picks a slice; you recompute one disparity from your repository, then questions.</p></div>
   </div>
-  <div class="callout note mt"><b>Peer feedback.</b> After each talk, everyone writes one strength, one question and one suggestion.</div>
+  <div class="callout note mt"><b>Peer feedback.</b> After each review, everyone writes one strength, one question and one suggestion.</div>
+  <aside class="notes"><p>The timer runs for ten minutes in all. Pick the slice before the review starts and keep it from the presenter: a school type, a region, a field of study, or two of them crossed. A good recomputation states the rate for each group, the interval and the count, and says when the slice is too small to estimate. If the code does not run, ask what they would change; the reproducibility mark is lost, the others are not.</p></aside>
 </section>
 
 <section class="slide order" id="running-order" data-label="Running order">
@@ -75,20 +76,23 @@
   <div class="kicker">Trainer review</div>
   <h2>What the presentations showed</h2>
   <div class="cols cols-3">
-    <div class="card c-teal"><h4>Strongest patterns</h4><p class="small mb0">What several projects got right.</p></div>
-    <div class="card c-coral"><h4>Common gaps</h4><p class="small mb0">What most projects would fix next.</p></div>
-    <div class="card c-purple"><h4>One surprise</h4><p class="small mb0">Something nobody expected.</p></div>
+    <div class="card c-teal"><h4>Strongest patterns</h4><p class="small mb0">What several packs got right: linkage tests, intervals, logs.</p></div>
+    <div class="card c-coral"><h4>Common gaps</h4><p class="small mb0">What most would fix next. Usual ones: an audit that stopped at gender, a residual risk lowered by its impact.</p></div>
+    <div class="card c-purple"><h4>One surprise</h4><p class="small mb0">A finding nobody expected, and what explained it.</p></div>
   </div>
-  <aside class="notes">Fill these in from your scoring notes during the last break. Name projects for strengths; keep gaps anonymous.</aside>
+  <aside class="notes"><p>Fill these in from your scoring notes during the last break. Name packs for strengths; keep gaps anonymous. The planted problems of the Sabeel data are in the answer key: say which ones the room found and which nobody did.</p></aside>
 </section>
 
 <section class="slide" id="what-next" data-label="After the course">
   <div class="kicker">After the course</div>
   <h2>Keep going</h2>
   <ul class="bullets">
-    <li><b>Your project stays yours:</b> keep it reproducible and add the next improvement you named today</li>
-    <li><b>Next Academy course:</b> REPLACE: the course that follows this one</li>
+    <li><b>The follow-up task:</b> take one release or model at your workplace through the impact assessment and send the scored register, not the data.</li>
+    <li><b>Your repository stays yours:</b> keep it rerunning from a clean copy and add the mitigation you named today.</li>
+    <li><b>At work:</b> keep a release log from the next extract on; a datasheet is only as good as its log.</li>
+    <li><b>Next Academy course:</b> DS-305 Uncertainty, Interpretability and Model Validation, for calibration and explanation.</li>
   </ul>
+  <aside class="notes"><p>The follow-up task is tracked: say how and by when the register is sent, as your delivery team has set it. The data stay inside the participant's entity; the register with its scores and reasons is what is shared.</p></aside>
 </section>
 
 <section class="slide dark" id="thanks" data-label="Thank you">
