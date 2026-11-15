@@ -1,0 +1,22 @@
+{
+ "R1": [
+  "pseudonymisation",
+  "still personal data: the key reverses it and the quasi-identifiers still link"
+ ],
+ "R2": [
+  "de-identification",
+  "attribute disclosure in uniform groups and outside knowledge; utility lost"
+ ],
+ "R3": [
+  "aggregation",
+  "small cells and differencing between tables"
+ ],
+ "R4": [
+  "synthetic data",
+  "a generator that copies records or lets membership be inferred"
+ ],
+ "R5": [
+  "differential privacy",
+  "noise in small districts, and a budget spent again every month"
+ ]
+}

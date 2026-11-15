@@ -20,7 +20,13 @@ from __future__ import annotations
 import json as _json
 import math
 import os
+import sys
 from pathlib import Path
+
+try:  # a Windows console that is not UTF-8 cannot print the ticks
+    sys.stdout.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"

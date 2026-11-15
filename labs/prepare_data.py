@@ -184,7 +184,13 @@ def ahliya():
 
 
 def write_csv(df, name):
-    df.to_csv(DATA / name, index=False, lineterminator="\n")
+    if name.endswith(".gz"):
+        import gzip
+        raw = df.to_csv(index=False, lineterminator="\n").encode("utf-8")
+        with open(DATA / name, "wb") as fh, gzip.GzipFile(filename="", mode="wb", fileobj=fh, mtime=0) as gz:
+            gz.write(raw)  # a fixed header: the same bytes on every run
+    else:
+        df.to_csv(DATA / name, index=False, lineterminator="\n")
 
 
 def main():
@@ -257,7 +263,7 @@ def main():
         "auc": round(float(roc_auc_score(y_off[urban], test.loc[urban, "score"])), 3),
         "threshold": 0.5,
     }
-    (DATA / "ahliya_validation_report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    (DATA / "ahliya_validation_report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     # deployment log: Ahliya auto-declines low scores; only applications passed to an officer get a reviewed label
     dep = make_people(rng, 9000, dist, id_prefix="YD", start=1)
@@ -282,7 +288,7 @@ def main():
               "fnr_women": round(f_w, 3), "fnr_men": round(f_m, 3), "gap": round(f_w - f_m, 3),
               "interval": "bootstrap, 200 resamples", "data": "data/ahliya_scored_test.csv"}
     (DATA / "peer").mkdir(exist_ok=True)
-    (DATA / "peer" / "peer_results.json").write_text(json.dumps(claims, indent=2) + "\n", encoding="utf-8")
+    (DATA / "peer" / "peer_results.json").write_text(json.dumps(claims, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     # facts for the trainer's answer key
     facts = {
@@ -292,7 +298,7 @@ def main():
         "test_base_rate": round(float(test["reviewed_eligible"].mean()), 3),
         "test_auc_vs_reviewed": round(float(roc_auc_score(test["reviewed_eligible"], test["score"])), 3),
     }
-    (DATA / "reference" / "generator_facts.json").write_text(json.dumps(facts, indent=2) + "\n", encoding="utf-8")
+    (DATA / "reference" / "generator_facts.json").write_text(json.dumps(facts, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(facts, indent=2))
 
 

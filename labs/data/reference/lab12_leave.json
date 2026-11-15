@@ -1,0 +1,24 @@
+{
+ "E1 applicant table": [
+  false,
+  [
+   "stays inside the fund; used only for the purpose it was collected for"
+  ]
+ ],
+ "E2 research extract": [
+  true,
+  [
+   "a sharing request through the researcher's university, with its written approval",
+   "a stated research purpose that is not for profit",
+   "only the minimum necessary fields (Lab 1.1 decisions)",
+   "disclosure risk reduced and measured first (Day 2)",
+   "a sharing agreement with retention and destruction terms"
+  ]
+ ],
+ "E3 district counts": [
+  true,
+  [
+   "published only after the counts below 10 are treated (Day 2)"
+  ]
+ ]
+}
