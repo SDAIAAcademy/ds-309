@@ -1,0 +1,12 @@
+{
+ "leaf=1": {
+  "copies_train": 0.9276,
+  "copies_holdout": 0.0008,
+  "closer_to_train": 0.9992
+ },
+ "leaf=200": {
+  "copies_train": 0.001,
+  "copies_holdout": 0.0005,
+  "closer_to_train": 0.5075
+ }
+}

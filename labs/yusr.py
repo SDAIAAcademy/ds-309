@@ -13,6 +13,7 @@ U.check(ok, m)    prints a tick, or raises AssertionError with the message
 U.wilson(k, n)    the 95% Wilson interval of k / n, as (low, high)
 U.classes(df, q)  the size of each record's equivalence class on the quasi-identifiers q
 U.out(lab)        a folder labs/artifacts/<lab>/ for what a lab writes
+U.plt(), U.show() matplotlib with the course defaults, and show() that is quiet outside a notebook
 """
 
 from __future__ import annotations
@@ -131,3 +132,34 @@ def _in_notebook() -> bool:
         return get_ipython() is not None
     except ImportError:
         return False
+
+
+def show():
+    """plt.show() in a notebook; nothing when the source runs as a script."""
+    if _in_notebook():
+        import matplotlib.pyplot as _plt
+        _plt.show()
+
+
+def generalise(df, b: int, p: int):
+    """The reference generalisation of Lab 2.1, used by its safety nets and by later labs."""
+    out = df.copy()
+    year = out["birth_date"].str[:4].astype(int)
+    if b == 0:
+        out["birth"] = out["birth_date"]
+    elif b == 1:
+        out["birth"] = year.astype(str)
+    else:
+        width = 5 if b == 2 else 10
+        lo = 1950 + ((year - 1950) // width) * width
+        out["birth"] = lo.astype(str) + "-" + (lo + width - 1).astype(str)
+    out["place"] = out[["postcode", "district", "region"][p]]
+    return out
+
+
+try:
+    import pandas as _pd
+    _pd.set_option("display.width", 160)
+    _pd.set_option("display.max_columns", 20)
+except ImportError:
+    pass
