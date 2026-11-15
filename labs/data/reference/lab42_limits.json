@@ -1,0 +1,8 @@
+{
+ "Out-of-scope uses": [
+  "declining an application without an officer's review",
+  "scoring applications for any other support programme",
+  "ranking applicants against each other for a fixed budget"
+ ],
+ "Caveats": "Trained on officers' historical decisions, not reviewed outcomes. Known biases: measurement bias in self-employed income, historical bias against family-home applicants, labelling bias in one office, evaluation bias in the original validation, and a feedback loop through auto-declines. Rates for groups with fewer than 30 eligible applicants are not estimated."
+}

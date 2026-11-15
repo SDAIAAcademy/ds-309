@@ -207,3 +207,17 @@ def ahliya_model():
     pre = ColumnTransformer([("num", StandardScaler(), AHLIYA_NUM),
                              ("cat", OneHotEncoder(handle_unknown="ignore"), AHLIYA_CAT)])
     return make_pipeline(pre, LogisticRegression(max_iter=2000, C=1.0))
+
+
+def saved(name: str):
+    """A result saved by an earlier lab's reference run (labs/data/reference/<name>.json), read without a message."""
+    return _decode(_json.loads((REF / f"{name}.json").read_text(encoding="utf-8")))
+
+
+def md_table(df) -> str:
+    """A DataFrame as a Markdown table, without extra packages."""
+    cols = list(df.columns)
+    lines = ["| " + " | ".join(map(str, cols)) + " |", "|" + "---|" * len(cols)]
+    for row in df.itertuples(index=False):
+        lines.append("| " + " | ".join("" if v is None or v != v else str(v).replace("|", "/") for v in row) + " |")
+    return "\n".join(lines)

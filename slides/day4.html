@@ -1,158 +1,389 @@
+<!-- ======================= OPENING ======================= -->
 <section class="slide title" id="title" data-auto="title">
-  <aside class="notes">REPLACE: welcome; introduce yourself; one question to the room that calibrates the pace; the rhythm of the day</aside>
+  <aside class="notes"><p>Day 4 turns the week's numbers into documents that someone else can check: a datasheet for the release, a model card for Ahliya, an impact assessment, and a review of a peer's result. Every lab starts from a supplied log or result, so nobody depends on yesterday's notebook. Start with the review checkpoint on Day 3.</p></aside>
 </section>
 
 <section class="slide" id="agenda" data-auto="agenda"></section>
 
-<!-- Session 1 -->
-
-<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
-
-<section class="slide" id="s1-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="review-day3" data-lo="LO5">
+  <div class="kicker">Review of Day 3</div>
+  <h2>Gender alone shows no gap. Is Ahliya fair?</h2>
+  <div class="quiz" data-type="single" data-lo="LO5">
+    <p class="lead">Anmar reports that eligible women and men are missed at 22.7% and 22.8%. He proposes to close the audit.</p>
+    <div class="opts">
+      <div class="opt" data-ok>Not shown: the intersection of gender and nationality must be checked too</div>
+      <div class="opt" data-why="Reads equal margins as equal treatment: a gap inside an intersection can cancel out in both margins">Yes: equal false negative rates by gender meet equal opportunity</div>
+      <div class="opt" data-why="Moves to a criterion the course did not choose: for support by need, the harm is the missed eligible applicant">No: the selection rates by gender must also be equal</div>
+      <div class="opt" data-why="Treats every slice as required: cells below the minimum of 30 eligible are reported as too few, not audited">Not until every region by gender by nationality cell is estimated</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Non-Saudi women are missed at 29.8%, which the gender margin hides.</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Answer A. D is the overcorrection: 23 of the 52 three-way cells are below 30 eligible applicants, so they are reported as too few to estimate. Today the intersection reappears in the model card's results table.</p></aside>
 </section>
 
-<section class="slide" id="s1-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<!-- ======================= SESSION 1 ======================= -->
+<section class="slide section" id="s1" data-auto="section" data-session="1"></section>
+
+<section class="slide" id="why-document" data-lo="LO6" data-label="Why">
+  <div class="kicker">What a recipient cannot see</div>
+  <h2>A file without its documentation invites the wrong use</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Waad receives 59,707 rows: she cannot see the <b>293 suppressed</b> records</li>
+      <li>She cannot see that income is <b>as recorded</b>, overstated for the self-employed</li>
+      <li>She cannot see that the officer decision is <b>historical</b>, not a reviewed outcome</li>
+    </ul>
+    <div class="card c-teal"><h4>The datasheet answers</h4><p class="small mb0">Why the data exist, what is in them, how they were made and treated, what risk remains, and what they must not be used for.</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <aside class="notes"><p>Gebru and colleagues, "Datasheets for Datasets" (2021), propose the questions; we use their sections plus two that a de-identified release needs. Ask: which of the three hidden facts would change Waad's conclusions most? The suppression falls on non-Saudi applicants in small regions, so a regional analysis of nationality is biased by the treatment itself.</p></aside>
+</section>
+
+<section class="slide" id="datasheet-sections" data-lo="LO6" data-label="Sections">
+  <div class="kicker">The sections</div>
+  <h2>Seven sections, two of them for de-identified data</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>Motivation</h4><p class="small mb0">Who asked, for what purpose, who approved.</p></div>
+    <div class="card c-teal flat"><h4>Composition</h4><p class="small mb0">Records, fields released and removed.</p></div>
+    <div class="card c-teal flat"><h4>Collection</h4><p class="small mb0">The source and what its fields really record.</p></div>
+    <div class="card c-coral flat"><h4>De-identification</h4><p class="small mb0">Risk before, treatment, risk after, utility.</p></div>
+    <div class="card c-coral flat"><h4>Residual risk</h4><p class="small mb0">What the treatment does not cover.</p></div>
+    <div class="card c-cyan flat"><h4>Uses and maintenance</h4><p class="small mb0">Allowed uses, forbidden uses, contact, code.</p></div>
+  </div>
+  <aside class="notes"><p>Composition, Collection, Uses and Maintenance follow Gebru and colleagues; De-identification and Residual risk are this course's additions, tied to the national anonymisation guideline, which treats pseudonymised data as personal data. Lab 4.1 checks that each section is present and not empty.</p></aside>
+</section>
+
+<section class="slide" id="from-the-log" data-lo="LO6" data-label="From the log">
+  <div class="kicker">Where the numbers come from</div>
+  <h2>Fill the datasheet from the release log, never from memory</h2>
+  <table class="t small">
+    <tr><th>Release log entry</th><th class="num">Value</th></tr>
+    <tr><td>Unique on birth date, gender and postcode, before</td><td class="num">59,458</td></tr>
+    <tr><td>Linkage success, before</td><td class="num">99.2%</td></tr>
+    <tr><td>Suppressed (rule: at most 1%)</td><td class="num">293</td></tr>
+    <tr><td>k after treatment · links claimed</td><td class="num">5 · 0</td></tr>
+    <tr><td>Largest change: mean income, Northern Borders</td><td class="num">-1.01%</td></tr>
+  </table>
+  <aside class="notes"><p>These are the values in data/release_log.json, written when the Day 2 release was made. A notebook rerun later may give different numbers if anything changed; the log records the run that was approved and released. Lab 4.1's check finds every number in the De-identification section and looks it up in the log.</p></aside>
+</section>
+
+<section class="slide" id="k-needs-context" data-lo="LO6" data-label="k = 5">
+  <div class="kicker">One number is not a guarantee</div>
+  <h2>"k = 5" means little without what it was measured on</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>The <b>quasi-identifiers</b>: birth band, gender, nationality, region</li>
+      <li>The <b>suppression</b>: 293 records, and who they were</li>
+      <li>What k does <b>not</b> cover: a class that shares one income or one disability value</li>
+    </ul>
+    <div class="card c-coral"><h4>Residual risks in the log</h4><p class="small mb0">Attribute disclosure in classes with one value; outside files holding other fields; suppression falling on non-Saudi applicants in small regions.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> A datasheet that says "anonymised" and stops there. The extract is still personal data and stays Restricted.</div>
+  <aside class="notes"><p>The Data Classification Policy puts personal data under Restricted; the extract was Restricted B before treatment, and treatment lowers the risk, not the class. The guideline's own examples of de-identification techniques (generalisation, aggregation, masking) are what Day 2 applied.</p></aside>
+</section>
+
+<section class="slide" id="cannot-rerun" data-lo="LO6" data-label="Cannot rerun">
+  <div class="kicker">The honest last section</div>
+  <h2>Name what a reader still cannot rerun, and why</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal flat"><h4>The treatment</h4><p class="small mb0">The source stays inside the fund. Acceptable: the code and seed 309 are named.</p></div>
+    <div class="card c-cyan flat"><h4>The linkage test</h4><p class="small mb0">Needs the register and the truth key, which the fund keeps for audit.</p></div>
+    <div class="card c-purple flat"><h4>The study codes</h4><p class="small mb0">Only the data protection officer holds the mapping, by design.</p></div>
+  </div>
+  <aside class="notes"><p>A reviewer accepts a limit that is stated with its reason; a limit discovered later reads as concealment. This list is task 5 of Lab 4.1. The stretch adds the distribution terms from the sharing agreement: research use only, no linkage, destruction after 24 months.</p></aside>
+</section>
+
+<section class="slide" id="check-datasheet" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>What must the residual risk section say?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">Malak's draft says: "k = 5 was reached, so the extract is anonymous and no risk remains." Yahya sends it back.</p>
+    <div class="opts">
+      <div class="opt" data-why="Moves the problem to a number: a larger k narrows linkage risk but still says nothing about classes that share one value">That k should be raised to 10 before release</div>
+      <div class="opt" data-why="Confuses documentation with access control: the agreement limits use, it does not remove the risk the datasheet must state">That the sharing agreement makes residual risk irrelevant</div>
+      <div class="opt" data-why="Reports the before-treatment figure as if it remained: no register record matched one record after treatment">That 99.2% of applicants can still be linked</div>
+      <div class="opt" data-ok>The risks k does not cover, and that the extract is still personal data</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> k limits singling out on the chosen quasi-identifiers only; attribute disclosure and other files remain, and the data stay Restricted.</div>
+  </div>
+  <aside class="notes"><p>Answer D. C catches participants who copy the before-treatment number into the after section; Lab 4.1's traceability check would accept it, because it is in the log, which is why a human still reads the datasheet.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-1" data-auto="lab" data-lab="4.1">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected: all seven sections present, every De-identification number found in the log, "the datasheet is complete and traceable". Show the check failing: type 290 suppressed records and rerun. Common error: formatting 0.992 as 99.2% and the check rejecting it; the helper accepts both a fraction and its percentage, so look for a rounding to 99%.</p></aside>
 </section>
 
-<!-- Session 2 -->
-
+<!-- ======================= SESSION 2 ======================= -->
 <section class="slide section" id="s2" data-auto="section" data-session="2"></section>
 
-<section class="slide" id="s2-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="card-sections" data-lo="LO6" data-label="Model card">
+  <div class="kicker">Mitchell and colleagues, 2019</div>
+  <h2>A model card tells a reviewer what the model is for and where it fails</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li><b>Model details</b> and <b>intended use</b></li>
+      <li><b>Metrics</b>: which, against what outcome</li>
+      <li><b>Quantitative analyses</b>: results by group, with intervals</li>
+      <li><b>Fairness</b>: the criterion, the mitigation, its cost</li>
+      <li><b>Out-of-scope uses</b> and <b>caveats</b></li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-teal"><h4>Ahliya today</h4><p class="small mb0">No card: only a validation report the audit could not reproduce.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Mitchell and colleagues, "Model Cards for Model Reporting" (2019). We keep their sections and add a Fairness section that records the Day 3 decision. The AI Ethics Principles ask for transparency and explainability at the Deploy and Monitor stage; a card is the document that carries it.</p></aside>
 </section>
 
-<section class="slide" id="s2-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="which-accuracy" data-lo="LO6" data-label="Which accuracy">
+  <div class="kicker">Metrics against the right outcome</div>
+  <h2>Report accuracy against what really happened, not against officers</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">88.1%</div><div class="lbl">validation report: agreement with officers in Riyadh and Makkah</div></div>
+    <div class="stat center"><div class="big">84.8%</div><div class="lbl">the card: against the reviewed outcome of 12,000 applications</div></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <div class="callout warn mt"><b>What goes wrong.</b> Copying the vendor's number into the card. It measured agreement with biased labels, in two regions.</div>
+  <aside class="notes"><p>From Lab 4.2: accuracy 84.8% on all 12,000 reviewed applications at threshold 0.5. Day 3's finding F4 was this evaluation bias. The card names the validation report's figure and says why it is not used, so a reader who has seen 88.1% elsewhere is not confused.</p></aside>
+</section>
+
+<section class="slide" id="results-table" data-lo="LO6" data-label="Results">
+  <div class="kicker">Quantitative analyses</div>
+  <h2>The results table includes the intersection, with counts and intervals</h2>
+  <table class="t small">
+    <tr><th>Group</th><th class="num">Eligible</th><th class="num">FNR</th><th class="num">95% interval</th></tr>
+    <tr><td>Women · Men</td><td class="num">2,413 · 3,928</td><td class="num">22.7% · 22.8%</td><td class="num">overlap</td></tr>
+    <tr class="hl"><td>Women, non-Saudi</td><td class="num">295</td><td class="num">29.8%</td><td class="num">24.9 to 35.3</td></tr>
+    <tr><td>Qassim</td><td class="num">282</td><td class="num">31.6%</td><td class="num">26.4 to 37.2</td></tr>
+    <tr><td>Men, non-Saudi</td><td class="num">216</td><td class="num">26.9%</td><td class="num">21.4 to 33.1</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 4.2's results_table, which repeats Lab 3.1 on the card's terms. Every row here has at least 30 eligible applicants; below that, the rate is left empty and the note says "too few to estimate", which is why the card stops at two attributes. A card that shows only gender would look fair; the checkpoint turns on that.</p></aside>
+</section>
+
+<section class="slide" id="card-fairness" data-lo="LO6" data-label="Fairness">
+  <div class="kicker">The fairness section</div>
+  <h2>State the criterion, the gap, the mitigation, and what it costs</h2>
+  <div class="prompt" data-tool="Model card, Fairness">Held to equal opportunity: equal false negative rates, because the harmful error is declining an eligible applicant. Largest group gap 12.9 points; group thresholds reduce it to 10.0 at the same accuracy, using gender and nationality, which needs approval. The lasting fix is verified income.</div>
+  <aside class="notes"><p>The paragraph is generated by Lab 4.2 from the Lab 3.4 reference comparison, so its numbers cannot drift from the audit. It contains the four things a reviewer needs: criterion and reason, size of the problem, the measure and its result, and its cost.</p></aside>
+</section>
+
+<section class="slide" id="out-of-scope" data-lo="LO6" data-label="Out of scope">
+  <div class="kicker">Limits</div>
+  <h2>Out-of-scope uses are the ones someone will try</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li>Declining an application <b>without an officer's review</b></li>
+      <li>Scoring applications for <b>another programme</b></li>
+      <li>Ranking applicants against each other for a <b>fixed budget</b></li>
+    </ul>
+    <div class="card c-coral"><h4>Caveats</h4><p class="small mb0">Trained on historical decisions. Measurement bias in self-employed income, historical bias on family homes, labelling bias in one office, a feedback loop through auto-declines.</p></div>
+  </div>
+  <aside class="notes"><p>Each caveat names a bias type from the national AI Bias Reference Guide, found on Day 3. The first out-of-scope use is the one in production today: 37.4% of applications were auto-declined below 0.2, finding F5. Ask the room which use a new manager would most likely try.</p></aside>
+</section>
+
+<section class="slide" id="check-card" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>A card that passes every section check</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">Anmar's card has all seven sections. Its results table shows gender and region, each with intervals. Wiam rejects it.</p>
+    <div class="opts">
+      <div class="opt" data-why="Asks for a figure the card already handles: the vendor's number is named and explained, not required">The card omits the validation report's 88.1%</div>
+      <div class="opt" data-why="Asks for more rows than the data support: small cells are reported as too few, not filled">It does not estimate every region by gender cell</div>
+      <div class="opt" data-ok>It hides the largest gap, which is in gender by nationality</div>
+      <div class="opt" data-why="Reads the absence of a fix as a defect of the card: the card records the mitigation, it does not have to close the gap">The gap is not closed, so the card cannot be filed</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Non-Saudi women are missed at 29.8%; margins by gender and region alone do not show it.</div>
+  </div>
+  <aside class="notes"><p>Answer C. Lab 4.2's check fails a card with no intersectional rows for this reason. D is worth a minute: documentation reports the state honestly, including a gap that remains.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-2" data-auto="lab" data-lab="4.2">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected: results by gender, nationality, gender by nationality and region; accuracy 84.8%; "the card passes". Common error: a group label containing a pipe breaks the Markdown table; the helper U.md_table replaces it. Participants who kept their own Lab 3.4 table can load it in place of the reference.</p></aside>
 </section>
 
-<!-- Session 3 -->
-
+<!-- ======================= SESSION 3 ======================= -->
 <section class="slide section" id="s3" data-auto="section" data-session="3"></section>
 
-<section class="slide" id="s3-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
-  <div class="cols cols-2">
-    <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
-    </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+<section class="slide" id="risk-cycle" data-lo="LO6" data-label="The cycle">
+  <div class="kicker">National AI Risk Management Framework</div>
+  <h2>Identify, assess, treat, monitor: and assess again after treatment</h2>
+  <div class="flow">
+    <div class="step c-teal"><b>1 · Identify</b>the risk, who is affected, the evidence</div>
+    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · Assess</b>likelihood × impact, a level and a band</div>
+    <div class="arrow frag" data-frag="c">→</div><div class="step c-amber frag" data-frag="c"><b>3 · Treat</b>avoid, mitigate, transfer or accept</div>
+    <div class="arrow frag" data-frag="d">→</div><div class="step c-coral frag" data-frag="d"><b>4 · Monitor</b>the residual risk, its owner, its reviewer</div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Press once per step. The framework (April 2026) sets the cycle and the scales. Our four risks come from the week: re-identification (Days 1 and 2), wrongful declines (Day 3), the dashboard budget (Day 2), and the synthetic file (Day 2). Identification is done for you in Lab 4.3, so the lab time goes to scoring.</p></aside>
 </section>
 
-<section class="slide" id="s3-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="risk-scales" data-lo="LO6" data-label="Scales">
+  <div class="kicker">The scales</div>
+  <h2>Two scores from 1 to 4, and their product is the level</h2>
+  <table class="t small">
+    <tr><th class="num">Score</th><th>Likelihood</th><th>Impact</th></tr>
+    <tr><td class="num">1</td><td>Rare</td><td>Low: limited, contained quickly</td></tr>
+    <tr><td class="num">2</td><td>Unlikely</td><td>Medium: tangible, contained in reasonable time</td></tr>
+    <tr><td class="num">3</td><td>Likely</td><td>High: substantial, needs an organisational response</td></tr>
+    <tr><td class="num">4</td><td>Almost certain</td><td>Catastrophic: severe, wide, possibly irreversible</td></tr>
+  </table>
+  <p class="small mt">Bands: 1 to 2 low · 3 to 6 medium · 8 to 12 high · 16 catastrophic.</p>
+  <aside class="notes"><p>Short forms of the framework's descriptions. Note that a level of 5, 7, 10, 11 or 13 to 15 cannot occur: products of 1 to 4 skip them. Likelihood is argued from exposure, the controls in place, how easily the harm happens, and precedents; impact from severity, breadth and reversibility.</p></aside>
+</section>
+
+<section class="slide" id="argue-from-evidence" data-lo="LO6" data-label="Evidence">
+  <div class="kicker">A score needs a reason</div>
+  <h2>Argue every score from a measured number</h2>
+  <div class="cols cols-2">
+    <div class="card c-coral"><h4>R2 · wrongful declines</h4><p class="small mb0">Likelihood 4: it is happening now, 30% of eligible non-Saudi women declined. Impact 3: support delayed or lost. <b>Level 12, high.</b></p></div>
+    <div class="card c-teal"><h4>R4 · the synthetic file</h4><p class="small mb0">Likelihood 2: only a regeneration with another setting copies rows. Impact 3: leaf one copied 92.8%. <b>Level 6, medium.</b></p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <div class="callout warn mt"><b>What goes wrong.</b> Scores by feeling, then adjusted until the table looks balanced. The register check in Lab 4.3 rejects a reason with no number in it.</div>
+  <aside class="notes"><p>The evidence lines are in data/risks.json and come from the week's reference runs. Ask a table to defend R2's likelihood at 3, then ask the room why measured harm is "almost certain". The answer is the checkpoint's.</p></aside>
+</section>
+
+<section class="slide" id="treat-residual" data-lo="LO6" data-label="Residual">
+  <div class="kicker">Treat and score again</div>
+  <h2>A treatment usually lowers the likelihood, not the impact</h2>
+  <table class="t small">
+    <tr><th>Risk</th><th class="num">Level</th><th>Treatment</th><th class="num">Residual</th></tr>
+    <tr><td>R1 re-identification</td><td class="num">9 high</td><td>k of five, agreement, destruction</td><td class="num">3</td></tr>
+    <tr class="hl"><td>R2 wrongful declines</td><td class="num">12 high</td><td>officer review, verified income</td><td class="num">6</td></tr>
+    <tr><td>R3 dashboard budget</td><td class="num">6</td><td>yearly ledger, margins shown</td><td class="num">4</td></tr>
+    <tr><td>R4 synthetic file</td><td class="num">6</td><td>leakage tests as a release gate</td><td class="num">3</td></tr>
+  </table>
+  <aside class="notes"><p>From the Lab 4.3 reference run. R2 stays medium: review makes a wrong score less likely to become a wrong decision, but a wrongly declined applicant is harmed exactly as before. Lowering the impact to make the residual look low is the most common error in real registers.</p></aside>
+</section>
+
+<section class="slide" id="human-reviewer" data-lo="LO6" data-label="Reviewer">
+  <div class="kicker">Who signs</div>
+  <h2>Every risk has an owner; every high risk also has a human reviewer</h2>
+  <div class="cols cols-2">
+    <ul class="bullets">
+      <li><b>Owner</b>: runs the treatment and reports on it</li>
+      <li><b>Reviewer</b>: independent of the owner, signs the residual risk</li>
+      <li>At Yusr: R1 and R2 go to <b>Wiam Al-Mutairi</b>, internal audit</li>
+    </ul>
+    <div class="card c-purple"><h4>Accepting a high risk</h4><p class="small mb0">Not a data scientist's decision. The register check rejects "accept" on a high band.</p></div>
+  </div>
+  <aside class="notes"><p>The course entry requires a human reviewer for high risks; the framework's escalation supports it. Owners in the reference: Yahya Al-Qahtani for R1 and R3, Bashayer Al-Otaibi for R2, Malak Al-Harbi for R4. The stretch adds R5, the feedback loop.</p></aside>
+</section>
+
+<section class="slide" id="check-likelihood" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>How likely is a harm that is already happening?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">Malak scores R2's likelihood as 2, "unlikely", because officers can overturn Ahliya. The audit measured 1,444 of 6,341 eligible applicants declined by the screen.</p>
+    <div class="opts">
+      <div class="opt" data-why="Counts a control that is not in place: 37.4% of applications are auto-declined and never seen by an officer">2 is right, since officers review every decision</div>
+      <div class="opt" data-ok>4: the harm is measured now, without an effective control</div>
+      <div class="opt" data-why="Lowers the likelihood because the impact is high: the two scores are argued separately">3, so that the level does not reach the catastrophic band</div>
+      <div class="opt" data-why="Scores on fairness instead of harm: likelihood asks how probable the harm is, not whether groups differ">1, because the gender gap is only 0.1 points</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> Likelihood is argued from exposure and the controls in place; the harm is already measured and auto-declines bypass review.</div>
+  </div>
+  <aside class="notes"><p>Answer B. Even at 4, R2 reaches 12, not 16: the band is high, so C's worry is misplaced. D mixes the gender margin with the risk: the harm is the missed eligible applicant, whoever they are.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-3" data-auto="lab" data-lab="4.3">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected levels 9, 12, 6, 6; residuals 3, 6, 4, 3; reviewers on R1 and R2; "the register passes". Disagreement on a score is fine if it is argued from the evidence; let two tables compare R3. Common error: a residual above the initial level after choosing "transfer", which the check catches.</p></aside>
 </section>
 
-<!-- Session 4 -->
-
+<!-- ======================= SESSION 4 ======================= -->
 <section class="slide section" id="s4" data-auto="section" data-session="4"></section>
 
-<section class="slide" id="s4-idea" data-lo="LO6">
-  <div class="kicker">REPLACE: the question this slide answers</div>
-  <h2>REPLACE: one idea, stated as a sentence</h2>
+<section class="slide" id="rerun-evidence" data-lo="LO6" data-label="Rerun">
+  <div class="kicker">Reproducibility as evidence</div>
+  <h2>A result counts when someone else can rerun it and get the same number</h2>
   <div class="cols cols-2">
     <ul class="bullets">
-      <li>REPLACE: at most six bullets, each a complete thought</li>
-      <li>REPLACE: bold the key phrase; numbers come from the lab run, not from memory</li>
+      <li>The <b>code</b> and the <b>data</b>, as used</li>
+      <li>A <b>pinned environment</b>: uv.lock in this course</li>
+      <li>Every <b>seed</b>, every threshold, every filter</li>
+      <li>A <b>log</b> of the run that was reported</li>
     </ul>
-    <div class="card c-teal"><h4>In the case study</h4><p class="small mb0">REPLACE: tie the idea to the case study and its data</p></div>
+    <div class="card c-teal"><h4>The capstone</h4><p class="small mb0">The assessor picks a slice and you recompute one disparity live, from your repository.</p></div>
   </div>
-  <div class="callout warn mt"><b>What goes wrong.</b> REPLACE: the failure participants will hit, and how to recognise it</div>
-  <aside class="notes">REPLACE: what to say, the demo to run, the question to ask the room, the common failure and its fix</aside>
+  <aside class="notes"><p>Reproducibility is the 10% criterion of the capstone rubric, but it underpins the other 90%: an audit nobody can rerun is an opinion. This course pins its environment with uv.lock and seeds every random step with 309.</p></aside>
 </section>
 
-<section class="slide" id="s4-steps" data-lo="LO6">
-  <div class="kicker">Step by step</div>
-  <h2>REPLACE: a process, shown one step per key press</h2>
-  <div class="flow">
-    <div class="step c-teal"><b>1 · REPLACE: name</b>REPLACE: what happens first</div>
-    <div class="arrow frag" data-frag="b">→</div><div class="step c-cyan frag" data-frag="b"><b>2 · REPLACE: name</b>REPLACE: the next piece</div>
-    <div class="arrow frag" data-frag="c">→</div><div class="step c-coral frag" data-frag="c"><b>3 · REPLACE: name</b>REPLACE: the result</div>
+<section class="slide" id="peer-claim" data-lo="LO6" data-label="The claim">
+  <div class="kicker">Lab 4.4, the peer's result</div>
+  <h2>"Ahliya misses eligible men more often than eligible women"</h2>
+  <div class="cols cols-2">
+    <div class="stat center"><div class="big">15.7% · 18.6%</div><div class="lbl">claimed FNR, women · men; gap -2.9 points</div></div>
+    <div class="card c-amber"><h4>The README says</h4><p class="small mb0">"I used Ahliya's threshold and the scored test set. The interval is a bootstrap."</p></div>
   </div>
-  <div class="callout tip mt frag"><b>Takeaway.</b> REPLACE: the one sentence to remember</div>
-  <aside class="notes">Press once per step and say what each step adds before the next one appears. REPLACE: the example to walk through</aside>
+  <p class="small mt">The code reproduces the claim exactly. Day 3 found 22.7% and 22.8%.</p>
+  <aside class="notes"><p>A participant of an earlier cohort, kept as handed in (data/peer). Running it gives the claimed numbers, which is where many reviews stop. Ask the room: the code runs and the numbers match; what is left to check? Then read the script together for two minutes.</p></aside>
+</section>
+
+<section class="slide" id="choices-move" data-lo="LO6" data-label="Choices">
+  <div class="kicker">What the README does not say</div>
+  <h2>Two undocumented choices; one of them flips the sign</h2>
+  <table class="t small">
+    <tr><th>Threshold</th><th>Missing income</th><th class="num">Rows</th><th class="num">Gap, women minus men</th></tr>
+    <tr><td>0.45 (peer)</td><td>dropped (peer)</td><td class="num">11,367</td><td class="num">-2.9 pts</td></tr>
+    <tr><td>0.45</td><td>kept</td><td class="num">12,000</td><td class="num">+0.6 pts</td></tr>
+    <tr><td>0.5</td><td>dropped</td><td class="num">11,367</td><td class="num">-3.7 pts</td></tr>
+    <tr class="hl"><td>0.5 (deployed)</td><td>kept</td><td class="num">12,000</td><td class="num">-0.2 pts</td></tr>
+  </table>
+  <aside class="notes"><p>From Lab 4.4's variants. The filter drops 633 rows, 65% of them women against 34% overall, and many are eligible applicants Ahliya misses. The README's "Ahliya's threshold" is wrong: the code uses 0.45. A third gap: the bootstrap has no seed, so the interval changes on each run.</p></aside>
+</section>
+
+<section class="slide" id="useful-gap" data-lo="LO6" data-label="Record">
+  <div class="kicker">Recording a gap</div>
+  <h2>A useful gap says where, by how much, and what to write</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-coral flat"><h4>Where</h4><p class="small mb0">load(), the notna() filter.</p></div>
+    <div class="card c-amber flat"><h4>Effect</h4><p class="small mb0">Gap -2.9 with the filter, +0.6 without it.</p></div>
+    <div class="card c-teal flat"><h4>Fix</h4><p class="small mb0">Keep the rows, or state the filter and who it removes.</p></div>
+  </div>
+  <div class="callout warn mt"><b>What goes wrong.</b> "Results not reproducible." True, and of no use to the author.</div>
+  <aside class="notes"><p>Lab 4.4 records four gaps in these columns: the filter, the threshold, the seed, and the missing versions. The check requires at least three, with a number in the ones that move the result. The tone is a colleague's, not an examiner's: the author fixes what the review names.</p></aside>
+</section>
+
+<section class="slide" id="corrected" data-lo="LO6" data-label="Corrected">
+  <div class="kicker">The corrected result</div>
+  <h2>On all rows at 0.5, no gender gap: the claim does not hold</h2>
+  <div class="prompt" data-tool="Review, corrected result">On all 12,000 reviewed applications at Ahliya's threshold of 0.5, the false negative rate is 0.227 for women and 0.228 for men (gap -0.002, 95% bootstrap interval -0.020 to +0.018, seed 309).</div>
+  <aside class="notes"><p>Printed by Lab 4.4. The interval includes zero. The audit's real gap, non-Saudi women, is invisible at this margin in both versions. The capstone review asks for the same: a stated result, the choices it rests on, and a seed.</p></aside>
+</section>
+
+<section class="slide" id="check-review" data-lo="LO6">
+  <div class="kicker">Checkpoint</div>
+  <h2>Which gap explains the different number?</h2>
+  <div class="quiz" data-type="single" data-lo="LO6">
+    <p class="lead">A peer reports an FNR gap of -2.9 points; your rerun on all rows at 0.5 gives -0.2. The bootstrap is unseeded, the threshold is 0.45, and 633 rows with missing income are dropped.</p>
+    <div class="opts">
+      <div class="opt" data-ok>The dropped rows: removing them alone takes the gap from +0.6 to -2.9</div>
+      <div class="opt" data-why="Blames the visible randomness: an unseeded bootstrap moves the interval, not the point estimate">The unseeded bootstrap, because each run differs</div>
+      <div class="opt" data-why="Picks the documented mismatch: at all rows, 0.45 against 0.5 moves the gap by under one point">The threshold of 0.45, because it differs from the documented 0.5</div>
+      <div class="opt" data-why="Assumes environments explain differences: the same code on the same data reproduced the claim exactly">A different pandas version on the peer's machine</div>
+    </div>
+    <div class="callout tip why"><b>Why.</b> At the peer's threshold, keeping the rows gives +0.6; dropping them gives -2.9, because they are mostly women Ahliya misses.</div>
+  </div>
+  <aside class="notes"><p>Answer A. C is the gap participants find first, since it contradicts the README; it matters for documentation but barely moves this number. Measuring each choice separately is what the variants table is for.</p></aside>
 </section>
 
 <section class="slide lab" id="lab-4-4" data-auto="lab" data-lab="4.4">
-  <aside class="notes">REPLACE: what to watch for while participants work, the typical problems, and the fallback for anyone who did not finish an earlier lab</aside>
+  <aside class="notes"><p>Expected: the peer's code gives 0.157, 0.186, -0.029; variants as on the Choices slide; corrected -0.002 with interval -0.020 to +0.018. The two unseeded interval runs printed in task 1 differ: point at them. For the stretch, pairs swap a Day 2 or Day 3 notebook with only its README.</p></aside>
 </section>
 
-<section class="slide" id="wrap-up">
-  <div class="kicker">Day 4 · wrap-up</div>
-  <h2>Three things to keep</h2>
-  <div class="cols cols-3">
-    <div class="card c-teal"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-coral"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
-    <div class="card c-purple"><h4>Remember</h4><p class="small mb0">REPLACE: one idea participants keep</p></div>
+<!-- ======================= CLOSE ======================= -->
+<section class="slide" id="wrap-up" data-label="Wrap-up">
+  <div class="kicker">Day 4 · Three things to keep</div>
+  <h2>Write from the log, score from the evidence, rerun before you believe</h2>
+  <div class="cols cols-3 gap-s">
+    <div class="card c-teal"><h4>From the log</h4><p class="small mb0">Datasheet and card numbers trace to the approved run, with their limits stated.</p></div>
+    <div class="card c-coral"><h4>From the evidence</h4><p class="small mb0">Likelihood and impact argued from measured numbers; a reviewer for every high risk.</p></div>
+    <div class="card c-purple"><h4>Rerun</h4><p class="small mb0">A filter nobody documented flipped a peer's conclusion.</p></div>
   </div>
+  <aside class="notes"><p>The four artifacts of today (datasheet, model card, risk register, review gaps) are the shape of the capstone pack. Ask each participant which of their own Day 2 or Day 3 results they would least like a peer to rerun, and why.</p></aside>
 </section>
 
 <section class="slide dark" id="next" data-label="Next">
-  <div class="kicker">Next</div>
-  <h2>Capstone: Capstone project presentations</h2>
-  <p class="lead">REPLACE: what participants prepare before then; unfinished labs can be finished at home</p>
-  <aside class="notes">REPLACE: accounts, installs or reading participants need before the next unit</aside>
+  <div class="kicker">Next · Capstone</div>
+  <h2>The release pack for the Sabeel Scholarship Fund</h2>
+  <ul class="bullets">
+    <li>A treated extract with its release log</li>
+    <li>A fairness audit with intervals, a datasheet, a model card and an impact assessment</li>
+    <li>A public repository whose README says how to rerun every number</li>
+    <li>Ten minutes: the assessor picks a slice and you recompute one disparity live</li>
+  </ul>
+  <aside class="notes"><p>The case brief and data are in labs/capstone. Reuse the week's notebooks: the methods carry over, the numbers do not. Commit as you go; the history is part of the evidence.</p></aside>
 </section>

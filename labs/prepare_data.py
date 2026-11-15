@@ -284,7 +284,7 @@ def main():
         return float((~p[pos]).mean())
     f_w = fnr(peer[peer["gender"] == "F"], pp[peer["gender"] == "F"])
     f_m = fnr(peer[peer["gender"] == "M"], pp[peer["gender"] == "M"])
-    claims = {"author": "a participant of an earlier cohort", "claim": "Ahliya misses eligible women more often than eligible men",
+    claims = {"author": "a participant of an earlier cohort", "claim": "Ahliya misses eligible men more often than eligible women",
               "fnr_women": round(f_w, 3), "fnr_men": round(f_m, 3), "gap": round(f_w - f_m, 3),
               "interval": "bootstrap, 200 resamples", "data": "data/ahliya_scored_test.csv"}
     (DATA / "peer").mkdir(exist_ok=True)

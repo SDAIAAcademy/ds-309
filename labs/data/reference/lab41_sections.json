@@ -1,0 +1,9 @@
+{
+ "Motivation": "Released for Waad Al-Shehri, through her university's research office. Purpose: How household size and income relate to approval, by region. Approved by Yahya Al-Qahtani, data protection officer.",
+ "Composition": "59,707 records, one per application. Fields: study code, birth (five-year band), gender, nationality, region, household size, employment, monthly income, disability in household, social security, officer decision. No direct identifier is included. Removed: national identifier, name, mobile, e-mail, birth date, postcode, district, case note, tenure, rent, application date, office.",
+ "Collection": "Drawn from the Applicant table, 60,000 synthetic applications of 2023 to 2026. The officer decision is the historical decision, not a reviewed outcome, and income is as recorded, which overstates self-employed income.",
+ "De-identification": "Before treatment 59,458 records were unique on birth date, gender and postcode, and a linkage test re-identified 99.2% of applicants in a public register. Birth was generalised to a five-year band and place to the region; 293 records were suppressed (at most 1% of records). After treatment k = 5 and the linkage test claimed 0 links. The largest change in a key statistic was -1.01% (mean income, Northern Borders).",
+ "Residual risk": "The extract is still personal data and stays Restricted. Remaining risks: attribute disclosure in classes that share one value; outside files holding other fields; suppression falls on non-Saudi applicants in small regions.",
+ "Uses": "For the stated research question only. Not for decisions about individuals, and not for linking with other files.",
+ "Maintenance": "Release of 2026-11-01; reproducible from labs/_src/D2_1_reach_k_least.py and labs/prepare_data.py, seed 309. Questions to the data protection officer."
+}
