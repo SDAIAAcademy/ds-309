@@ -185,7 +185,7 @@
     {
       "id": "q-privacy-07",
       "type": "single",
-      "prompt": "To reach k = 5, node (a) uses five-year birth bands and region and suppresses 293 records; node (b) uses ten-year bands and region and suppresses 41. The study asks how approval varies with age. What do you choose and report?",
+      "prompt": "To reach k = 5, node (a) uses five-year birth bands and region and suppresses 293 records; node (b) uses ten-year bands and region and suppresses 84. The study asks how approval varies with age. What do you choose and report?",
       "options": [
         "(b), because fewer suppressed records always means more utility",
         "(a), without mentioning the suppressed records, since k is met",

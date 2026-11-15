@@ -430,7 +430,7 @@ avg_risk = (1 / sizes).mean()</code></pre>
     <p class="lead">Release B and release C both have k = 1. B has 2,152 unique records and C has 7. Yahya asks whether they are equally risky. What do you tell him?</p>
     <div class="opts">
       <div class="opt" data-why="Reads k as the whole story: k is only the smallest class, so it hides how many people are exposed">Yes: both have k = 1, so both expose someone</div>
-      <div class="opt" data-why="Thinks more fields mean more safety: each extra quasi-identifier splits classes and raises the risk">B is safer because it keeps more fields</div>
+      <div class="opt" data-why="Confuses detail kept for the analysis with protection: finer birth and place values split classes and raise the risk">B is safer because its birth year and district are more precise</div>
       <div class="opt" data-ok>C is far safer, but neither meets k of five until the small classes are treated</div>
       <div class="opt" data-why="Treats seven people as negligible: each of them is certainly re-identified by anyone who knows them">C is safe to release as it is, since seven records is negligible</div>
     </div>

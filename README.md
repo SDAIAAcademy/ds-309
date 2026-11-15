@@ -95,6 +95,16 @@ The case brief and its synthetic data are in [`labs/capstone/`](labs/capstone/RE
 | Impact assessment | 20 |
 | Reproducibility | 10 |
 
+## Assessment
+
+| Part | Share of the mark |
+|---|---|
+| Supervised AI-off check on privacy controls, disclosure risk and fairness metrics | 20% |
+| Capstone release pack, scored on the rubric above | 60% |
+| Live review: recomputing a disparity on a slice the assessor selects | 20% |
+
+To pass: 70% overall and at least 60% on the capstone rubric. Authenticity rests on the release log and the commit history, and on the live rerun of one privacy or fairness result on a slice the assessor chooses. The certificate is a completion certificate with assessed work.
+
 ## Prerequisites
 
 - DS-204 Machine Learning for Tabular Data: Baselines and Validation
